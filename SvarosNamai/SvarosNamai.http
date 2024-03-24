@@ -1,0 +1,6 @@
+@SvarosNamai_HostAddress = http://localhost:5072
+
+GET {{SvarosNamai_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
