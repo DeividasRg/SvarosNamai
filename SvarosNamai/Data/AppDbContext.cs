@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using SvarosNamai.Service.ProductAPI.Models;
 
-namespace SvarosNamai.Service.OrderAPI
+namespace SvarosNamai.Service.ProductAPI.Data
 {
 	public class AppDbContext : DbContext
 	{
