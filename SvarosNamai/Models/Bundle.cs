@@ -8,11 +8,10 @@ namespace SvarosNamai.Service.ProductAPI.Models
     {
         [Key]
         public int BundleId { get; set; }
-        public string BundleName {  get; set; }
+        [Required]
+        public string BundleName { get; set; }
+        [Range(1,100)]
         public double Price { get; set; }
         public double? Discount { get; set; }
-        public string Description { get; set; } 
-        
-        public IEnumerable<ServiceBundle> ServicesInBundle { get; set;}
     }
 }
