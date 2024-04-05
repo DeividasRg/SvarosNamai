@@ -31,7 +31,18 @@ namespace SvarosNamai.Service.ProductAPI.Controllers
         [HttpGet("GetBundles")]
         public ResponseDto GetBundles()
         {
-            _response.Result = _mapper.Map<IEnumerable<Bundle>>(_db.Bundles.ToList());
+            var bundles = _mapper.Map<IEnumerable<Bundle>>(_db.Bundles.ToList());
+            foreach(var bundle in bundles) 
+            {
+                var productIds = _db.ProductBundle
+                        .Where(u => u.BundleId == bundle.BundleId)
+                        .Select(u => u.ProductId)
+                        .ToList();
+
+                bundle.Products = _db.Products
+                    .Where(u => productIds.Contains(u.ProductId));
+            }
+            _response.Result = bundles;
             return _response;
         }
 
@@ -194,5 +205,75 @@ namespace SvarosNamai.Service.ProductAPI.Controllers
             }
             return _response;
         }
+
+        [HttpDelete("RemoveProductFromBundle/{id}")]
+        public async Task<ResponseDto> RemoveProductFromBundle(int id)
+        {
+            var check = await _db.ProductBundle.FindAsync(id);
+            if(check != null)
+            {
+                _db.ProductBundle.Remove(check);
+                _db.SaveChanges();
+                return _response;
+            }
+            else
+            {
+                _response.IsSuccess = false;
+                _response.Message = "id does not exist";
+                return _response;
+            }
+        }
+        [HttpDelete("DeleteProduct/{id}")]
+        public async Task<ResponseDto> DeleteProduct(int id)
+        {
+            var check = await _db.Products.FindAsync(id);
+            if (check != null)
+            {
+                var bundleCheck = await _db.ProductBundle.AnyAsync(u => u.ProductId == id);
+                if (bundleCheck == false)
+                {
+                    _db.Products.Remove(check);
+                    _db.SaveChanges();
+                }
+                else
+                {
+                    _response.IsSuccess = false;
+                    _response.Message = "Product is assigned to a bundle";
+                }
+            }
+            else
+            {
+                _response.IsSuccess= false;
+                _response.Message = "Product doesn't exist";
+            }
+            return _response;
+        }
+        [HttpDelete("DeleteBundle/{id}")]
+        public async Task<ResponseDto> DeleteBundle(int id)
+        {
+            var check = await _db.Bundles.FindAsync(id);
+            if (check != null)
+            {
+                var bundleCheck = await _db.ProductBundle.AnyAsync(u => u.BundleId == id);
+                if (bundleCheck == false)
+                {
+                    _db.Bundles.Remove(check);
+                    _db.SaveChanges();
+                }
+                else
+                {
+                    _response.IsSuccess = false;
+                    _response.Message = "Bundle has assigned products";
+                }
+            }
+            else
+            {
+                _response.IsSuccess = false;
+                _response.Message = "Bundle doesn't exist";
+            }
+            return _response;
+        }
+
+
     }
 }
