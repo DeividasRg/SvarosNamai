@@ -10,9 +10,7 @@ namespace SvarosNamai.Service.ProductAPI.Models
     {
         [Key]
         public int ProductBundleId { get; set; }
-        [ForeignKey("BundleId")]
-        public Bundle Bundle { get; set; }
-        [ForeignKey("ProductId")]
-        public Product Product { get; set; }
+        public int BundleId { get; set; }
+        public int ProductId { get; set; }
     }
 }

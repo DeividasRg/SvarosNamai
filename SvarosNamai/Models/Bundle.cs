@@ -3,6 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace SvarosNamai.Service.ProductAPI.Models
 {
@@ -16,6 +17,8 @@ namespace SvarosNamai.Service.ProductAPI.Models
         public double Price { get; set; }
         public double? Discount { get; set; }
         public DateTime DateCreated { get; set; }
-        public DateTime? DateUpdated { get; set; }   
+        public DateTime? DateUpdated { get; set; }
+        [ForeignKey("ProductBundleId")]
+        public ProductBundle ProductBundle { get; set; }
     }
 }

@@ -8,7 +8,7 @@ namespace SvarosNamai.Service.ProductAPI.Models.Dtos
 {
     public class ProductBundleDto
     {
-        public Bundle Bundle { get; set; }
-        public IEnumerable<Product> Products { get; set; }
+        public int BundleId { get; set; }
+        public List<int> ProductIds { get; set; }
     }
 }

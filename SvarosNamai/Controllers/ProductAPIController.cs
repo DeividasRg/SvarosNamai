@@ -145,23 +145,38 @@ namespace SvarosNamai.Service.ProductAPI.Controllers
         {
             try
             {
-                var bundleIdFromDB = _db.ProductBundle.AsNoTracking().FirstOrDefault(u => u.Bundle.BundleId == productBundle.Bundle.BundleId);
-                if (bundleIdFromDB != null)
+                var bundleIdCheck =  await _db.Bundles.FirstOrDefaultAsync(u => u.BundleId == productBundle.BundleId);
+                if (bundleIdCheck != null)
                 {
-                   foreach(var produkt in productBundle.Products) 
+
+                    foreach (var produkt in productBundle.ProductIds)
                     {
-                        if (!_db.ProductBundle.Any(u => u.Product.ProductId == produkt.ProductId && u.Bundle.BundleId == productBundle.Bundle.BundleId))
+                        var productCheck = await _db.Products.FirstOrDefaultAsync(u => u.ProductId == produkt);
+                        if (productCheck != null)
                         {
-                            ProductBundle bundleToDb = new ProductBundle()
+                            if (!_db.ProductBundle.Any(u => u.ProductId == produkt && u.BundleId == productBundle.BundleId))
                             {
-                                Bundle = productBundle.Bundle,
-                                Product = produkt
-                            };
-                            _db.ProductBundle.Add(bundleToDb);
-                           await _db.SaveChangesAsync();
+                                ProductBundle bundleToDb = new ProductBundle()
+                                {
+                                    BundleId = productBundle.BundleId,
+                                    ProductId = produkt
+                                };
+                                _db.ProductBundle.Add(bundleToDb);
+                            }
+                        }
+                        else
+                        {
+                            _response.Message = $"Product with the id {produkt} does not exist";
+                            break;
                         }
                     }
+                    await _db.SaveChangesAsync();
                 }
+                else
+                {
+                    _response.Message = "Bundle does not exist";
+                }
+                
             }
             catch (Exception ex)
             {
