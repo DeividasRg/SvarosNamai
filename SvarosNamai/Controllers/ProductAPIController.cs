@@ -50,6 +50,15 @@ namespace SvarosNamai.Service.ProductAPI.Controllers
                 Bundle bundle = _db.Bundles.FirstOrDefault(u => u.BundleId == bundleId);
                 if(bundle != null) 
                 {
+                    var productIds = _db.ProductBundle
+                        .Where(u=> u.BundleId == bundleId)
+                        .Select(u => u.ProductId)
+                        .ToList();
+
+                    bundle.Products = _db.Products
+                        .Where(u => productIds.Contains(u.ProductId));
+
+
                     _response.Result = bundle;
                     _response.Message = "Successfully Retrieved";
                     return _response;

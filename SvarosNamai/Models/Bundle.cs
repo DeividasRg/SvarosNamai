@@ -18,7 +18,7 @@ namespace SvarosNamai.Service.ProductAPI.Models
         public double? Discount { get; set; }
         public DateTime DateCreated { get; set; }
         public DateTime? DateUpdated { get; set; }
-        [ForeignKey("ProductBundleId")]
-        public ProductBundle ProductBundle { get; set; }
+        
+        public IEnumerable<Product> Products { get; set;}
     }
 }
