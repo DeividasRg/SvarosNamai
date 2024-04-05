@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SvarosNamai.Service.ProductAPI.Data;
 
@@ -11,9 +12,11 @@ using SvarosNamai.Service.ProductAPI.Data;
 namespace SvarosNamai.Service.ProductAPI.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240405072331_addDates")]
+    partial class addDates
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -34,7 +37,7 @@ namespace SvarosNamai.Service.ProductAPI.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("DateCreated")
+                    b.Property<DateTime?>("DateCreated")
                         .HasColumnType("datetime2");
 
                     b.Property<DateTime?>("DateUpdated")
@@ -59,11 +62,8 @@ namespace SvarosNamai.Service.ProductAPI.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ProductId"));
 
-                    b.Property<DateTime>("DateCreated")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime?>("DateUpdated")
-                        .HasColumnType("datetime2");
+                    b.Property<int>("BundleId")
+                        .HasColumnType("int");
 
                     b.Property<string>("Description")
                         .IsRequired()
@@ -75,33 +75,12 @@ namespace SvarosNamai.Service.ProductAPI.Migrations
 
                     b.HasKey("ProductId");
 
+                    b.HasIndex("BundleId");
+
                     b.ToTable("Products");
                 });
 
-            modelBuilder.Entity("SvarosNamai.Service.ProductAPI.Models.ProductBundle", b =>
-                {
-                    b.Property<int>("ProductBundleId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ProductBundleId"));
-
-                    b.Property<int>("BundleId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("ProductId")
-                        .HasColumnType("int");
-
-                    b.HasKey("ProductBundleId");
-
-                    b.HasIndex("BundleId");
-
-                    b.HasIndex("ProductId");
-
-                    b.ToTable("ProductBundle");
-                });
-
-            modelBuilder.Entity("SvarosNamai.Service.ProductAPI.Models.ProductBundle", b =>
+            modelBuilder.Entity("SvarosNamai.Service.ProductAPI.Models.Product", b =>
                 {
                     b.HasOne("SvarosNamai.Service.ProductAPI.Models.Bundle", "Bundle")
                         .WithMany()
@@ -109,15 +88,7 @@ namespace SvarosNamai.Service.ProductAPI.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("SvarosNamai.Service.ProductAPI.Models.Product", "Product")
-                        .WithMany()
-                        .HasForeignKey("ProductId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.Navigation("Bundle");
-
-                    b.Navigation("Product");
                 });
 #pragma warning restore 612, 618
         }

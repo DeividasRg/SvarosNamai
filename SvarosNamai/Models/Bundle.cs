@@ -1,4 +1,6 @@
-﻿using System.Collections;
+﻿using Microsoft.VisualBasic;
+using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
@@ -13,5 +15,7 @@ namespace SvarosNamai.Service.ProductAPI.Models
         [Range(1,100)]
         public double Price { get; set; }
         public double? Discount { get; set; }
+        public DateTime DateCreated { get; set; }
+        public DateTime? DateUpdated { get; set; }   
     }
 }

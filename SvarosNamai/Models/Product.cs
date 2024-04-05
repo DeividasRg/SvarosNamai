@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace SvarosNamai.Service.ProductAPI.Models
@@ -10,7 +11,7 @@ namespace SvarosNamai.Service.ProductAPI.Models
         [Required]
         public string Name { get; set; }
         public string Description { get; set; }
-        [ForeignKey("BundleId")]
-        public Bundle Bundle { get; set; }
+        public DateTime DateCreated { get; set; }
+        public DateTime? DateUpdated { get; set; }
     }
 }
