@@ -4,15 +4,11 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace SvarosNamai.Service.ProductAPI.Models
+namespace SvarosNamai.Service.ProductAPI.Models.Dtos
 {
-    public class ProductBundle
+    public class ProductBundleDto
     {
-        [Key]
-        public int ProductBundleId { get; set; }
-        [ForeignKey("BundleId")]
         public Bundle Bundle { get; set; }
-        [ForeignKey("ProductId")]
-        public Product Product { get; set; }
+        public IEnumerable<Product> Products { get; set; }
     }
 }

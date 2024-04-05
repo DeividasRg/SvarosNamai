@@ -141,11 +141,27 @@ namespace SvarosNamai.Service.ProductAPI.Controllers
         }
 
         [HttpPost("AddProductToBundle")]
-        public async Task<ResponseDto> AddProductToBundle(ProductBundle productBundle)
+        public async Task<ResponseDto> AddProductToBundle(ProductBundleDto productBundle)
         {
             try
             {
-
+                var bundleIdFromDB = _db.ProductBundle.AsNoTracking().FirstOrDefault(u => u.Bundle.BundleId == productBundle.Bundle.BundleId);
+                if (bundleIdFromDB != null)
+                {
+                   foreach(var produkt in productBundle.Products) 
+                    {
+                        if (!_db.ProductBundle.Any(u => u.Product.ProductId == produkt.ProductId && u.Bundle.BundleId == productBundle.Bundle.BundleId))
+                        {
+                            ProductBundle bundleToDb = new ProductBundle()
+                            {
+                                Bundle = productBundle.Bundle,
+                                Product = produkt
+                            };
+                            _db.ProductBundle.Add(bundleToDb);
+                           await _db.SaveChangesAsync();
+                        }
+                    }
+                }
             }
             catch (Exception ex)
             {
