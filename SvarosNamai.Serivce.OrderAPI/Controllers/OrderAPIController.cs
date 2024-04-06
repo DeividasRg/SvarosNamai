@@ -9,6 +9,7 @@ using SvarosNamai.Service.OrderAPI.Data;
 using SvarosNamai.Service.OrderAPI.Models.Dtos;
 using System;
 using System.Collections;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace SvarosNamai.Serivce.OrderAPI.Controllers
@@ -41,9 +42,8 @@ namespace SvarosNamai.Serivce.OrderAPI.Controllers
                 {
                     Order orderToDb = _mapper.Map<Order>(order);
                     orderToDb.CreationDate = DateTime.Now;
-                    orderToDb.Status = SD.Status_Approved;
                     await _db.Orders.AddAsync(orderToDb);
-                    
+
 
 
                     foreach (var product in bundleFromDb.Products)
@@ -54,14 +54,59 @@ namespace SvarosNamai.Serivce.OrderAPI.Controllers
                         await _db.OrderLines.AddAsync(orderline);
                         await _db.SaveChangesAsync();
                     }
-                    
+                    //Send An Email
 
 
-                    _response.Message = "OrderCreated";
+                    _response.Message = "Order Created";
 
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
+            {
+                _response.IsSuccess = false;
+                _response.Message = ex.Message;
+            }
+            return _response;
+        }
+
+
+        [HttpPut("OrderStatusChange")]
+        public async Task<ResponseDto> OrderStatusChange(int status, int orderId)
+        {
+            try
+            {
+                Order orderCheck = _db.Orders.Find(orderId);
+                if (orderCheck != null)
+                {
+                    int statusCheck = OrderStatusses.GetStatusConstant(status);
+                    if (statusCheck == 99)
+                    {
+                        _response.Message = "Not a valid status";
+                        _response.IsSuccess = false;
+                    }
+                    else if (statusCheck == orderCheck.Status)
+                    {
+                        _response.Message = "Order status is as submitted";
+                        _response.IsSuccess = false;
+                    }
+                    else
+                    {
+                        switch (status)
+                        {
+                            case OrderStatusses.Status_Approved:
+                                orderCheck.Status = OrderStatusses.Status_Approved;
+                                await _db.SaveChangesAsync();
+                                break;
+                            case OrderStatusses.Status_Cancelled:
+                                orderCheck.Status = OrderStatusses.Status_Cancelled;
+                                break;
+                            default:
+                                break;
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
             {
                 _response.IsSuccess = false;
                 _response.Message = ex.Message;

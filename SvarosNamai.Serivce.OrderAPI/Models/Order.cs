@@ -22,8 +22,9 @@ namespace SvarosNamai.Serivce.OrderAPI.Models
         public string LastName {  get; set; }
         [Required]
         public string PhoneNumber { get; set; }
+        public string Email { get; set; }
         public DateTime CreationDate { get; set; }
         public DateTime? CompletionDate { get; set; }
-        public string? Status { get; set; } = SD.Status_Pending;
+        public int? Status { get; set; } = OrderStatusses.Status_Pending;
     }
 }

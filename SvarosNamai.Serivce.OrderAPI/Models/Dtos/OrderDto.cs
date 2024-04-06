@@ -20,5 +20,7 @@ namespace SvarosNamai.Serivce.OrderAPI.Models
         public string LastName { get; set; }
         [Required]
         public string PhoneNumber { get; set; }
+        public string Email { get; set; }
+
     }
 }
