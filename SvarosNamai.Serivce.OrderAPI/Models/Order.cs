@@ -23,6 +23,7 @@ namespace SvarosNamai.Serivce.OrderAPI.Models
         [Required]
         public string PhoneNumber { get; set; }
         public string Email { get; set; }
+        public double Price { get; set; }
         public DateTime CreationDate { get; set; }
         public DateTime? CompletionDate { get; set; }
         public DateOnly OrderDate { get; set; }

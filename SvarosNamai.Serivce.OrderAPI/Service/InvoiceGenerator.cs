@@ -1,10 +1,14 @@
 ﻿using iText.Kernel.Pdf;
 using iText.Layout;
 using iText.Layout.Element;
+using iText.Layout.Properties;
+using SvarosNamai.Serivce.OrderAPI.Models;
 using SvarosNamai.Serivce.OrderAPI.Service.IService;
 using SvarosNamai.Service.OrderAPI.Data;
 using SvarosNamai.Service.OrderAPI.Models.Dtos;
 using System;
+using System.Collections;
+using System.Linq;
 using System.Reflection.Metadata;
 using System.Threading.Tasks;
 using Document = iText.Layout.Document;
@@ -31,27 +35,52 @@ namespace SvarosNamai.Serivce.OrderAPI.Service
         {
             try
             {
+                var order = _db.Orders.Find(orderId);
+                var orderlines = _db.OrderLines.Where(u => u.Order == order);
+                String path = @"C:\\Users\\deivi\\Desktop\\example.pdf";
+                PdfWriter writer = new PdfWriter(path);
+                PdfDocument pdf = new PdfDocument(writer);
+                Document document = new Document(pdf);
 
-                string outputPath = "C:\\Users\\deivi\\Desktop\\example.pdf";
+                Paragraph header = new Paragraph("Sąskaita faktūra")
+                .SetTextAlignment(TextAlignment.CENTER)
+                .SetFontSize(20);
+                document.Add(header);
+
+                Paragraph details = new Paragraph()
+                    .AddTabStops(new TabStop(100, TabAlignment.RIGHT))
+                    .Add("Date: ").Add(DateTime.Now.ToShortDateString()).Add("\n")
+                    .Add("Invoice #: ").Add($"SN - {orderId}").Add("\n")
+                    .Add("Customer: ").Add($"{order.Name} {order.LastName}").Add("\n")
+                    .Add("Address: ").Add($"{order.Street} {order.HouseNo}{order.HouseLetter}, {order.City}").Add("\n")
+                    .Add("Email: ").Add($"{order.Email}");
+                document.Add(details);
+
+                Table table = new Table(1)
+                    .UseAllAvailableWidth();
 
 
-                using (PdfWriter writer = new PdfWriter(outputPath))
+                Cell cell = new Cell().Add(new Paragraph("Paslauga"));
+                table.AddHeaderCell(cell);
+
+
+                foreach(var line in orderlines)
                 {
-                    using (PdfDocument pdf = new PdfDocument(writer))
-                    { 
-                        using(Document document = new Document(pdf)) 
-                        {
-                            Paragraph paragraph = new Paragraph("Hello, World!");
-                            document.Add(paragraph);
-                            document.Close();
-                        }
-                    }
+                    Cell productNameCell = new Cell().Add(new Paragraph(line.ProductName));
+                    table.AddCell(productNameCell);
                 }
 
-                _response.Message = "Pdf Created";
+
+                document.Add(table);
+
                 
+                Paragraph total = new Paragraph($"Total: {order.Price}")
+                    .SetTextAlignment(TextAlignment.RIGHT)
+                    .SetBold();
+                document.Add(total);
 
 
+                document.Close();
 
 
             }

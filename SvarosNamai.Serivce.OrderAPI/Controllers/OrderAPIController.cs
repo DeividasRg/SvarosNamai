@@ -44,6 +44,7 @@ namespace SvarosNamai.Serivce.OrderAPI.Controllers
                 {
                     Order orderToDb = _mapper.Map<Order>(order);
                     orderToDb.CreationDate = DateTime.Now;
+                    orderToDb.Price = bundleFromDb.Price;
                     await _db.Orders.AddAsync(orderToDb);
 
 
@@ -108,6 +109,20 @@ namespace SvarosNamai.Serivce.OrderAPI.Controllers
                                 break;
                             case OrderStatusses.Status_Cancelled:
                                 orderCheck.Status = OrderStatusses.Status_Cancelled;
+                                await _db.SaveChangesAsync();
+                                //Send Email explaining why
+                                break;
+                            case OrderStatusses.Status_Completed:
+                                var generateInvoice = await _invoice.GenerateInvoice(orderId);
+                                if (generateInvoice.IsSuccess)
+                                {
+                                    orderCheck.Status = OrderStatusses.Status_Completed;
+                                    await _db.SaveChangesAsync();
+                                }
+                                else
+                                {
+                                    break;
+                                }
                                 break;
                             default:
                                 break;
