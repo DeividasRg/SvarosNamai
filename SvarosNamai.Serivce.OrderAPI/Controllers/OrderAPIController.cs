@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using SvarosNamai.Serivce.OrderAPI.Models;
 using SvarosNamai.Serivce.OrderAPI.Service.IService;
 using SvarosNamai.Service.OrderAPI.Data;
 using SvarosNamai.Service.OrderAPI.Models.Dtos;
@@ -27,23 +28,10 @@ namespace SvarosNamai.Serivce.OrderAPI.Controllers
         }
 
 
-
-        [HttpGet]
-        public async Task<ResponseDto> GetBundle(int id)
+        [HttpPost("CreateOrder")]
+        public async Task<ResponseDto> CreateOrder(OrderDto order, int bundleId)
         {
-            try
-            {
-                _response.Result =  await _productService.GetBundle(id);
-            }
-            catch(Exception ex) 
-            {
-                _response.IsSuccess = false;
-                _response.Message = ex.Message;
-            }
-            return _response;
+
         }
-
-
-
     }
 }

@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using SvarosNamai.Serivce.OrderAPI.Models;
 
 
 namespace SvarosNamai.Service.OrderAPI
@@ -9,7 +10,7 @@ namespace SvarosNamai.Service.OrderAPI
         {
             var mappingConfig = new MapperConfiguration(config =>
             {
-
+                config.CreateMap<Order, OrderDto>().ReverseMap();
             });
             return mappingConfig;
         }

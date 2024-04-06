@@ -36,6 +36,35 @@ namespace SvarosNamai.Service.ProductAPI.Controllers
             return _response;
         }
 
+        [HttpGet("GetAllActiveBundles")]
+        public ResponseDto GetAllActiveBundles()
+        {
+            try
+            {
+                IEnumerable<Bundle> bundlesFromDB = _db.Bundles.Where(u => u.IsActive == true);
+                IEnumerable<BundleDto> bundleDtosFromDb = _mapper.Map<IEnumerable<BundleDto>>(bundlesFromDB);
+                foreach(var bundle in bundleDtosFromDb) 
+                {
+                    var productIds = _db.ProductBundle
+                    .Where(u => u.BundleId == bundle.BundleId)
+                    .Select(u => u.ProductId)
+                    .ToList();
+
+                    var productsUnmapped = _db.Products
+                        .Where(u => productIds.Contains(u.ProductId));
+
+                    bundle.Products = _mapper.Map<IEnumerable<ProductDto>>(productsUnmapped);
+                }
+                _response.Result = bundleDtosFromDb;
+            }
+            catch(Exception ex) 
+            {
+                _response.IsSuccess = false;
+                _response.Message = ex.Message; 
+            }
+            return _response;
+        }
+
         [HttpGet("GetBundle/{bundleId}")]
         public ResponseDto GetBundle(int bundleId)
         {
@@ -232,28 +261,29 @@ namespace SvarosNamai.Service.ProductAPI.Controllers
             }
             return _response;
         }
-        [HttpDelete("DeleteBundle/{id}")]
-        public async Task<ResponseDto> DeleteBundle(int id)
+
+
+        [HttpPut("BundleActivation")]
+        public async Task<ResponseDto> BundleActivation(int id)
         {
-            var check = await _db.Bundles.FindAsync(id);
-            if (check != null)
+            var bundle = await _db.Bundles.FindAsync(id);
+            if (bundle != null)
             {
-                var bundleCheck = await _db.ProductBundle.AnyAsync(u => u.BundleId == id);
-                if (bundleCheck == false)
+                if (bundle.IsActive == false)
                 {
-                    _db.Bundles.Remove(check);
-                    _db.SaveChanges();
+                    bundle.IsActive = true;
                 }
                 else
                 {
-                    _response.IsSuccess = false;
-                    _response.Message = "Bundle has assigned products";
+                    bundle.IsActive = false;
                 }
+                 await _db.SaveChangesAsync();
+                _response.Message = "Activation Successfully changed";
             }
             else
             {
                 _response.IsSuccess = false;
-                _response.Message = "Bundle doesn't exist";
+                _response.Message = "Bundle not found";
             }
             return _response;
         }

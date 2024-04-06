@@ -18,6 +18,8 @@ namespace SvarosNamai.Service.ProductAPI.Models
         public double? Discount { get; set; }
         public DateTime DateCreated { get; set; }
         public DateTime? DateUpdated { get; set; }
+        [Required]
+        public bool IsActive {  get; set; } = false;
        
     }
 }
