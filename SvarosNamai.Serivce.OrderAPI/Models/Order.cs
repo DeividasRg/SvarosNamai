@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SvarosNamai.Serivce.OrderAPI.Utility;
+using System;
 using System.ComponentModel.DataAnnotations;
 
 namespace SvarosNamai.Serivce.OrderAPI.Models
@@ -23,5 +24,6 @@ namespace SvarosNamai.Serivce.OrderAPI.Models
         public string PhoneNumber { get; set; }
         public DateTime CreationDate { get; set; }
         public DateTime? CompletionDate { get; set; }
+        public string? Status { get; set; } = SD.Status_Pending;
     }
 }

@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using SvarosNamai.Serivce.OrderAPI.Models;
 using SvarosNamai.Serivce.OrderAPI.Service.IService;
+using SvarosNamai.Serivce.OrderAPI.Utility;
 using SvarosNamai.Service.OrderAPI.Data;
 using SvarosNamai.Service.OrderAPI.Models.Dtos;
 using System;
@@ -40,6 +41,7 @@ namespace SvarosNamai.Serivce.OrderAPI.Controllers
                 {
                     Order orderToDb = _mapper.Map<Order>(order);
                     orderToDb.CreationDate = DateTime.Now;
+                    orderToDb.Status = SD.Status_Approved;
                     await _db.Orders.AddAsync(orderToDb);
                     
 
