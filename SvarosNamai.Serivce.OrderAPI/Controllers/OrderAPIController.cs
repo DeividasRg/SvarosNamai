@@ -22,13 +22,15 @@ namespace SvarosNamai.Serivce.OrderAPI.Controllers
         protected ResponseDto _response;
         private IMapper _mapper;
         private IProductService _productService;
+        private IInvoiceGenerator _invoice;
 
-        public OrderAPIController(AppDbContext db, IMapper mapper, IProductService productService)
+        public OrderAPIController(AppDbContext db, IMapper mapper, IProductService productService, IInvoiceGenerator invoice)
         {
             _db = db;
             _response = new ResponseDto();
             _mapper = mapper;
             _productService = productService;
+            _invoice = invoice;
         }
 
 
@@ -66,6 +68,13 @@ namespace SvarosNamai.Serivce.OrderAPI.Controllers
                 _response.IsSuccess = false;
                 _response.Message = ex.Message;
             }
+            return _response;
+        }
+
+        [HttpPost]
+        public async Task<ResponseDto> PdfFile(int id)
+        {
+            var resp = _invoice.GenerateInvoice(id);
             return _response;
         }
 

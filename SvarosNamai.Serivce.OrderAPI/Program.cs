@@ -22,6 +22,7 @@ builder.Services.AddSingleton(mapper);
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<IProductService, ProductService>();
+builder.Services.AddScoped<IInvoiceGenerator, InvoiceGenerator>();
 builder.Services.AddHttpClient("Product", u => u.BaseAddress = new Uri(builder.Configuration["ServiceUrls:ProductAPI"]));
 
 builder.Services.AddControllers();
