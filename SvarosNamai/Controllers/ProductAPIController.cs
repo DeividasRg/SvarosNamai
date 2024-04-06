@@ -28,23 +28,6 @@ namespace SvarosNamai.Service.ProductAPI.Controllers
             _mapper = mapper;
         }
 
-        [HttpGet("GetBundles")]
-        public ResponseDto GetBundles()
-        {
-            var bundles = _mapper.Map<IEnumerable<Bundle>>(_db.Bundles.ToList());
-            foreach(var bundle in bundles) 
-            {
-                var productIds = _db.ProductBundle
-                        .Where(u => u.BundleId == bundle.BundleId)
-                        .Select(u => u.ProductId)
-                        .ToList();
-
-                bundle.Products = _db.Products
-                    .Where(u => productIds.Contains(u.ProductId));
-            }
-            _response.Result = bundles;
-            return _response;
-        }
 
         [HttpGet("GetProducts")]
         public ResponseDto GetProducts()
@@ -58,17 +41,18 @@ namespace SvarosNamai.Service.ProductAPI.Controllers
         {
             try
             {
-                Bundle bundle = _db.Bundles.FirstOrDefault(u => u.BundleId == bundleId);
-                if(bundle != null) 
+                BundleDto bundle = _mapper.Map<BundleDto>(_db.Bundles.FirstOrDefault(u => u.BundleId == bundleId));
+                if (bundle != null)
                 {
                     var productIds = _db.ProductBundle
-                        .Where(u=> u.BundleId == bundleId)
+                        .Where(u => u.BundleId == bundleId)
                         .Select(u => u.ProductId)
                         .ToList();
 
-                    bundle.Products = _db.Products
+                    var productsUnmapped = _db.Products
                         .Where(u => productIds.Contains(u.ProductId));
 
+                    bundle.Products = _mapper.Map<IEnumerable<ProductDto>>(productsUnmapped);
 
                     _response.Result = bundle;
                     _response.Message = "Successfully Retrieved";
@@ -105,7 +89,7 @@ namespace SvarosNamai.Service.ProductAPI.Controllers
         }
 
         [HttpPost("AddBundle")]
-        public async Task<ResponseDto> AddBundle(BundleDto bundle)
+        public async Task<ResponseDto> AddBundle(BundleToAddDto bundle)
         {
             try
             {

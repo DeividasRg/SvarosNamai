@@ -11,6 +11,7 @@ namespace SvarosNamai.Service.ProductAPI
             var mappingConfig = new MapperConfiguration(config =>
             {
                 config.CreateMap<Bundle, BundleDto>().ReverseMap();
+                config.CreateMap<Bundle, BundleToAddDto>().ReverseMap();
                 config.CreateMap<Product, ProductDto>().ReverseMap();
             });
             return mappingConfig;
