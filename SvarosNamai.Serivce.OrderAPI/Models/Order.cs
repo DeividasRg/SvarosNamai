@@ -25,6 +25,7 @@ namespace SvarosNamai.Serivce.OrderAPI.Models
         public string Email { get; set; }
         public DateTime CreationDate { get; set; }
         public DateTime? CompletionDate { get; set; }
+        public DateOnly OrderDate { get; set; }
         public int? Status { get; set; } = OrderStatusses.Status_Pending;
     }
 }
