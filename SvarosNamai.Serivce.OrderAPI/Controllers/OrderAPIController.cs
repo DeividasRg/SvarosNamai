@@ -23,14 +23,16 @@ namespace SvarosNamai.Serivce.OrderAPI.Controllers
         private IMapper _mapper;
         private IProductService _productService;
         private IInvoiceGenerator _invoice;
+        private IEmailService _emaill;
 
-        public OrderAPIController(AppDbContext db, IMapper mapper, IProductService productService, IInvoiceGenerator invoice)
+        public OrderAPIController(AppDbContext db, IMapper mapper, IProductService productService, IInvoiceGenerator invoice, IEmailService emaill)
         {
             _db = db;
             _response = new ResponseDto();
             _mapper = mapper;
             _productService = productService;
             _invoice = invoice;
+            _emaill = emaill;
         }
 
 
@@ -59,8 +61,23 @@ namespace SvarosNamai.Serivce.OrderAPI.Controllers
                     }
                     //Send An Email
 
+                    var emailSend = await _emaill.SendConfirmationEmail(new ConfirmationEmailDto()
+                    {
+                        Email = orderToDb.Email,
+                        Name = orderToDb.Name,
+                        LastName = orderToDb.LastName,
+                        OrderId = orderToDb.OrderId
+                    });
 
-                    _response.Message = "Order Created";
+                    if(emailSend.IsSuccess)
+                    {
+                        _response.Message = "Order Created";
+                    }
+                    else
+                    {
+                        _response.Message = $"Order Created, Email not sent. Reason: {emailSend.Message}";
+                    }
+
 
                 }
             }
