@@ -8,7 +8,12 @@ namespace SvarosNamai.Service.OrderAPI.Data
     {
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
         { }
-        
+
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            optionsBuilder.UseLazyLoadingProxies();
+        }
+
         public DbSet<Order> Orders {  get; set; }
         public DbSet<OrderLine> OrderLines { get; set; }
         public DbSet<Reservations> Reservations { get; set; }   

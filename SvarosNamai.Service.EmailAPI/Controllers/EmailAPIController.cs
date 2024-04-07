@@ -29,13 +29,35 @@ namespace SvarosNamai.Service.EmailAPI.Controllers
         {
             try
             {
+
+
+                string message;
+                string subject;
+
+
+                switch (info.OrderStatus)
+                {
+                        case 0:
+                            message = $"Jūsų užsakymas Nr.{info.OrderId} pateiktas, laukite patvirtinimo";
+                            subject = $"Užsakymas {info.OrderId} pateiktas";
+                            break;
+                        case 1:
+                            message = $"Jūsų užsakymas Nr.{info.OrderId} patvirtintas adresu {info.Address}, {info.Date} dieną {info.Hour} valandą";
+                        subject = $"Užsakymas {info.OrderId} patvirtinimas";
+                        break;
+                    default:
+                        throw new Exception();
+                        break;
+                }
+
+
                 var msg = new SendGridMessage()
                 {
                     From = new EmailAddress("deividasrg@gmail.com", "Deividas Ragauskas"),
-                    Subject = $"Užsakymo {info.OrderId} patvirtinimas",
-                    PlainTextContent = $"Jūsų užsakymas Nr.{info.OrderId} patvirtintas"
+                    Subject = subject,
+                    PlainTextContent = message
                 };
-                string message = msg.PlainTextContent;
+                
 
                 msg.AddTo(new EmailAddress($"{info.Email}", $"{info.Name} {info.LastName}"));
                 var response = await _sendgrid.SendEmailAsync(msg);

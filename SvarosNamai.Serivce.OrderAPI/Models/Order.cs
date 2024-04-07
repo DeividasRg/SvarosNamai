@@ -28,7 +28,7 @@ namespace SvarosNamai.Serivce.OrderAPI.Models
         public DateTime CreationDate { get; set; }
         public DateTime? CompletionDate { get; set; }
         [ForeignKey("ReservationId")]
-        public Reservations Reservation { get; set; }
-        public int? Status { get; set; } = OrderStatusses.Status_Pending;
+        public virtual Reservations Reservation { get; set; }
+        public int Status { get; set; } = OrderStatusses.Status_Pending;
     }
 }

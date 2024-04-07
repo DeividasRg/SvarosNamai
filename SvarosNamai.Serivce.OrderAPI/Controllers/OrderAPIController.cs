@@ -23,16 +23,16 @@ namespace SvarosNamai.Serivce.OrderAPI.Controllers
         private IMapper _mapper;
         private IProductService _productService;
         private IInvoiceGenerator _invoice;
-        private IEmailService _emaill;
+        private IEmailService _email;
 
-        public OrderAPIController(AppDbContext db, IMapper mapper, IProductService productService, IInvoiceGenerator invoice, IEmailService emaill)
+        public OrderAPIController(AppDbContext db, IMapper mapper, IProductService productService, IInvoiceGenerator invoice, IEmailService email)
         {
             _db = db;
             _response = new ResponseDto();
             _mapper = mapper;
             _productService = productService;
             _invoice = invoice;
-            _emaill = emaill;
+            _email = email;
         }
 
 
@@ -61,13 +61,9 @@ namespace SvarosNamai.Serivce.OrderAPI.Controllers
                     }
                     //Send An Email
 
-                    var emailSend = await _emaill.SendConfirmationEmail(new ConfirmationEmailDto()
-                    {
-                        Email = orderToDb.Email,
-                        Name = orderToDb.Name,
-                        LastName = orderToDb.LastName,
-                        OrderId = orderToDb.OrderId
-                    });
+
+                    var emailSend = await _email.SendConfirmationEmail(_mapper.Map<ConfirmationEmailDto>(orderToDb));
+                    
 
                     if(emailSend.IsSuccess)
                     {
@@ -103,6 +99,7 @@ namespace SvarosNamai.Serivce.OrderAPI.Controllers
             try
             {
                 Order orderCheck = _db.Orders.Find(orderId);
+                ConfirmationEmailDto info = _mapper.Map<ConfirmationEmailDto>(orderCheck);
                 if (orderCheck != null)
                 {
                     int statusCheck = OrderStatusses.GetStatusConstant(status);
@@ -118,10 +115,16 @@ namespace SvarosNamai.Serivce.OrderAPI.Controllers
                     }
                     else
                     {
+                        
+
+                        
+                        
                         switch (status)
                         {
                             case OrderStatusses.Status_Approved:
                                 orderCheck.Status = OrderStatusses.Status_Approved;
+                                info.OrderStatus = 1;
+                                var emailSend = await _email.SendConfirmationEmail(info);
                                 await _db.SaveChangesAsync();
                                 break;
                             case OrderStatusses.Status_Cancelled:

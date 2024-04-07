@@ -8,7 +8,7 @@ namespace SvarosNamai.Serivce.OrderAPI.Models
         [Key]
         public int OrderLineId { get; set; }
         [ForeignKey("OrderId")]
-        public Order Order { get; set; }
+        public virtual Order Order { get; set; }
         public string ProductName { get; set; }
     }
 }

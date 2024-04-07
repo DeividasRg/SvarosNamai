@@ -1,4 +1,6 @@
-﻿namespace SvarosNamai.Service.OrderAPI.Models.Dtos
+﻿using System;
+
+namespace SvarosNamai.Service.OrderAPI.Models.Dtos
 {
     public class ConfirmationEmailDto
     {
@@ -6,5 +8,9 @@
         public string Name { get; set; }
         public string LastName { get; set; }
         public int OrderId { get; set; }
+        public int OrderStatus { get; set; }
+        public DateOnly Date { get; set; }
+        public int Hour { get; set; }
+        public string Address { get; set; }
     }
 }
