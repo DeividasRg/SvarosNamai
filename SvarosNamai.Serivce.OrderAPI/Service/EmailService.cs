@@ -1,9 +1,13 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Newtonsoft.Json;
 using SvarosNamai.Serivce.OrderAPI.Service.IService;
 using SvarosNamai.Service.OrderAPI.Models.Dtos;
 using System;
+using System.IO;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
 using static iText.StyledXmlParser.Jsoup.Select.Evaluator;
@@ -48,6 +52,59 @@ namespace SvarosNamai.Serivce.OrderAPI.Service
             }
             return _response;
 
+        }
+
+        public async Task<ResponseDto> SendCompleteEmail(ConfirmationEmailDto info, string pdfFilePath)
+        {
+            try
+            {
+
+
+                if (string.IsNullOrEmpty(pdfFilePath) || !System.IO.File.Exists(pdfFilePath))
+                {
+                    _response.IsSuccess = false;
+                    _response.Message = "Pdf file doesn't exist";
+                    return _response;
+                }
+                
+                
+                    byte[] pdfBytes = await System.IO.File.ReadAllBytesAsync(pdfFilePath);
+
+
+
+
+
+
+                var client = _httpClientFactory.CreateClient("Email");
+                    var formData = new MultipartFormDataContent();
+
+                var infoJson = new StringContent(JsonConvert.SerializeObject(info));
+                infoJson.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/json");
+                formData.Add(infoJson, "info");
+
+                var pdfContent = new ByteArrayContent(pdfBytes);
+                pdfContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/pdf");
+                formData.Add(pdfContent, "pdfFile", Path.GetFileName(pdfFilePath));
+
+
+                    var response = await client.PostAsync($"/api/email/SendCompleteEmail", formData);
+                    var apiContent = await response.Content.ReadAsStringAsync();
+                    var result = JsonConvert.DeserializeObject<ResponseDto>(apiContent);
+
+                    if (!result.IsSuccess)
+                    {
+                        _response.Message = result.Message;
+                    }
+                
+
+            }
+            catch(Exception ex) 
+            {
+                _response.IsSuccess = false;
+                _response.Message = ex.Message;
+            }
+            return _response;
+            
         }
 
     }

@@ -120,6 +120,8 @@ namespace SvarosNamai.Serivce.OrderAPI.Service
                 document.Add(total);
 
                 document.Close();
+
+                _response.Result = path;
             }
             catch (Exception ex)
             {

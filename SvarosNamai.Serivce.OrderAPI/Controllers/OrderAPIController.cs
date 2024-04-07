@@ -99,7 +99,6 @@ namespace SvarosNamai.Serivce.OrderAPI.Controllers
             try
             {
                 Order orderCheck = _db.Orders.Find(orderId);
-                ConfirmationEmailDto info = _mapper.Map<ConfirmationEmailDto>(orderCheck);
                 if (orderCheck != null)
                 {
                     int statusCheck = OrderStatusses.GetStatusConstant(status);
@@ -115,29 +114,34 @@ namespace SvarosNamai.Serivce.OrderAPI.Controllers
                     }
                     else
                     {
-                        
+                        ConfirmationEmailDto info = _mapper.Map<ConfirmationEmailDto>(orderCheck);
 
-                        
-                        
                         switch (status)
                         {
                             case OrderStatusses.Status_Approved:
                                 orderCheck.Status = OrderStatusses.Status_Approved;
-                                info.OrderStatus = 1;
-                                var emailSend = await _email.SendConfirmationEmail(info);
+                                info.OrderStatus = OrderStatusses.Status_Approved;
+                                var emailSendForApproved = await _email.SendConfirmationEmail(info);
                                 await _db.SaveChangesAsync();
                                 break;
                             case OrderStatusses.Status_Cancelled:
                                 orderCheck.Status = OrderStatusses.Status_Cancelled;
                                 orderCheck.Reservation.IsActive = false;
+                                info.OrderStatus = OrderStatusses.Status_Cancelled;
+                                var emailSendForCancelled = await _email.SendConfirmationEmail(info);
                                 await _db.SaveChangesAsync();
-                                //Send Email explaining why
                                 break;
                             case OrderStatusses.Status_Completed:
                                 var generateInvoice = await _invoice.GenerateInvoice(orderId);
                                 if (generateInvoice.IsSuccess)
                                 {
                                     orderCheck.Status = OrderStatusses.Status_Completed;
+                                    var emailConfirmationSend = await _email.SendCompleteEmail(info, generateInvoice.Result.ToString());
+                                    if (!emailConfirmationSend.IsSuccess)
+                                    {
+                                        _response.Message = emailConfirmationSend.Message;
+                                        _response.IsSuccess = false;
+                                    }
                                     await _db.SaveChangesAsync();
                                 }
                                 else
