@@ -24,7 +24,7 @@ namespace SvarosNamai.Service.EmailAPI.Controllers
         }
 
         [HttpPost("SendCompleteEmail")]
-        public async Task<ResponseDto> SendCompleteEmail([FromForm] ConfirmationEmailDto info, [FromForm] IFormFile pdfFile)
+        public async Task<ResponseDto> SendCompleteEmail(ConfirmationEmailDto info, IFormFile pdfFile)
         {
             try
             {

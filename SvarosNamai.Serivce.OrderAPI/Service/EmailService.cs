@@ -78,16 +78,19 @@ namespace SvarosNamai.Serivce.OrderAPI.Service
                 var client = _httpClientFactory.CreateClient("Email");
                     var formData = new MultipartFormDataContent();
 
-                var infoJson = new StringContent(JsonConvert.SerializeObject(info));
-                infoJson.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/json");
-                formData.Add(infoJson, "info");
+                
+
 
                 var pdfContent = new ByteArrayContent(pdfBytes);
                 pdfContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/pdf");
                 formData.Add(pdfContent, "pdfFile", Path.GetFileName(pdfFilePath));
 
+                var json = JsonConvert.SerializeObject(info);
+                var content = new StringContent(json, Encoding.UTF8, "application/json");
+                formData.Add(content, "info");
 
-                    var response = await client.PostAsync($"/api/email/SendCompleteEmail", formData);
+
+                var response = await client.PostAsync($"/api/email/SendCompleteEmail", formData);
                     var apiContent = await response.Content.ReadAsStringAsync();
                     var result = JsonConvert.DeserializeObject<ResponseDto>(apiContent);
 
