@@ -1,6 +1,7 @@
 ﻿using SvarosNamai.Serivce.OrderAPI.Utility;
 using System;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace SvarosNamai.Serivce.OrderAPI.Models
 {
@@ -26,8 +27,8 @@ namespace SvarosNamai.Serivce.OrderAPI.Models
         public double Price { get; set; }
         public DateTime CreationDate { get; set; }
         public DateTime? CompletionDate { get; set; }
-        public DateOnly OrderDate { get; set; }
-        public int Hour { get; set; }
+        [ForeignKey("ReservationId")]
+        public Reservations Reservation { get; set; }
         public int? Status { get; set; } = OrderStatusses.Status_Pending;
     }
 }

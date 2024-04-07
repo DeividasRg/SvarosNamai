@@ -109,6 +109,7 @@ namespace SvarosNamai.Serivce.OrderAPI.Controllers
                                 break;
                             case OrderStatusses.Status_Cancelled:
                                 orderCheck.Status = OrderStatusses.Status_Cancelled;
+                                orderCheck.Reservation.IsActive = false;
                                 await _db.SaveChangesAsync();
                                 //Send Email explaining why
                                 break;

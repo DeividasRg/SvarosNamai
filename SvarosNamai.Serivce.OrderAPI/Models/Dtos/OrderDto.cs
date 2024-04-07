@@ -21,6 +21,8 @@ namespace SvarosNamai.Serivce.OrderAPI.Models
         [Required]
         public string PhoneNumber { get; set; }
         public string Email { get; set; }
+        public int Hour { get; set; }
+        public DateOnly Date {  get; set; }
 
     }
 }

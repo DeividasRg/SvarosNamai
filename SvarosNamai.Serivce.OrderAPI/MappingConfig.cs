@@ -10,7 +10,12 @@ namespace SvarosNamai.Service.OrderAPI
         {
             var mappingConfig = new MapperConfiguration(config =>
             {
-                config.CreateMap<Order, OrderDto>().ReverseMap();
+                config.CreateMap<Order, OrderDto>().ReverseMap()
+                                      .ForMember(dest => dest.Reservation, opt => opt.MapFrom(src => new Reservations
+                                      {
+                                          Date = src.Date,
+                                          Hour = src.Hour
+                                      }));
             });
             return mappingConfig;
         }

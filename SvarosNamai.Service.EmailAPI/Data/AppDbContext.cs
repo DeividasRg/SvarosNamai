@@ -1,6 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
-using SvarosNamai.Serivce.OrderAPI.Models;
-using SvarosNamai.Service.OrderAPI.Models;
+﻿
+
+using Microsoft.EntityFrameworkCore;
 
 namespace SvarosNamai.Service.OrderAPI.Data
 {
@@ -10,8 +10,7 @@ namespace SvarosNamai.Service.OrderAPI.Data
         { }
         
         public DbSet<Order> Orders {  get; set; }
-        public DbSet<OrderLine> OrderLines { get; set; }
-        public DbSet<Reservations> Reservations { get; set; }   
+
 
 
 
