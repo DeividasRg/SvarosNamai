@@ -13,6 +13,7 @@ namespace SvarosNamai.Serivce.OrderAPI.Models
         [Required]
         [Range(1,1000)]
         public int HouseNo { get; set; }
+        public int? ApartmentNo { get; set; }
         public string? HouseLetter { get; set; }
         [Required]
         public string Name { get; set; }

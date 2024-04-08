@@ -69,17 +69,17 @@ namespace SvarosNamai.Serivce.OrderAPI.Service
                     .Add("Data: ").Add(DateTime.Now.ToShortDateString()).Add("\n")
                     .Add("Užsakymo nr. : ").Add($"{orderId}").Add("\n")
                     .Add("Klientas: ").Add($"{order.Name} {order.LastName}").Add("\n")
-                    .Add("Adresas: ").Add($"{order.Street} {order.HouseNo}{order.HouseLetter}, {order.City}").Add("\n")
+                    .Add("Adresas: ").Add($"{order.Street} {order.HouseNo}{order.ApartmentNo}{order.HouseLetter}, {order.City}").Add("\n")
                     .Add("El.pašto adresas: ").Add($"{order.Email}").Add("\n")
                     .Add("Telefono nr.: ").Add($"{order.PhoneNumber}");
 
                 
                 Paragraph companyDetails = new Paragraph()
                     .AddTabStops(new TabStop(100, TabAlignment.RIGHT))
-                    .Add("Company Name: ").Add("MB \"Švaros Namai\"").Add("\n")
-                    .Add("Address: ").Add("Taikos g. 13, Vilnius").Add("\n")
-                    .Add("Email: ").Add("greta@svarosnamai.lt").Add("\n")
-                    .Add("Phone: ").Add("+370 648 (71)806")
+                    .Add("Pavadinimas: ").Add("MB \"Švaros Namai\"").Add("\n")
+                    .Add("Adresas: ").Add("Taikos g. 13, Vilnius").Add("\n")
+                    .Add("El.pašto adresas: ").Add("greta@svarosnamai.lt").Add("\n")
+                    .Add("Telefono nr.: ").Add("+370 648 (71)806")
                     .SetTextAlignment(TextAlignment.RIGHT); 
 
                 

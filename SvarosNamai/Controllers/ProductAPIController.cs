@@ -1,7 +1,9 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using SvarosNamai.Serivce.ProductAPI.Service.IService;
 using SvarosNamai.Service.ProductAPI.Data;
 using SvarosNamai.Service.ProductAPI.Models;
 using SvarosNamai.Service.ProductAPI.Models.Dtos;
@@ -20,12 +22,14 @@ namespace SvarosNamai.Service.ProductAPI.Controllers
         private readonly AppDbContext _db;
         protected ResponseDto _response;
         private IMapper _mapper;
+        private IErrorLogger _error;
 
-        public ProductAPIController(AppDbContext db, IMapper mapper) 
+        public ProductAPIController(AppDbContext db, IMapper mapper, IErrorLogger error) 
         {
             _db = db;
             _response = new ResponseDto();
             _mapper = mapper;
+            _error = error;
         }
 
 
@@ -42,25 +46,33 @@ namespace SvarosNamai.Service.ProductAPI.Controllers
             try
             {
                 IEnumerable<Bundle> bundlesFromDB = _db.Bundles.Where(u => u.IsActive == true);
-                IEnumerable<BundleDto> bundleDtosFromDb = _mapper.Map<IEnumerable<BundleDto>>(bundlesFromDB);
-                foreach(var bundle in bundleDtosFromDb) 
+                if (bundlesFromDB != null)
                 {
-                    var productIds = _db.ProductBundle
-                    .Where(u => u.BundleId == bundle.BundleId)
-                    .Select(u => u.ProductId)
-                    .ToList();
+                    IEnumerable<BundleDto> bundleDtosFromDb = _mapper.Map<IEnumerable<BundleDto>>(bundlesFromDB);
+                    foreach (var bundle in bundleDtosFromDb)
+                    {
+                        var productIds = _db.ProductBundle
+                        .Where(u => u.BundleId == bundle.BundleId)
+                        .Select(u => u.ProductId)
+                        .ToList();
 
-                    var productsUnmapped = _db.Products
-                        .Where(u => productIds.Contains(u.ProductId));
+                        var productsUnmapped = _db.Products
+                            .Where(u => productIds.Contains(u.ProductId));
 
-                    bundle.Products = _mapper.Map<IEnumerable<ProductDto>>(productsUnmapped);
+                        bundle.Products = _mapper.Map<IEnumerable<ProductDto>>(productsUnmapped);
+                    }
+                    _response.Result = bundleDtosFromDb;
                 }
-                _response.Result = bundleDtosFromDb;
+                else
+                {
+                    throw new Exception("No active bundles");
+                }
             }
             catch(Exception ex) 
             {
                 _response.IsSuccess = false;
-                _response.Message = ex.Message; 
+                _response.Message = ex.Message;
+                _error.LogError(_response.Message);
             }
             return _response;
         }
@@ -98,6 +110,7 @@ namespace SvarosNamai.Service.ProductAPI.Controllers
             {
                 _response.IsSuccess = false;
                 _response.Message = ex.Message;
+                _error.LogError (_response.Message);    
             }
             return _response;
         }
@@ -117,11 +130,16 @@ namespace SvarosNamai.Service.ProductAPI.Controllers
                     _response.Message = "Successfully Retrieved";
                     return _response;
                 }
+                else
+                {
+                    throw new Exception("Product doesn't exist");
+                }
             }
             catch (Exception ex)
             {
                 _response.IsSuccess = false;
                 _response.Message = ex.Message;
+                _error.LogError (_response.Message);    
             }
             return _response;
         }
@@ -142,14 +160,14 @@ namespace SvarosNamai.Service.ProductAPI.Controllers
                 }
                 else
                 {
-                    _response.IsSuccess = false;
-                    _response.Message = "Bundle already exists";
+                    throw new Exception("Bundle already exists");
                 }
             }
             catch(Exception ex) 
             {
                 _response.IsSuccess = false;    
                 _response.Message = ex.Message;
+                _error.LogError(_response.Message);
             }
             return _response;
         }
@@ -170,14 +188,14 @@ namespace SvarosNamai.Service.ProductAPI.Controllers
                 }
                 else
                 {
-                    _response.IsSuccess = false;
-                    _response.Message = "Product already exists";
+                    throw new Exception("Product alredy exists");
                 }
             }
             catch (Exception ex)
             {
                 _response.IsSuccess = false;
                 _response.Message = ex.Message;
+                _error.LogError(_response.Message);
             }
             return _response;
         }
@@ -208,15 +226,14 @@ namespace SvarosNamai.Service.ProductAPI.Controllers
                         }
                         else
                         {
-                            _response.Message = $"Product with the id {produkt} does not exist";
-                            break;
+                            throw new Exception("Product doesn't exist");
                         }
                     }
                     await _db.SaveChangesAsync();
                 }
                 else
                 {
-                    _response.Message = "Bundle does not exist";
+                    throw new Exception("Bundle doesn't exist");
                 }
                 
             }
@@ -224,6 +241,7 @@ namespace SvarosNamai.Service.ProductAPI.Controllers
             {
                 _response.IsSuccess = false;
                 _response.Message = ex.Message;
+                _error.LogError(_response.Message);
             }
             return _response;
         }
@@ -231,42 +249,57 @@ namespace SvarosNamai.Service.ProductAPI.Controllers
         [HttpDelete("RemoveProductFromBundle/{id}")]
         public async Task<ResponseDto> RemoveProductFromBundle(int id)
         {
-            var check = await _db.ProductBundle.FindAsync(id);
-            if(check != null)
+            try
             {
-                _db.ProductBundle.Remove(check);
-                _db.SaveChanges();
-                return _response;
+                var check = await _db.ProductBundle.FindAsync(id);
+                if (check != null)
+                {
+                    _db.ProductBundle.Remove(check);
+                    _db.SaveChanges();
+                    
+                }
+                else
+                {
+                    throw new Exception("id doesn't exist");
+                }
             }
-            else
+            catch(Exception ex)
             {
                 _response.IsSuccess = false;
-                _response.Message = "id does not exist";
-                return _response;
+                _response.Message = ex.Message;
+                _error.LogError(_response.Message);
             }
+            return _response;
         }
         [HttpDelete("DeleteProduct/{id}")]
         public async Task<ResponseDto> DeleteProduct(int id)
         {
-            var check = await _db.Products.FindAsync(id);
-            if (check != null)
+            try
             {
-                var bundleCheck = await _db.ProductBundle.AnyAsync(u => u.ProductId == id);
-                if (bundleCheck == false)
+                var check = await _db.Products.FindAsync(id);
+                if (check != null)
                 {
-                    _db.Products.Remove(check);
-                    _db.SaveChanges();
+                    var bundleCheck = await _db.ProductBundle.AnyAsync(u => u.ProductId == id);
+                    if (bundleCheck == false)
+                    {
+                        _db.Products.Remove(check);
+                        _db.SaveChanges();
+                    }
+                    else
+                    {
+                        throw new Exception("Product is assigned to a bundle");
+                    }
                 }
                 else
                 {
-                    _response.IsSuccess = false;
-                    _response.Message = "Product is assigned to a bundle";
+                    throw new Exception("Product doesn't exist");
                 }
             }
-            else
+            catch(Exception ex)
             {
-                _response.IsSuccess= false;
-                _response.Message = "Product doesn't exist";
+                _response.IsSuccess = false;
+                _response.Message = ex.Message;
+                _error.LogError(_response.Message);
             }
             return _response;
         }
@@ -275,24 +308,32 @@ namespace SvarosNamai.Service.ProductAPI.Controllers
         [HttpPut("BundleActivation")]
         public async Task<ResponseDto> BundleActivation(int id)
         {
-            var bundle = await _db.Bundles.FindAsync(id);
-            if (bundle != null)
+            try
             {
-                if (bundle.IsActive == false)
+                var bundle = await _db.Bundles.FindAsync(id);
+                if (bundle != null)
                 {
-                    bundle.IsActive = true;
+                    if (bundle.IsActive == false)
+                    {
+                        bundle.IsActive = true;
+                    }
+                    else
+                    {
+                        bundle.IsActive = false;
+                    }
+                    await _db.SaveChangesAsync();
+                    _response.Message = "Activation Successfully changed";
                 }
                 else
                 {
-                    bundle.IsActive = false;
+                    throw new Exception("Bundle not found");
                 }
-                 await _db.SaveChangesAsync();
-                _response.Message = "Activation Successfully changed";
             }
-            else
+            catch(Exception ex)
             {
                 _response.IsSuccess = false;
-                _response.Message = "Bundle not found";
+                _response.Message = ex.Message;
+                _error.LogError(_response.Message);
             }
             return _response;
         }

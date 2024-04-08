@@ -21,7 +21,7 @@ namespace SvarosNamai.Service.OrderAPI
                 .ForMember(dest => dest.Date, opt => opt.MapFrom(src => src.Reservation.Date))
                 .ForMember(dest => dest.Hour, opt => opt.MapFrom(src => src.Reservation.Hour))
                 .ForMember(dest => dest.OrderStatus, opt => opt.MapFrom(src => src.Status))
-                .ForMember(dest => dest.Address, opt => opt.MapFrom(src => $"{src.Street} {src.HouseNo}{src.HouseLetter}, {src.City}"));
+                .ForMember(dest => dest.Address, opt => opt.MapFrom(src => $"{src.Street} {src.HouseNo}{src.ApartmentNo}{src.HouseLetter}, {src.City}"));
                 
                 
             });

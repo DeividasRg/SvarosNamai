@@ -150,7 +150,7 @@ namespace SvarosNamai.Serivce.OrderAPI.Controllers
                                     var emailConfirmationSend = await _email.SendCompleteEmail(info, generateInvoice.Result.ToString());
                                     if (!emailConfirmationSend.IsSuccess)
                                     {
-                                        throw new Exception($"{emailConfirmationSend.Message}")
+                                        throw new Exception($"{emailConfirmationSend.Message}");
                                     }
                                     else
                                     {
@@ -159,7 +159,7 @@ namespace SvarosNamai.Serivce.OrderAPI.Controllers
                                 }
                                 else
                                 {
-                                    throw new Exception($"{generateInvoice.Message}")
+                                    throw new Exception($"{generateInvoice.Message}");
                                 }
                                 break;
                             default:

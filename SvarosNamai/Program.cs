@@ -4,6 +4,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using SvarosNamai.Serivce.ProductAPI.Service;
+using SvarosNamai.Serivce.ProductAPI.Service.IService;
 using SvarosNamai.Service.ProductAPI;
 using SvarosNamai.Service.ProductAPI.Data;
 using System;
@@ -15,6 +17,7 @@ builder.Services.AddDbContext<AppDbContext>(option =>
 {
     option.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
+builder.Services.AddScoped<IErrorLogger, ErrorLogger>();
 IMapper mapper = MappingConfig.RegisterMaps().CreateMapper();
 builder.Services.AddSingleton(mapper);
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
