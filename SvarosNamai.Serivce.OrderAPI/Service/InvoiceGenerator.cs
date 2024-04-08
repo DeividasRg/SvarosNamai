@@ -18,6 +18,7 @@ using Document = iText.Layout.Document;
 using System.ComponentModel.Design;
 using AngleSharp.Css.Dom;
 using iText.Layout.Borders;
+using System.IO;
 
 namespace SvarosNamai.Serivce.OrderAPI.Service
 {
@@ -43,8 +44,19 @@ namespace SvarosNamai.Serivce.OrderAPI.Service
             {
                 var order = _db.Orders.Find(orderId);
                 var orderlines = _db.OrderLines.Where(u => u.Order == order);
-                String path = $@"C:\Users\dragauskas\OneDrive - barbora.lt\Desktop\\SN-{order.OrderId}.pdf";
-                PdfWriter writer = new PdfWriter(path);
+
+                string directoryPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Invoices");
+
+                if (!Directory.Exists(directoryPath))
+                {
+                    Directory.CreateDirectory(directoryPath);
+                }
+
+                var filepath = Path.Combine(directoryPath, $"{order.OrderId}_{order.Street} {order.HouseNo}{order.ApartmentNo}{order.HouseLetter}" + ".pdf");
+
+
+
+                PdfWriter writer = new PdfWriter(filepath);
                 PdfDocument pdf = new PdfDocument(writer);
                 Document document = new Document(pdf);
 
@@ -123,7 +135,7 @@ namespace SvarosNamai.Serivce.OrderAPI.Service
 
                 document.Close();
 
-                _response.Result = path;
+                _response.Result = filepath;
             }
             catch (Exception ex)
             {
