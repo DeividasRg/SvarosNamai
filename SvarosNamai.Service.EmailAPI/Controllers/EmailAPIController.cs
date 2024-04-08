@@ -1,11 +1,13 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using SendGrid;
 using SendGrid.Helpers.Mail;
 using SvarosNamai.Serivce.EmailAPI.Service.IService;
 using SvarosNamai.Service.EmailAPI.Models;
 using SvarosNamai.Service.EmailAPI.Models.Dtos;
 using SvarosNamai.Service.OrderAPI.Data;
+using System.IO;
 
 namespace SvarosNamai.Service.EmailAPI.Controllers
 {
@@ -43,7 +45,7 @@ namespace SvarosNamai.Service.EmailAPI.Controllers
                 }
 
 
-                var filepath = Path.Combine(directoryPath, $"{info.OrderId}_{info.Address}" + ".pdf");
+                var filepath = Path.Combine(directoryPath, $"{info.OrderId}" + ".pdf");
                 using (var stream = new MemoryStream(info.pdfFile))
                 {
                     using (var fileStream = new FileStream(filepath,FileMode.Create))
@@ -178,7 +180,33 @@ namespace SvarosNamai.Service.EmailAPI.Controllers
                 _response.Message = ex.Message;
                 _error.LogError(_response.Message);
             }
+            
 
+            return _response;
+        }
+
+        [HttpGet("GetInvoice/{orderId}")]
+        public async Task<ResponseDto> GetInvoice(int orderId)
+        {
+            try
+            {
+                string directoryPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Invoices");
+                if (System.IO.File.Exists(directoryPath+$"\\{orderId}.pdf"))
+                {
+                    byte[] fileBytes = System.IO.File.ReadAllBytes(directoryPath + $"\\{orderId}.pdf");
+                    _response.Result = JsonConvert.SerializeObject(fileBytes);
+                }
+                else
+                {
+                    throw new Exception("Invoice with given orderId doesn't exist");
+                }
+            }
+            catch(Exception ex)
+            {
+                _response.IsSuccess = false;
+                _response.Message = ex.Message;
+                _error.LogError(_response.Message);
+            }
             return _response;
         }
     }

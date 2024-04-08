@@ -97,5 +97,30 @@ namespace SvarosNamai.Serivce.OrderAPI.Service
             
         }
 
+        public async Task<ResponseDto> GetInvoice(int orderId)
+        {
+            try
+            {
+                var client = _httpClientFactory.CreateClient("Email");
+                var response = await client.GetAsync($"/api/email/GetInvoice/{orderId}");
+                var apiContent = await response.Content.ReadAsStringAsync();
+                var resp = JsonConvert.DeserializeObject<ResponseDto>(apiContent);
+                if (resp.IsSuccess)
+                {
+                    _response.Result = resp.Result;
+                }
+                else
+                {
+                    throw new Exception($"{resp.Message}");
+                }
+            }
+            catch(Exception ex)
+            {
+                _response.IsSuccess = false;
+                _response.Message = ex.Message;
+                _error.LogError(_response.Message);
+            }
+            return _response;
+        }
     }
 }

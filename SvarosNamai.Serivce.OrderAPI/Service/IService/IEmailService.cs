@@ -8,5 +8,6 @@ namespace SvarosNamai.Serivce.OrderAPI.Service.IService
     {
         Task<ResponseDto> SendConfirmationEmail(ConfirmationEmailDto info);
         Task<ResponseDto> SendCompleteEmail(ConfirmationEmailDto info, string pdfFilePath);
+        Task<ResponseDto> GetInvoice(int orderId);
     }
 }

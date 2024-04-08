@@ -9,6 +9,7 @@ using SvarosNamai.Service.OrderAPI.Data;
 using SvarosNamai.Service.OrderAPI.Models.Dtos;
 using System;
 using System.Collections;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -65,9 +66,9 @@ namespace SvarosNamai.Serivce.OrderAPI.Controllers
 
 
                     var emailSend = await _email.SendConfirmationEmail(_mapper.Map<ConfirmationEmailDto>(orderToDb));
-                    
 
-                    if(emailSend.IsSuccess)
+
+                    if (emailSend.IsSuccess)
                     {
                         _response.Message = "Order Created";
                     }
@@ -92,12 +93,63 @@ namespace SvarosNamai.Serivce.OrderAPI.Controllers
             return _response;
         }
 
-        [HttpPost]
-        public async Task<ResponseDto> PdfFile(int id)
+        [HttpGet("DownloadInvoice/{orderId}")]
+        public async Task<IActionResult> DownloadInvoice(int orderId)
         {
-            var resp = _invoice.GenerateInvoice(id);
-            return _response;
+            try
+            {
+                var checkDb = _db.Orders.Find(orderId);
+                if(checkDb.Status != 2)
+                {
+                    throw new Exception("Order not Completed");
+                }
+                if (checkDb != null)
+                {
+                    var emailCheck = await _email.GetInvoice(orderId);
+                    if (emailCheck.IsSuccess)
+                    {
+                        MemoryStream stream = new MemoryStream(JsonConvert.DeserializeObject<byte[]>(emailCheck.Result.ToString()));
+                        
+                            Response.Headers["Content-Disposition"] = $"attachment; filename={orderId}.pdf";
+                            Response.ContentType = "application/octet-stream";
+
+                            return File(stream, "application/octet.stream");
+                        
+                    }
+                    else
+                    {
+                        var generateInvoice = await _invoice.GenerateInvoice(orderId);    
+                        if(generateInvoice.IsSuccess)
+                        {
+                            MemoryStream stream = new MemoryStream(System.IO.File.ReadAllBytes(generateInvoice.Result.ToString()));
+                            
+                                Response.Headers["Content-Disposition"] = $"attachment; filename={orderId}.pdf";
+                                Response.ContentType = "application/octet-stream";
+
+                                return File(stream, "application/octet.stream");
+                            
+                        }
+                        else
+                        {
+                            throw new Exception("Can't generate invoice");
+                        }
+                    }
+                }
+                else
+                {
+                    throw new Exception("orderId not found");
+                }
+            }
+            catch (Exception ex)
+            {
+                _error.LogError(ex.Message);
+                return BadRequest(ex.Message);
+            }
+            
         }
+
+
+
 
 
         [HttpPut("OrderStatusChange")]
