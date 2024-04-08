@@ -24,8 +24,9 @@ namespace SvarosNamai.Serivce.OrderAPI.Controllers
         private IProductService _productService;
         private IInvoiceGenerator _invoice;
         private IEmailService _email;
+        private IErrorLogger _error;
 
-        public OrderAPIController(AppDbContext db, IMapper mapper, IProductService productService, IInvoiceGenerator invoice, IEmailService email)
+        public OrderAPIController(AppDbContext db, IMapper mapper, IProductService productService, IInvoiceGenerator invoice, IEmailService email, IErrorLogger error)
         {
             _db = db;
             _response = new ResponseDto();
@@ -33,6 +34,7 @@ namespace SvarosNamai.Serivce.OrderAPI.Controllers
             _productService = productService;
             _invoice = invoice;
             _email = email;
+            _error = error;
         }
 
 
@@ -42,7 +44,7 @@ namespace SvarosNamai.Serivce.OrderAPI.Controllers
             try
             {
                 BundleDto bundleFromDb = await _productService.GetBundle(bundleId);
-                if (bundleFromDb != null)
+                if (bundleFromDb != null && bundleFromDb.Products != null)
                 {
                     Order orderToDb = _mapper.Map<Order>(order);
                     orderToDb.CreationDate = DateTime.Now;
@@ -72,15 +74,20 @@ namespace SvarosNamai.Serivce.OrderAPI.Controllers
                     else
                     {
                         _response.Message = $"Order Created, Email not sent. Reason: {emailSend.Message}";
+                        _error.LogError(emailSend.Message);
+                        return _response;
                     }
-
-
+                }
+                else
+                {
+                    throw new Exception("Bundle doesn't exist or doesn't have products");
                 }
             }
             catch (Exception ex)
             {
                 _response.IsSuccess = false;
                 _response.Message = ex.Message;
+                _error.LogError(ex.Message);
             }
             return _response;
         }
@@ -106,11 +113,15 @@ namespace SvarosNamai.Serivce.OrderAPI.Controllers
                     {
                         _response.Message = "Not a valid status";
                         _response.IsSuccess = false;
+                        _error.LogError(_response.Message);
+                        return _response;
                     }
                     else if (statusCheck == orderCheck.Status)
                     {
                         _response.Message = "Order status is as submitted";
                         _response.IsSuccess = false;
+                        _error.LogError(_response.Message);
+                        return _response;
                     }
                     else
                     {
@@ -139,14 +150,16 @@ namespace SvarosNamai.Serivce.OrderAPI.Controllers
                                     var emailConfirmationSend = await _email.SendCompleteEmail(info, generateInvoice.Result.ToString());
                                     if (!emailConfirmationSend.IsSuccess)
                                     {
-                                        _response.Message = emailConfirmationSend.Message;
-                                        _response.IsSuccess = false;
+                                        throw new Exception($"{emailConfirmationSend.Message}")
                                     }
-                                    await _db.SaveChangesAsync();
+                                    else
+                                    {
+                                        await _db.SaveChangesAsync();
+                                    }
                                 }
                                 else
                                 {
-                                    break;
+                                    throw new Exception($"{generateInvoice.Message}")
                                 }
                                 break;
                             default:
@@ -159,6 +172,8 @@ namespace SvarosNamai.Serivce.OrderAPI.Controllers
             {
                 _response.IsSuccess = false;
                 _response.Message = ex.Message;
+                _error.LogError(ex.Message);
+
             }
             return _response;
         }

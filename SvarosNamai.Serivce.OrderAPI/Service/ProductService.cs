@@ -33,6 +33,10 @@ namespace SvarosNamai.Serivce.OrderAPI.Service
                     BundleDto bundle = JsonConvert.DeserializeObject<BundleDto>(Convert.ToString(resp.Result));
                     return bundle;
                 }
+                else
+                {
+                    throw new Exception($"{resp.Message}");
+                }
             }
             catch (Exception ex) 
             {

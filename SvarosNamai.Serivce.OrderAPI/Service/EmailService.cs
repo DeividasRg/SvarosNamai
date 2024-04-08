@@ -19,12 +19,14 @@ namespace SvarosNamai.Serivce.OrderAPI.Service
         private readonly IHttpClientFactory _httpClientFactory;
         private IMapper _mapper;
         private readonly ResponseDto _response;
+        private readonly IErrorLogger _error;
 
-        public EmailService(IHttpClientFactory httpClientFactory, IMapper mapper)
+        public EmailService(IHttpClientFactory httpClientFactory, IMapper mapper, IErrorLogger error)
         {
             _httpClientFactory = httpClientFactory;
             _mapper = mapper;
             _response = new ResponseDto();
+            _error = error;
         }
 
 
@@ -41,7 +43,7 @@ namespace SvarosNamai.Serivce.OrderAPI.Service
 
                 if (!result.IsSuccess)
                 {
-                    _response.Message = result.Message;
+                    throw new Exception($"{result.Message}");
                 }
 
             }
@@ -49,6 +51,7 @@ namespace SvarosNamai.Serivce.OrderAPI.Service
             {
                 _response.IsSuccess = false;
                 _response.Message = ex.Message;
+                _error.LogError(_response.Message);
             }
             return _response;
 
@@ -62,24 +65,14 @@ namespace SvarosNamai.Serivce.OrderAPI.Service
 
                 if (string.IsNullOrEmpty(pdfFilePath) || !System.IO.File.Exists(pdfFilePath))
                 {
-                    _response.IsSuccess = false;
-                    _response.Message = "Pdf file doesn't exist";
-                    return _response;
+                    throw new Exception("pdf file doesn't exist");
                 }
                 
                 
                     info.pdfFile = await System.IO.File.ReadAllBytesAsync(pdfFilePath);
 
-
-
-
-
-
                 var client = _httpClientFactory.CreateClient("Email");
-                //var formData = new MultipartFormDataContent();
-                //var json = JsonConvert.SerializeObject(info);
-                //var content = new StringContent(json, Encoding.UTF8, "application/json");
-                //formData.Add(content, "info");
+
 
                 var json = JsonConvert.SerializeObject(info);
                 var content = new StringContent(json, Encoding.UTF8, "application/json");
@@ -89,7 +82,7 @@ namespace SvarosNamai.Serivce.OrderAPI.Service
 
                     if (!result.IsSuccess)
                     {
-                        _response.Message = result.Message;
+                    throw new Exception($"{result.Message}");
                     }
                 
 
@@ -98,6 +91,7 @@ namespace SvarosNamai.Serivce.OrderAPI.Service
             {
                 _response.IsSuccess = false;
                 _response.Message = ex.Message;
+                _error.LogError(_response.Message);
             }
             return _response;
             

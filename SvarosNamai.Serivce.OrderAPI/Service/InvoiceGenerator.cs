@@ -27,11 +27,13 @@ namespace SvarosNamai.Serivce.OrderAPI.Service
 
         private readonly AppDbContext _db;
         private ResponseDto _response;
+        private readonly IErrorLogger _error;
 
-        public InvoiceGenerator(AppDbContext db)
+        public InvoiceGenerator(AppDbContext db, IErrorLogger error)
         {
             _db = db;
             _response = new ResponseDto();
+            _error = error;
         }
 
 
@@ -127,6 +129,7 @@ namespace SvarosNamai.Serivce.OrderAPI.Service
             {
                 _response.IsSuccess = false;
                 _response.Message = ex.Message;
+                _error.LogError(_response.Message);
             }
             return _response;
         }

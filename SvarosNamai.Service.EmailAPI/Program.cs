@@ -1,5 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using SendGrid;
+using SvarosNamai.Serivce.EmailAPI.Service;
+using SvarosNamai.Serivce.EmailAPI.Service.IService;
 using SvarosNamai.Service.OrderAPI.Data;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -9,7 +11,7 @@ builder.Services.AddDbContext<AppDbContext>(option =>
 {
     option.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
-
+builder.Services.AddScoped<IErrorLogger, ErrorLogger>();
 
 builder.Services.AddScoped<ISendGridClient>(provider =>
 {

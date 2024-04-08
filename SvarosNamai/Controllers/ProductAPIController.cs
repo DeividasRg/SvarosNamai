@@ -70,7 +70,7 @@ namespace SvarosNamai.Service.ProductAPI.Controllers
         {
             try
             {
-                BundleDto bundle = _mapper.Map<BundleDto>(_db.Bundles.FirstOrDefault(u => u.BundleId == bundleId));
+                BundleDto bundle = _mapper.Map<BundleDto>(_db.Bundles.Find(bundleId));
                 if (bundle != null)
                 {
                     var productIds = _db.ProductBundle
@@ -87,14 +87,23 @@ namespace SvarosNamai.Service.ProductAPI.Controllers
                     _response.Message = "Successfully Retrieved";
                     return _response;
                 }
+                else
+                {
+                    throw new Exception("Bundle doesn't exist");
+                }
             }
-            catch(Exception ex) 
+
+
+            catch (Exception ex)
             {
                 _response.IsSuccess = false;
                 _response.Message = ex.Message;
             }
             return _response;
         }
+
+        
+        
 
         [HttpGet("GetProduct/{productId}")]
         public ResponseDto GetProduct(int productId)
