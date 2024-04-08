@@ -24,11 +24,11 @@ namespace SvarosNamai.Service.EmailAPI.Controllers
         }
 
         [HttpPost("SendCompleteEmail")]
-        public async Task<ResponseDto> SendCompleteEmail(ConfirmationEmailDto info, IFormFile pdfFile)
+        public async Task<ResponseDto> SendCompleteEmail([FromForm]ConfirmationEmailDto info)
         {
             try
             {
-                if(pdfFile == null || pdfFile.Length <= 0 || info == null)
+                if (info.pdfFile == null || info.pdfFile.Length <= 0 || info == null)
                 {
                     _response.IsSuccess = false;
                     _response.Message = "Incorrect info";
@@ -36,12 +36,15 @@ namespace SvarosNamai.Service.EmailAPI.Controllers
                 }
 
                 var filepath = Path.Combine("pdf_files", Guid.NewGuid().ToString() + ".pdf");
-                using (var stream = new FileStream(filepath,FileMode.Create))
+                using (var stream = new MemoryStream(info.pdfFile))
                 {
-                    await pdfFile.CopyToAsync(stream);
+                    using (var fileStream = new FileStream(filepath,FileMode.Create))
+                    {
+                        await stream.CopyToAsync(fileStream);
+                    }
                 }
 
-                string message = "Užsakymas įvkdytas, prisegame sąskaitą faktūrą.";
+                    string message = "Užsakymas įvkdytas, prisegame sąskaitą faktūrą.";
 
                 var msg = new SendGridMessage()
                 {

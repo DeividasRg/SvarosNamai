@@ -10,5 +10,6 @@
         public DateOnly Date {  get; set; }
         public int Hour { get; set; }
         public string Address { get; set; }
+        public byte[]? pdfFile { get; set; }
     }
 }

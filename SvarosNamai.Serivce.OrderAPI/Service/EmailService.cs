@@ -68,7 +68,7 @@ namespace SvarosNamai.Serivce.OrderAPI.Service
                 }
                 
                 
-                    byte[] pdfBytes = await System.IO.File.ReadAllBytesAsync(pdfFilePath);
+                    info.pdfFile = await System.IO.File.ReadAllBytesAsync(pdfFilePath);
 
 
 
@@ -78,12 +78,10 @@ namespace SvarosNamai.Serivce.OrderAPI.Service
                 var client = _httpClientFactory.CreateClient("Email");
                     var formData = new MultipartFormDataContent();
 
-                
 
 
-                var pdfContent = new ByteArrayContent(pdfBytes);
-                pdfContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/pdf");
-                formData.Add(pdfContent, "pdfFile", Path.GetFileName(pdfFilePath));
+                formData.Add(new ByteArrayContent(info.pdfFile), "pdfFile", "filename.pdf");
+
 
                 var json = JsonConvert.SerializeObject(info);
                 var content = new StringContent(json, Encoding.UTF8, "application/json");

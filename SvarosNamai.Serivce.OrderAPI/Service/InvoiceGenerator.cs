@@ -41,7 +41,7 @@ namespace SvarosNamai.Serivce.OrderAPI.Service
             {
                 var order = _db.Orders.Find(orderId);
                 var orderlines = _db.OrderLines.Where(u => u.Order == order);
-                String path = $@"C:\\Users\\deivi\\Desktop\\SN-{order.OrderId}.pdf";
+                String path = $@"C:\Users\dragauskas\OneDrive - barbora.lt\Desktop\\SN-{order.OrderId}.pdf";
                 PdfWriter writer = new PdfWriter(path);
                 PdfDocument pdf = new PdfDocument(writer);
                 Document document = new Document(pdf);
