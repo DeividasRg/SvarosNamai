@@ -24,7 +24,7 @@ namespace SvarosNamai.Service.EmailAPI.Controllers
         }
 
         [HttpPost("SendCompleteEmail")]
-        public async Task<ResponseDto> SendCompleteEmail([FromForm]ConfirmationEmailDto info)
+        public async Task<ResponseDto> SendCompleteEmail(ConfirmationEmailDto info)
         {
             try
             {
@@ -35,7 +35,14 @@ namespace SvarosNamai.Service.EmailAPI.Controllers
                     return _response;
                 }
 
-                var filepath = Path.Combine("pdf_files", Guid.NewGuid().ToString() + ".pdf");
+                string directoryPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "pdf_files");
+                if(!Directory.Exists(directoryPath))
+                {
+                    Directory.CreateDirectory(directoryPath);
+                }
+
+
+                var filepath = Path.Combine(directoryPath, Guid.NewGuid().ToString() + ".pdf");
                 using (var stream = new MemoryStream(info.pdfFile))
                 {
                     using (var fileStream = new FileStream(filepath,FileMode.Create))
@@ -53,7 +60,9 @@ namespace SvarosNamai.Service.EmailAPI.Controllers
                     PlainTextContent = message
                 };
 
-                msg.AddAttachment(filepath, "order.pdf");
+                string base64Content = Convert.ToBase64String(info.pdfFile);
+
+                msg.AddAttachment("order.pdf", base64Content);
                 msg.AddTo(new EmailAddress($"{info.Email}", $"{info.Name} {info.LastName}"));
                 var response = await _sendgrid.SendEmailAsync(msg);
 
