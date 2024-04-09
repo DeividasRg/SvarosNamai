@@ -40,6 +40,10 @@ namespace SvarosNamai.Service.InvoiceAPI.Controllers
         {
             try
             {
+                if(_db.Invoices.Any(u => u.OrderId == order.OrderId))
+                {
+                    throw new Exception("Invoice already generated for this orderId");
+                }
 
                 string directoryPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Invoices");
 
@@ -161,6 +165,33 @@ namespace SvarosNamai.Service.InvoiceAPI.Controllers
                 _error.LogError(_response.Message);
             }
             return _response;
+        }
+
+
+        [HttpGet("DownloadInvoice/{orderId}")]
+        public async Task<IActionResult> DownloadInvoice(int orderId)
+        {
+            try
+            {
+
+                var invoice = _db.Invoices.Where(u => u.OrderId == orderId).FirstOrDefault();
+                if(invoice != null)
+                {
+                return PhysicalFile(invoice.Path, "application/octet-stream", $"{invoice.InvoiceName}.pdf");
+                }
+                else
+                {
+                    throw new Exception("Invoice doesn't exist");
+                }
+
+               
+
+            }
+            catch(Exception ex)
+            {
+                return new NotFoundObjectResult(ex.Message);
+                _error.LogError(_response.Message);
+            }
         }
     }
 }

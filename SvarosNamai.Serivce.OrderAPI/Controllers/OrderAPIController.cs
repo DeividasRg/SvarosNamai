@@ -125,12 +125,20 @@ namespace SvarosNamai.Serivce.OrderAPI.Controllers
                         switch (status)
                         {
                             case OrderStatusses.Status_Approved:
+                                if(orderCheck.Status == OrderStatusses.Status_Completed)
+                                {
+                                    throw new Exception("Order already completed");
+                                }
                                 orderCheck.Status = OrderStatusses.Status_Approved;
                                 info.OrderStatus = OrderStatusses.Status_Approved;
                                 var emailSendForApproved = await _email.SendConfirmationEmail(info);
                                 await _db.SaveChangesAsync();
                                 break;
                             case OrderStatusses.Status_Cancelled:
+                                if (orderCheck.Status == OrderStatusses.Status_Completed)
+                                {
+                                    throw new Exception("Order already completed");
+                                }
                                 orderCheck.Status = OrderStatusses.Status_Cancelled;
                                 orderCheck.Reservation.IsActive = false;
                                 info.OrderStatus = OrderStatusses.Status_Cancelled;
