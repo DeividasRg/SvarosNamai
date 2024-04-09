@@ -1,49 +1,44 @@
-﻿using iText.IO.Font;
-using iText.IO.Font.Constants;
+﻿using iText.Bouncycastle.Crypto;
+using iText.IO.Font;
 using iText.Kernel.Font;
 using iText.Kernel.Pdf;
 using iText.Layout;
+using iText.Layout.Borders;
 using iText.Layout.Element;
 using iText.Layout.Properties;
-using SvarosNamai.Serivce.OrderAPI.Models;
-using SvarosNamai.Serivce.OrderAPI.Service.IService;
-using SvarosNamai.Service.OrderAPI.Data;
-using SvarosNamai.Service.OrderAPI.Models.Dtos;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
+using SvarosNamai.Serivce.InvoiceAPI.Service.IService;
+using SvarosNamai.Service.InvoiceAPI.Data;
+using SvarosNamai.Service.InvoiceAPI.Models;
+using SvarosNamai.Service.InvoiceAPI.Models.Dtos;
 using System;
-using System.Collections;
-using System.Linq;
-using System.Reflection.Metadata;
-using System.Threading.Tasks;
-using Document = iText.Layout.Document;
-using System.ComponentModel.Design;
-using AngleSharp.Css.Dom;
-using iText.Layout.Borders;
 using System.IO;
+using System.Threading.Tasks;
 
-namespace SvarosNamai.Serivce.OrderAPI.Service
+namespace SvarosNamai.Service.InvoiceAPI.Controllers
 {
-    public class InvoiceGenerator : IInvoiceGenerator
+    [Route("api/invoice")]
+    [ApiController]
+    public class InvoiceController : ControllerBase
     {
-
-
         private readonly AppDbContext _db;
         private ResponseDto _response;
-        private readonly IErrorLogger _error;
+        private IErrorLogger _error;
 
-        public InvoiceGenerator(AppDbContext db, IErrorLogger error)
+        public InvoiceController(AppDbContext db, IErrorLogger error)
         {
             _db = db;
             _response = new ResponseDto();
             _error = error;
         }
 
-
-        public async Task<ResponseDto> GenerateInvoice(int orderId)
+        [HttpGet("GenerateInvoice")]
+        public async Task<ResponseDto> GenerateInvoice(OrderForInvoiceDto order)
         {
             try
             {
-                var order = _db.Orders.Find(orderId);
-                var orderlines = _db.OrderLines.Where(u => u.Order == order);
 
                 string directoryPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Invoices");
 
@@ -52,7 +47,7 @@ namespace SvarosNamai.Serivce.OrderAPI.Service
                     Directory.CreateDirectory(directoryPath);
                 }
 
-                var filepath = Path.Combine(directoryPath, $"{order.OrderId}_{order.Street} {order.HouseNo}{order.ApartmentNo}{order.HouseLetter}" + ".pdf");
+                var filepath = Path.Combine(directoryPath, $"{order.OrderId}_{order.Street} {order.HouseNo}{order.HouseLetter} {order.ApartmentNo}" + ".pdf");
 
 
 
@@ -71,7 +66,7 @@ namespace SvarosNamai.Serivce.OrderAPI.Service
 
                 document.Add(new Paragraph().SetMarginBottom(20));
 
-                
+
                 Table detailsTable = new Table(2)
                     .UseAllAvailableWidth();
 
@@ -79,22 +74,22 @@ namespace SvarosNamai.Serivce.OrderAPI.Service
                 Paragraph details = new Paragraph()
                     .AddTabStops(new TabStop(100, TabAlignment.RIGHT))
                     .Add("Data: ").Add(DateTime.Now.ToShortDateString()).Add("\n")
-                    .Add("Užsakymo nr. : ").Add($"{orderId}").Add("\n")
+                    .Add("Užsakymo nr. : ").Add($"{order.OrderId}").Add("\n")
                     .Add("Klientas: ").Add($"{order.Name} {order.LastName}").Add("\n")
                     .Add("Adresas: ").Add($"{order.Street} {order.HouseNo}{order.ApartmentNo}{order.HouseLetter}, {order.City}").Add("\n")
                     .Add("El.pašto adresas: ").Add($"{order.Email}").Add("\n")
                     .Add("Telefono nr.: ").Add($"{order.PhoneNumber}");
 
-                
+
                 Paragraph companyDetails = new Paragraph()
                     .AddTabStops(new TabStop(100, TabAlignment.RIGHT))
                     .Add("Pavadinimas: ").Add("MB \"Švaros Namai\"").Add("\n")
                     .Add("Adresas: ").Add("Taikos g. 13, Vilnius").Add("\n")
                     .Add("El.pašto adresas: ").Add("greta@svarosnamai.lt").Add("\n")
                     .Add("Telefono nr.: ").Add("+370 648 (71)806")
-                    .SetTextAlignment(TextAlignment.RIGHT); 
+                    .SetTextAlignment(TextAlignment.RIGHT);
 
-                
+
                 Cell detailsCell = new Cell().Add(details)
                                                .SetBorder(Border.NO_BORDER);
                 Cell companyDetailsCell = new Cell().Add(companyDetails)
@@ -104,14 +99,14 @@ namespace SvarosNamai.Serivce.OrderAPI.Service
 
                 document.Add(detailsTable);
 
-                
+
                 document.Add(new Paragraph().SetMarginBottom(20));
 
                 Paragraph paslaugaHeader = new Paragraph("Paslaugos")
                     .SetTextAlignment(TextAlignment.CENTER)
                     .SetFontSize(20)
                     .SetBold();
-                    
+
 
                 document.Add(paslaugaHeader);
 
@@ -120,22 +115,33 @@ namespace SvarosNamai.Serivce.OrderAPI.Service
                 Table table = new Table(1)
                     .UseAllAvailableWidth();
 
-                foreach (var line in orderlines)
+                foreach (var line in order.Lines)
                 {
                     Cell productNameCell = new Cell().Add(new Paragraph(line.ProductName));
+                    Cell productPriceCell = new Cell().Add(new Paragraph(line.Price.ToString()));
                     table.AddCell(productNameCell);
                 }
 
                 document.Add(table);
 
-                Paragraph total = new Paragraph($"Suma: {order.Price} €")
+                Paragraph total = new Paragraph($"Suma: COMING SOON €")
                     .SetTextAlignment(TextAlignment.RIGHT)
                     .SetBold();
                 document.Add(total);
 
                 document.Close();
 
-                _response.Result = filepath;
+                Invoice invoice = new Invoice()
+                {
+                    OrderId = order.OrderId,
+                    InvoiceName = $"{order.OrderId}_{order.Street} {order.HouseNo}{order.HouseLetter} {order.ApartmentNo}",
+                    Path = filepath
+                };
+
+                byte[] bytes = System.IO.File.ReadAllBytes(filepath);
+
+
+                _response.Result = JsonConvert.SerializeObject(bytes);
             }
             catch (Exception ex)
             {
@@ -145,18 +151,6 @@ namespace SvarosNamai.Serivce.OrderAPI.Service
             }
             return _response;
         }
-
-
-
-
-
-
-
-
-
-
-
-
-
     }
 }
+

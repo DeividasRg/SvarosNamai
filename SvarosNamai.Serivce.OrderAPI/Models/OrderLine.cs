@@ -10,5 +10,6 @@ namespace SvarosNamai.Serivce.OrderAPI.Models
         [ForeignKey("OrderId")]
         public virtual Order Order { get; set; }
         public string ProductName { get; set; }
+        public double? Price { get; set; }   
     }
 }

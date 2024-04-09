@@ -9,6 +9,7 @@ using SvarosNamai.Service.OrderAPI.Data;
 using SvarosNamai.Service.OrderAPI.Models.Dtos;
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -20,20 +21,19 @@ namespace SvarosNamai.Serivce.OrderAPI.Controllers
     public class OrderAPIController : ControllerBase
     {
         private readonly AppDbContext _db;
-        protected ResponseDto _response;
-        private IMapper _mapper;
-        private IProductService _productService;
-        private IInvoiceGenerator _invoice;
-        private IEmailService _email;
-        private IErrorLogger _error;
+        private  ResponseDto _response;
+        private readonly IMapper _mapper;
+        private readonly IProductService _productService;
+        private readonly IEmailService _email;
+        private readonly IErrorLogger _error;
+        private readonly IInvoiceService _invoice;
 
-        public OrderAPIController(AppDbContext db, IMapper mapper, IProductService productService, IInvoiceGenerator invoice, IEmailService email, IErrorLogger error)
+        public OrderAPIController(AppDbContext db, IMapper mapper, IProductService productService, IEmailService email, IErrorLogger error)
         {
             _db = db;
             _response = new ResponseDto();
             _mapper = mapper;
             _productService = productService;
-            _invoice = invoice;
             _email = email;
             _error = error;
         }
@@ -93,64 +93,6 @@ namespace SvarosNamai.Serivce.OrderAPI.Controllers
             return _response;
         }
 
-        [HttpGet("DownloadInvoice/{orderId}")]
-        public async Task<IActionResult> DownloadInvoice(int orderId)
-        {
-            try
-            {
-                var checkDb = _db.Orders.Find(orderId);
-                if(checkDb.Status != 2)
-                {
-                    throw new Exception("Order not Completed");
-                }
-                if (checkDb != null)
-                {
-                    var emailCheck = await _email.GetInvoice(orderId);
-                    if (emailCheck.IsSuccess)
-                    {
-                        MemoryStream stream = new MemoryStream(JsonConvert.DeserializeObject<byte[]>(emailCheck.Result.ToString()));
-                        
-                            Response.Headers["Content-Disposition"] = $"attachment; filename={orderId}.pdf";
-                            Response.ContentType = "application/octet-stream";
-
-                            return File(stream, "application/octet.stream");
-                        
-                    }
-                    else
-                    {
-                        var generateInvoice = await _invoice.GenerateInvoice(orderId);    
-                        if(generateInvoice.IsSuccess)
-                        {
-                            MemoryStream stream = new MemoryStream(System.IO.File.ReadAllBytes(generateInvoice.Result.ToString()));
-                            
-                                Response.Headers["Content-Disposition"] = $"attachment; filename={orderId}.pdf";
-                                Response.ContentType = "application/octet-stream";
-
-                                return File(stream, "application/octet.stream");
-                            
-                        }
-                        else
-                        {
-                            throw new Exception("Can't generate invoice");
-                        }
-                    }
-                }
-                else
-                {
-                    throw new Exception("orderId not found");
-                }
-            }
-            catch (Exception ex)
-            {
-                _error.LogError(ex.Message);
-                return BadRequest(ex.Message);
-            }
-            
-        }
-
-
-
-
 
         [HttpPut("OrderStatusChange")]
         public async Task<ResponseDto> OrderStatusChange(int status, int orderId)
@@ -195,7 +137,10 @@ namespace SvarosNamai.Serivce.OrderAPI.Controllers
                                 await _db.SaveChangesAsync();
                                 break;
                             case OrderStatusses.Status_Completed:
-                                var generateInvoice = await _invoice.GenerateInvoice(orderId);
+                                OrderForInvoiceDto order = _mapper.Map<OrderForInvoiceDto>(orderCheck);
+                                order.Lines = _mapper.Map<IEnumerable<OrderLinesForInvoiceDto>>(
+                                _db.OrderLines.Where(u => u.Order.OrderId == orderCheck.OrderId));
+                                ResponseDto generateInvoice = await _invoice.GenerateInvoice(order);
                                 if (generateInvoice.IsSuccess)
                                 {
                                     orderCheck.Status = OrderStatusses.Status_Completed;
@@ -226,6 +171,27 @@ namespace SvarosNamai.Serivce.OrderAPI.Controllers
                 _response.Message = ex.Message;
                 _error.LogError(ex.Message);
 
+            }
+            return _response;
+        }
+
+        [HttpPost("AddProductToOrder")]
+        public async Task<ResponseDto> AddProductToOrder(OrderLine orderLine)
+        {
+            try
+            {
+                var checkOrder = _db.Orders.Find(orderLine.Order);
+                if (checkOrder != null && checkOrder.Status != 2)
+                {
+                    await _db.OrderLines.AddAsync(orderLine);
+                    await _db.SaveChangesAsync();
+                }
+            }
+            catch(Exception ex)
+            {
+                _response.IsSuccess = false;
+                _response.Message = ex.Message;
+                _error.LogError(ex.Message);
             }
             return _response;
         }

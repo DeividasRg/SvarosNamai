@@ -3,8 +3,8 @@ using System.Threading.Tasks;
 
 namespace SvarosNamai.Serivce.OrderAPI.Service.IService
 {
-    public interface IInvoiceGenerator
+    public interface IInvoiceService
     {
-        Task<ResponseDto> GenerateInvoice(int orderId);
+        Task<ResponseDto> GenerateInvoice(OrderForInvoiceDto order);
     }
 }
