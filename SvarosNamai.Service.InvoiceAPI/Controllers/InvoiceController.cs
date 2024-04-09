@@ -189,8 +189,8 @@ namespace SvarosNamai.Service.InvoiceAPI.Controllers
             }
             catch(Exception ex)
             {
-                return new NotFoundObjectResult(ex.Message);
                 _error.LogError(_response.Message);
+                return new NotFoundObjectResult(ex.Message);
             }
         }
     }
