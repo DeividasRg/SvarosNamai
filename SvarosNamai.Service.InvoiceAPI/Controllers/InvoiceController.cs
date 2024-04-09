@@ -15,6 +15,7 @@ using SvarosNamai.Service.InvoiceAPI.Models;
 using SvarosNamai.Service.InvoiceAPI.Models.Dtos;
 using System;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace SvarosNamai.Service.InvoiceAPI.Controllers
@@ -34,7 +35,7 @@ namespace SvarosNamai.Service.InvoiceAPI.Controllers
             _error = error;
         }
 
-        [HttpGet("GenerateInvoice")]
+        [HttpPost("GenerateInvoice")]
         public async Task<ResponseDto> GenerateInvoice(OrderForInvoiceDto order)
         {
             try
@@ -107,24 +108,31 @@ namespace SvarosNamai.Service.InvoiceAPI.Controllers
                     .SetFontSize(20)
                     .SetBold();
 
-
                 document.Add(paslaugaHeader);
 
                 document.Add(new Paragraph().SetMarginBottom(5));
 
-                Table table = new Table(1)
+                
+                Table table = new Table(2)
                     .UseAllAvailableWidth();
+
+                
+                Cell productNameHeaderCell = new Cell().Add(new Paragraph("Pavadinimas").SetBold());
+                Cell productPriceHeaderCell = new Cell().Add(new Paragraph("Kaina").SetBold());
+                table.AddHeaderCell(productNameHeaderCell);
+                table.AddHeaderCell(productPriceHeaderCell);
 
                 foreach (var line in order.Lines)
                 {
                     Cell productNameCell = new Cell().Add(new Paragraph(line.ProductName));
-                    Cell productPriceCell = new Cell().Add(new Paragraph(line.Price.ToString()));
+                    Cell productPriceCell = new Cell().Add(new Paragraph($"{line.Price.ToString()} €"));
                     table.AddCell(productNameCell);
+                    table.AddCell(productPriceCell);
                 }
 
                 document.Add(table);
 
-                Paragraph total = new Paragraph($"Suma: COMING SOON €")
+                Paragraph total = new Paragraph($"Suma: {order.Lines.Sum(line => line.Price)} €")
                     .SetTextAlignment(TextAlignment.RIGHT)
                     .SetBold();
                 document.Add(total);
@@ -137,6 +145,9 @@ namespace SvarosNamai.Service.InvoiceAPI.Controllers
                     InvoiceName = $"{order.OrderId}_{order.Street} {order.HouseNo}{order.HouseLetter} {order.ApartmentNo}",
                     Path = filepath
                 };
+                
+                await _db.Invoices.AddAsync(invoice);
+                await _db.SaveChangesAsync();
 
                 byte[] bytes = System.IO.File.ReadAllBytes(filepath);
 

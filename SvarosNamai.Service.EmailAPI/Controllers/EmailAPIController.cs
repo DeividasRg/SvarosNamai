@@ -101,6 +101,11 @@ namespace SvarosNamai.Service.EmailAPI.Controllers
                 _db.EmailLogs.Add(log);
                 await _db.SaveChangesAsync();
 
+                if(System.IO.File.Exists(filepath))
+                {
+                    System.IO.File.Delete(filepath);
+                }
+
             }
             catch (Exception ex) 
             {

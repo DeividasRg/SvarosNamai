@@ -28,7 +28,7 @@ namespace SvarosNamai.Serivce.OrderAPI.Controllers
         private readonly IErrorLogger _error;
         private readonly IInvoiceService _invoice;
 
-        public OrderAPIController(AppDbContext db, IMapper mapper, IProductService productService, IEmailService email, IErrorLogger error)
+        public OrderAPIController(AppDbContext db, IMapper mapper, IProductService productService, IEmailService email, IErrorLogger error, IInvoiceService invoice)
         {
             _db = db;
             _response = new ResponseDto();
@@ -36,6 +36,7 @@ namespace SvarosNamai.Serivce.OrderAPI.Controllers
             _productService = productService;
             _email = email;
             _error = error;
+            _invoice = invoice;
         }
 
 
@@ -143,14 +144,15 @@ namespace SvarosNamai.Serivce.OrderAPI.Controllers
                                 ResponseDto generateInvoice = await _invoice.GenerateInvoice(order);
                                 if (generateInvoice.IsSuccess)
                                 {
-                                    orderCheck.Status = OrderStatusses.Status_Completed;
-                                    var emailConfirmationSend = await _email.SendCompleteEmail(info, generateInvoice.Result.ToString());
+                                    info.pdfFile = JsonConvert.DeserializeObject<byte[]>(generateInvoice.Result.ToString());
+                                    var emailConfirmationSend = await _email.SendCompleteEmail(info);
                                     if (!emailConfirmationSend.IsSuccess)
                                     {
                                         throw new Exception($"{emailConfirmationSend.Message}");
                                     }
                                     else
                                     {
+                                        orderCheck.Status = OrderStatusses.Status_Completed;
                                         await _db.SaveChangesAsync();
                                     }
                                 }

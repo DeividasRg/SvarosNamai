@@ -57,20 +57,17 @@ namespace SvarosNamai.Serivce.OrderAPI.Service
 
         }
 
-        public async Task<ResponseDto> SendCompleteEmail(ConfirmationEmailDto info, string pdfFilePath)
+        public async Task<ResponseDto> SendCompleteEmail(ConfirmationEmailDto info)
         {
             try
             {
 
-
-                if (string.IsNullOrEmpty(pdfFilePath) || !System.IO.File.Exists(pdfFilePath))
+                if (info == null)
                 {
-                    throw new Exception("pdf file doesn't exist");
+                    throw new Exception("info not provided");
                 }
                 
                 
-                    info.pdfFile = await System.IO.File.ReadAllBytesAsync(pdfFilePath);
-
                 var client = _httpClientFactory.CreateClient("Email");
 
 

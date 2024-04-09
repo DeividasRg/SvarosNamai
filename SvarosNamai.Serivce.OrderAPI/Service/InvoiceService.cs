@@ -30,8 +30,8 @@ namespace SvarosNamai.Serivce.OrderAPI.Service
             {
                 var client = _httpClientFactory.CreateClient("Invoice");
                 var json = JsonConvert.SerializeObject(order);
-                var encodedData = WebUtility.UrlEncode(json);
-                var response = await client.GetAsync($"/api/invoice/GenerateInvoice?data={encodedData}");
+                var content = new StringContent(json, Encoding.UTF8, "application/json");
+                var response = await client.PostAsync($"/api/invoice/GenerateInvoice", content);
                 var apiContent = await response.Content.ReadAsStringAsync();
                 var resp = JsonConvert.DeserializeObject<ResponseDto>(apiContent);
                 if (resp.IsSuccess)
