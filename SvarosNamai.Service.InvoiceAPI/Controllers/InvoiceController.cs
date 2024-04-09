@@ -40,7 +40,8 @@ namespace SvarosNamai.Service.InvoiceAPI.Controllers
         {
             try
             {
-                if(_db.Invoices.Any(u => u.OrderId == order.OrderId))
+
+                if(_db.Invoices.Any(u => u.OrderId == order.OrderId) && order.Status != 2)
                 {
                     throw new Exception("Invoice already generated for this orderId");
                 }

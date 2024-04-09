@@ -147,8 +147,8 @@ namespace SvarosNamai.Serivce.OrderAPI.Controllers
                                 break;
                             case OrderStatusses.Status_Completed:
                                 OrderForInvoiceDto order = _mapper.Map<OrderForInvoiceDto>(orderCheck);
-                                order.Lines = _mapper.Map<IEnumerable<OrderLinesForInvoiceDto>>(
-                                _db.OrderLines.Where(u => u.Order.OrderId == orderCheck.OrderId));
+                                order.Lines = _mapper.Map<IEnumerable<OrderLinesForInvoiceDto>>(_db.OrderLines.Where(u => u.Order.OrderId == orderCheck.OrderId));
+                                order.Status = OrderStatusses.Status_Completed;
                                 ResponseDto generateInvoice = await _invoice.GenerateInvoice(order);
                                 if (generateInvoice.IsSuccess)
                                 {

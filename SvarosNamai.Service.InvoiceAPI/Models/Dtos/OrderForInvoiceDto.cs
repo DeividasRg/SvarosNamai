@@ -15,6 +15,7 @@ namespace SvarosNamai.Service.InvoiceAPI.Models.Dtos
         public string City { get; set; }
         public string Email { get; set; }
         public string PhoneNumber { get; set; }
+        public int Status {  get; set; }
         public IEnumerable<OrderLinesForInvoiceDto> Lines { get; set; }
     }
 }
