@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
@@ -94,7 +95,7 @@ namespace SvarosNamai.Serivce.OrderAPI.Controllers
             return _response;
         }
 
-
+        [Authorize]
         [HttpPut("OrderStatusChange")]
         public async Task<ResponseDto> OrderStatusChange(int status, int orderId)
         {
@@ -125,20 +126,24 @@ namespace SvarosNamai.Serivce.OrderAPI.Controllers
                         switch (status)
                         {
                             case OrderStatusses.Status_Approved:
+
                                 if(orderCheck.Status == OrderStatusses.Status_Completed)
                                 {
                                     throw new Exception("Order already completed");
                                 }
+
                                 orderCheck.Status = OrderStatusses.Status_Approved;
                                 info.OrderStatus = OrderStatusses.Status_Approved;
                                 var emailSendForApproved = await _email.SendConfirmationEmail(info);
                                 await _db.SaveChangesAsync();
                                 break;
                             case OrderStatusses.Status_Cancelled:
+
                                 if (orderCheck.Status == OrderStatusses.Status_Completed)
                                 {
                                     throw new Exception("Order already completed");
                                 }
+
                                 orderCheck.Status = OrderStatusses.Status_Cancelled;
                                 orderCheck.Reservation.IsActive = false;
                                 info.OrderStatus = OrderStatusses.Status_Cancelled;
@@ -185,6 +190,7 @@ namespace SvarosNamai.Serivce.OrderAPI.Controllers
             return _response;
         }
 
+        [Authorize]
         [HttpPost("AddProductToOrder")]
         public async Task<ResponseDto> AddProductToOrder(OrderLine orderLine)
         {
@@ -201,6 +207,36 @@ namespace SvarosNamai.Serivce.OrderAPI.Controllers
             {
                 _response.IsSuccess = false;
                 _response.Message = ex.Message;
+                _error.LogError(ex.Message);
+            }
+            return _response;
+        }
+
+        [Authorize]
+        [HttpPut("AddPricesToProducts")]
+        public async Task<ResponseDto> AddPricesToProducts(IEnumerable<OrderLine> orderlines)
+        {
+            try
+            {
+                foreach (var line in orderlines)
+                {
+                    var currentLine = _db.OrderLines.Find(line.OrderLineId);
+
+                    if (currentLine != null)
+                    {
+                        currentLine.Price = line.Price;
+                    }
+                    else
+                    {
+                        throw new Exception("Line doesn't exist");
+                    }
+                }
+                await _db.SaveChangesAsync();
+            }
+            catch(Exception ex)
+            {
+                _response.IsSuccess = false;
+                _response.Result = ex.Message;
                 _error.LogError(ex.Message);
             }
             return _response;

@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -32,7 +33,7 @@ namespace SvarosNamai.Service.ProductAPI.Controllers
             _error = error;
         }
 
-
+        [Authorize]
         [HttpGet("GetProducts")]
         public ResponseDto GetProducts()
         {
@@ -115,9 +116,9 @@ namespace SvarosNamai.Service.ProductAPI.Controllers
             return _response;
         }
 
-        
-        
 
+
+        [Authorize]
         [HttpGet("GetProduct/{productId}")]
         public ResponseDto GetProduct(int productId)
         {
@@ -144,6 +145,7 @@ namespace SvarosNamai.Service.ProductAPI.Controllers
             return _response;
         }
 
+        [Authorize]
         [HttpPost("AddBundle")]
         public async Task<ResponseDto> AddBundle(BundleToAddDto bundle)
         {
@@ -171,7 +173,7 @@ namespace SvarosNamai.Service.ProductAPI.Controllers
             }
             return _response;
         }
-
+        [Authorize]
         [HttpPost("AddProduct")]
         public async Task<ResponseDto> AddProduct(ProductDto product)
         {
@@ -199,7 +201,7 @@ namespace SvarosNamai.Service.ProductAPI.Controllers
             }
             return _response;
         }
-
+        [Authorize]
         [HttpPost("AddProductToBundle")]
         public async Task<ResponseDto> AddProductToBundle(ProductBundleDto productBundle)
         {
@@ -245,7 +247,7 @@ namespace SvarosNamai.Service.ProductAPI.Controllers
             }
             return _response;
         }
-
+        [Authorize]
         [HttpDelete("RemoveProductFromBundle/{id}")]
         public async Task<ResponseDto> RemoveProductFromBundle(int id)
         {
@@ -271,6 +273,8 @@ namespace SvarosNamai.Service.ProductAPI.Controllers
             }
             return _response;
         }
+
+        [Authorize]
         [HttpDelete("DeleteProduct/{id}")]
         public async Task<ResponseDto> DeleteProduct(int id)
         {
@@ -304,7 +308,7 @@ namespace SvarosNamai.Service.ProductAPI.Controllers
             return _response;
         }
 
-
+        [Authorize]
         [HttpPut("BundleActivation")]
         public async Task<ResponseDto> BundleActivation(int id)
         {

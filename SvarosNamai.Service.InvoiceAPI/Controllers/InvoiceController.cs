@@ -6,6 +6,7 @@ using iText.Layout;
 using iText.Layout.Borders;
 using iText.Layout.Element;
 using iText.Layout.Properties;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
@@ -22,6 +23,7 @@ namespace SvarosNamai.Service.InvoiceAPI.Controllers
 {
     [Route("api/invoice")]
     [ApiController]
+    [Authorize]
     public class InvoiceController : ControllerBase
     {
         private readonly AppDbContext _db;
@@ -35,6 +37,7 @@ namespace SvarosNamai.Service.InvoiceAPI.Controllers
             _error = error;
         }
 
+        
         [HttpPost("GenerateInvoice")]
         public async Task<ResponseDto> GenerateInvoice(OrderForInvoiceDto order)
         {
