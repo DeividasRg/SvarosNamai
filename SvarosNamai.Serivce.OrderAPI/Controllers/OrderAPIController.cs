@@ -241,5 +241,13 @@ namespace SvarosNamai.Serivce.OrderAPI.Controllers
             }
             return _response;
         }
+
+        [HttpGet("GetOrders")]
+        [Authorize]
+        public async Task<ResponseDto> GetOrders()
+        {
+            _response.Result = _mapper.Map<IEnumerable<OrderDto>>(_db.Orders.ToList());
+            return _response;
+        }
     }
 }

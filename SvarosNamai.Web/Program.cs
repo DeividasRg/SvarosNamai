@@ -1,7 +1,19 @@
+using SvarosNamai.Web.Service;
+using SvarosNamai.Web.Service.IService;
+using SvarosNamai.Web.Utility;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddHttpClient();
+builder.Services.AddHttpClient<IOrderService, OrderService>();
+
+SD.OrderAPIBase = builder.Configuration["ServiceUrls:OrderAPI"];
+
+builder.Services.AddScoped<IBaseService, BaseService>();
+builder.Services.AddScoped<IOrderService, OrderService>();
 
 var app = builder.Build();
 
