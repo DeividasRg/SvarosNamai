@@ -4,6 +4,6 @@ namespace SvarosNamai.Web.Service.IService
 {
     public interface IOrderService
     {
-        Task<ResponseDto?> GetAllOrders();
+        Task<ResponseDto?> GetAllOrdersAsync();
     }
 }

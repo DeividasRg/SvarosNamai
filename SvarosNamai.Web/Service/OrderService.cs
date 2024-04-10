@@ -15,7 +15,7 @@ namespace SvarosNamai.Web.Service
         }
 
 
-        public async Task<ResponseDto?> GetAllOrders()
+        public async Task<ResponseDto?> GetAllOrdersAsync()
         {
             return await _baseService.SendAsync(new RequestDto()
             {
