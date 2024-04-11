@@ -242,11 +242,46 @@ namespace SvarosNamai.Serivce.OrderAPI.Controllers
             return _response;
         }
         [Authorize]
-        [HttpGet("GetOrders")]
-        public async Task<ResponseDto> GetOrders()
+		[HttpGet("GetOrders")]
+		public async Task<ResponseDto> GetOrders()
+		{
+			IEnumerable<Order> orders = _db.Orders.ToList();
+			List<OrderDto> orderDtos = new List<OrderDto>(); 
+
+			foreach (var order in orders)
+			{
+				var orderDto = _mapper.Map<OrderDto>(order);
+				orderDto.Hour = order.Reservation.Hour;
+				orderDto.Date = order.Reservation.Date;
+				orderDtos.Add(orderDto); 
+			}
+
+			_response.Result = orderDtos;
+			return _response;
+		}
+
+        [Authorize]
+        [HttpGet("GetOrder/{orderId}")]
+        public async Task<ResponseDto> GetOrder(int orderId)
         {
-            _response.Result = _mapper.Map<IEnumerable<OrderDto>>(_db.Orders.ToList());
+            Order order = _db.Orders.Find(orderId);
+            OrderDto orderDto = _mapper.Map<OrderDto>(order);
+            orderDto.Hour = order.Reservation.Hour;
+            orderDto.Date = order.Reservation.Date;
+            _response.Result = orderDto;
             return _response;
         }
+
+        //[Authorize]
+        [HttpGet("GetOrderlines/{orderId}")]
+        public async Task<ResponseDto> GetOrderLines(int orderId)
+        {
+            IEnumerable<OrderLine> orderLines = _db.OrderLines.Where(u => u.Order.OrderId == orderId);
+            IEnumerable<OrderLinesForInvoiceDto> orderForSend = _mapper.Map<IEnumerable<OrderLinesForInvoiceDto>>(orderLines);
+            _response.Result = orderForSend;
+            return _response;
+        }
+
+
     }
 }

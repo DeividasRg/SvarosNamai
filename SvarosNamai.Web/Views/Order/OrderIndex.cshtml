@@ -22,10 +22,16 @@
 						Užsakymo numeris
 					</th>
 					<th>
+						Vardas Pavardė
+					</th>
+					<th>
 						Adresas
 					</th>
 					<th>
 						Laikas
+					</th>
+					<th>
+						Statusas
 					</th>
 					<th></th>
 				</tr>
@@ -37,16 +43,20 @@
 					<td> @order.OrderId
 					</td>
 						<td>
-							@order.Street @order.HouseNo@(order.HouseLetter != null ? order.HouseLetter : "") @(order.ApartmentNo != null ? order.ApartmentNo : ""), @order.City
-					</td>
-					<td> @order.Date, @order.Hour
+							@order.Name @order.LastName
+						</td>
+						<td>
+							@order.Street @order.HouseNo@(order.HouseLetter != null ?  order.HouseLetter : "") @(order.ApartmentNo != null ? (" - " + order.ApartmentNo) : ""), @order.City
 					</td>
 						<td>
-							@order.Status
+							@order.Date,  <b>@order.Hour valanda</b>
+					</td>
+						<td>
+							@(SvarosNamai.Web.Utility.SD.GetStatusDescription(order.Status))
 						</td>
 					<td>
-						<a class="btn btn-danger">
-							<i class="bi bi-trash"></i>
+						<a class="btn btn-success">
+								<a asp-controller="Order" asp-action="Details" asp-route-orderId="@order.OrderId"><i class="bi bi-search">></i></a>
 						</a>
 					</td>
 				</tr>

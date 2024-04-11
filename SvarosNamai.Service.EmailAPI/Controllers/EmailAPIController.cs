@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.VisualBasic;
 using Newtonsoft.Json;
 using SendGrid;
 using SendGrid.Helpers.Mail;
@@ -166,6 +167,16 @@ namespace SvarosNamai.Service.EmailAPI.Controllers
                     _error.LogError(response.Body.ToString());
                 }
 
+                bool hasAttachments;
+                if(msg.Attachments == null)
+                {
+                    hasAttachments = false;
+                }
+                else
+                {
+                    hasAttachments = true;
+                }
+
 
 
                 EmailLog log = new EmailLog()
@@ -173,7 +184,7 @@ namespace SvarosNamai.Service.EmailAPI.Controllers
                     Email = info.Email,
                     Content = message,
                     WasSent = _response.IsSuccess,
-                    HadAttachment = (msg.Attachments.Count > 0) ? true : false,
+                    HadAttachment = hasAttachments,
                     Time = DateTime.Now
                 };
                 _db.EmailLogs.Add(log);

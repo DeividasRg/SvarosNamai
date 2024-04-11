@@ -2,6 +2,7 @@
 using SvarosNamai.Serivce.OrderAPI.Models;
 using SvarosNamai.Service.OrderAPI.Data;
 using SvarosNamai.Service.OrderAPI.Models.Dtos;
+using System.Collections.Generic;
 using System.Linq;
 
 
@@ -25,6 +26,16 @@ namespace SvarosNamai.Service.OrderAPI
 
             var mappingConfig = new MapperConfiguration(config =>
             {
+                config.CreateMap<OrderLinesForInvoiceDto, OrderLine>().ReverseMap()
+                .ForMember(dest => dest.OrderId, opt => opt.MapFrom(src => src.Order.OrderId));
+
+                
+
+
+
+
+
+
                 config.CreateMap<Order, OrderDto>().ReverseMap()
                                       .ForMember(dest => dest.Reservation, opt => opt.MapFrom(src => new Reservations
                                       {

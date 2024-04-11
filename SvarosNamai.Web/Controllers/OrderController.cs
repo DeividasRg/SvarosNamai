@@ -27,5 +27,30 @@ namespace SvarosNamai.Web.Controllers
 
             return View(list);
         }
+
+        [Authorize]
+        public async Task<IActionResult> Details(int orderId)
+        {
+            OrderDto order = new();
+            IEnumerable<OrderLinesForInvoiceDto> lines = new List<OrderLinesForInvoiceDto>();
+            ResponseDto orderResponse = await _orderService.GetOrderAsync(orderId);
+            ResponseDto linesResponse = await _orderService.GetOrderLines(orderId);
+            
+
+            if (orderResponse != null && orderResponse.IsSuccess && linesResponse != null && linesResponse.IsSuccess)
+            {
+                order = JsonConvert.DeserializeObject<OrderDto>(orderResponse.Result.ToString());
+                lines = JsonConvert.DeserializeObject<IEnumerable<OrderLinesForInvoiceDto>>(linesResponse.Result.ToString());
+            }
+
+            OrderDetailDto orderDetailDto = new OrderDetailDto
+            {
+                Order = order,
+                Lines = lines
+            };
+
+
+                return View(orderDetailDto);
+        }
     }
 }
