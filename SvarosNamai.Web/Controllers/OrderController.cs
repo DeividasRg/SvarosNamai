@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using SvarosNamai.Web.Models;
 using SvarosNamai.Web.Service.IService;
@@ -13,7 +14,7 @@ namespace SvarosNamai.Web.Controllers
             _orderService = orderService;
         }
 
-
+        [Authorize]
         public async Task<IActionResult> OrderIndex()
         {
             List<OrderDto>? list = new();

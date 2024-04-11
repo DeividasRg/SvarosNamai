@@ -241,7 +241,7 @@ namespace SvarosNamai.Serivce.OrderAPI.Controllers
             }
             return _response;
         }
-
+        [Authorize]
         [HttpGet("GetOrders")]
         public async Task<ResponseDto> GetOrders()
         {

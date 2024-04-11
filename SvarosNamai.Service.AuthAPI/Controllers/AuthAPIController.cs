@@ -41,7 +41,7 @@ namespace SvarosNamai.Service.AuthAPI.Controllers
             if(loginResponse.User == null) 
             {
                 _response.IsSuccess = false;
-                _response.Message = "Username or password is incorrect";
+                _response.Message = "Prisijungimas arba slaptažodis neteisingas";
                 return BadRequest(_response);
             }
 
