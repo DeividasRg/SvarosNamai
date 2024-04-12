@@ -48,7 +48,7 @@ namespace SvarosNamai.Web.Controllers
                 return RedirectToAction("Details", new { orderId = orderId });
             }
 
-            return RedirectToAction("Details", new { orderId = orderId });
+            return View();
         }
 
         [Authorize]
@@ -99,7 +99,7 @@ namespace SvarosNamai.Web.Controllers
 
             ResponseDto response = await _orderService.ChangeOrderStatus(order);
 
-            return RedirectToAction("Details", new {orderId = orderId});
+            return View();
         }
     }
 }
