@@ -15,6 +15,7 @@ namespace SvarosNamai.Web.Controllers
         }
 
         [Authorize]
+        [HttpGet]
         public async Task<IActionResult> ProductPrices(int orderId)
         {
             List<OrderLineDto> lines = new List<OrderLineDto>();

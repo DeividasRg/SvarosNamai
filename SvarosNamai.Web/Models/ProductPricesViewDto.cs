@@ -4,5 +4,10 @@
     {
         public int OrderId { get; set; }
         public List<OrderLineDto> Lines { get; set; }
+
+        public ProductPricesViewDto()
+        {
+            Lines = new List<OrderLineDto>();
+        }
     }
 }

@@ -35,13 +35,13 @@
                                                 <input type="number" step="0.01" class="form-control" asp-for="@line.Price" />
                                                 <span class="input-group-text">€</span>
                                             </div>
-                                            <!-- Hidden input field for OrderLineId -->
-                                            <input type="hidden" asp-for="@line.OrderLineId" value="@line.OrderLineId" />
-                                            <input type="hidden" asp-for="@line.OrderId" value="@line.OrderId" />
-                                            <input type="hidden" asp-for="@line.ProductName" value="@line.ProductName" />
+                                            <input type="hidden" asp-for="@line.OrderLineId" />
+                                            <input type="hidden" asp-for="@line.OrderId" />
+                                            <input type="hidden" asp-for="@line.ProductName" />
                                         </td>
                                     </tr>
                                 }
+
                             </tbody>
                         </table>
                         <button type="submit" class="btn btn-success">Submit</button>
