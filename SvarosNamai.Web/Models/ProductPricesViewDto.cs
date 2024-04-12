@@ -1,8 +1,8 @@
 ﻿namespace SvarosNamai.Web.Models
 {
-    public class OrderDetailDto
+    public class ProductPricesViewDto
     {
-        public OrderDto Order { get; set; }
+        public int OrderId { get; set; }
         public IEnumerable<OrderLineDto> Lines { get; set; }
     }
 }

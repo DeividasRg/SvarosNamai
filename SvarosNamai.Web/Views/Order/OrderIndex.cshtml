@@ -55,9 +55,7 @@
 							@(SvarosNamai.Web.Utility.SD.GetStatusDescription(order.Status))
 						</td>
 					<td>
-						<a class="btn btn-success">
-								<a asp-controller="Order" asp-action="Details" asp-route-orderId="@order.OrderId"><i class="bi bi-search">></i></a>
-						</a>
+						<a class="btn btn-success asp-controller="Order" asp-action="Details" asp-route-orderId="@order.OrderId"><i class="bi bi-search"></i></a>
 					</td>
 				</tr>
 				}

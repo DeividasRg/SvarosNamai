@@ -1,5 +1,5 @@
 ﻿@model OrderDetailDto
-
+<form asp-controller="Order">
 <div class="container">
     <div class="row">
         <div class="col-md-6">
@@ -54,7 +54,7 @@
                 <div class="card-header bg-secondary bg-gradient ml-0 py-3">
                     <div class="row">
                         <div class="col-12 text-center">
-                            <h1 class="text-white">Užsakymas nr. @Model.Order.OrderId</h1>
+                            <h1 class="text-white">Paslaugos</h1>
                         </div>
                     </div>
                 </div>
@@ -62,35 +62,44 @@
                     <div class="row pb-3">
                     </div>
                     <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Paslaugos pavadinimas</th>
+                                <th>Paslaugos kaina</th>
+                            </tr>
+                        </thead>
                         <tbody>
+                            @foreach(var line in Model.Lines)
+                            {
                             <tr>
-                                <td>Vardas Pavardė:</td>
-                                <td></td>
+                                <td>@line.ProductName</td>
+                                <td>@($"{line.Price} €") </td>
                             </tr>
-                            <tr>
-                                <td>Telefonas:</td>
-                                <td></td>
-                            </tr>
-                            <tr>
-                                <td>El.paštas:</td>
-                                <td></td>
-                            </tr>
-                            <tr>
-                                <td>Adresas:</td>
-                                <td></td>
-                            </tr>
-                            <tr>
-                                <td>Data:</td>
-                                <td></td>
-                            </tr>
-                            <tr>
-                                <td>Valanda:</td>
-                                <td></td>
-                            </tr>
-                            <tr>
-                                <td>Statusas:</td>
-                                <td></td>
-                            </tr>
+                            }
+                                    <td colspan="2">
+                                @if(Model.Order.Status == 0)
+                                    {
+                                    <button asp-controller="Order" asp-action="ChangeOrderStatus" asp-route-status="1" asp-route-orderId="@Model.Order.OrderId" type="submit" class="btn btn-success form-control my-1">Patvirtinti</button>
+                                    <button asp-controller="Order" asp-action="ChangeOrderStatus" asp-route-status="-1" asp-route-orderId="@Model.Order.OrderId" type="submit" class="btn btn-danger form-control my-1">Atšaukti</button>
+
+                                    }
+                                    @if (Model.Order.Status == 1)
+                                    {
+                                    <button type="submit" class="btn btn-info form-control my-1">
+                                        <a asp-controller="Order" asp-action="ProductPrices" asp-route-orderId="@Model.Order.OrderId" style="color: inherit; text-decoration: none;">Keisti kainas</a>
+                                    </button>
+
+                                    <button asp-controller="Order" asp-action="ChangeOrderStatus" asp-route-status="-1" asp-route-orderId="@Model.Order.OrderId" type="submit" class="btn btn-danger form-control my-1">Atšaukti</button>
+                                    }
+                                    @if(Model.Order.Status ==2)
+                                    {
+                                    <button type="submit" class="btn btn-info form-control my-1">Atsisiųsti sąskaitą faktūrą</button>
+                                    }
+                                    @if (Model.Order.Status == -1)
+                                    {
+                                    
+                                    }
+                                </td>
                         </tbody>
                     </table>
                 </div>
@@ -98,3 +107,4 @@
         </div>
     </div>
 </div>
+</form>

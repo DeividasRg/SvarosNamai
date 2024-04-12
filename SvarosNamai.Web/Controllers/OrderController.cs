@@ -15,6 +15,42 @@ namespace SvarosNamai.Web.Controllers
         }
 
         [Authorize]
+        public async Task<IActionResult> ProductPrices(int orderId)
+        {
+            IEnumerable<OrderLineDto> lines = new List<OrderLineDto>();
+            ResponseDto linesResponse = await _orderService.GetOrderLines(orderId);
+
+            if(linesResponse != null && linesResponse.IsSuccess)
+            {
+                lines = JsonConvert.DeserializeObject<IEnumerable<OrderLineDto>>(linesResponse.Result.ToString());
+                ProductPricesViewDto products = new()
+                {
+                    Lines = lines,
+                    OrderId = orderId
+                };
+                return View(products);
+            }
+            return RedirectToAction("Details", new { orderId = orderId });
+
+        }
+
+        [Authorize]
+        [HttpPost]
+        public async Task<IActionResult> ProductPrices(ProductPricesViewDto products)
+        {
+
+            int orderId = products.OrderId;
+            ResponseDto response = await _orderService.ChangeProductPrices(products.Lines);
+
+            if(response != null && response.IsSuccess)
+            {
+                return RedirectToAction("Details", new { orderId = orderId });
+            }
+
+            return RedirectToAction("Details", new { orderId = orderId });
+        }
+
+        [Authorize]
         public async Task<IActionResult> OrderIndex()
         {
             List<OrderDto>? list = new();
@@ -32,7 +68,7 @@ namespace SvarosNamai.Web.Controllers
         public async Task<IActionResult> Details(int orderId)
         {
             OrderDto order = new();
-            IEnumerable<OrderLinesForInvoiceDto> lines = new List<OrderLinesForInvoiceDto>();
+            IEnumerable<OrderLineDto> lines = new List<OrderLineDto>();
             ResponseDto orderResponse = await _orderService.GetOrderAsync(orderId);
             ResponseDto linesResponse = await _orderService.GetOrderLines(orderId);
             
@@ -40,7 +76,7 @@ namespace SvarosNamai.Web.Controllers
             if (orderResponse != null && orderResponse.IsSuccess && linesResponse != null && linesResponse.IsSuccess)
             {
                 order = JsonConvert.DeserializeObject<OrderDto>(orderResponse.Result.ToString());
-                lines = JsonConvert.DeserializeObject<IEnumerable<OrderLinesForInvoiceDto>>(linesResponse.Result.ToString());
+                lines = JsonConvert.DeserializeObject<IEnumerable<OrderLineDto>>(linesResponse.Result.ToString());
             }
 
             OrderDetailDto orderDetailDto = new OrderDetailDto
@@ -48,9 +84,21 @@ namespace SvarosNamai.Web.Controllers
                 Order = order,
                 Lines = lines
             };
-
-
                 return View(orderDetailDto);
+        }
+
+        [Authorize]
+        public async Task<IActionResult> ChangeOrderStatus(int orderId, int status)
+        {
+            OrderStatusChangeDto order = new()
+            {
+                orderId = orderId,
+                status = status
+            };
+
+            ResponseDto response = await _orderService.ChangeOrderStatus(order);
+
+            return RedirectToAction("Details", new {orderId = orderId});
         }
     }
 }

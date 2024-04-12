@@ -1,6 +1,7 @@
 ﻿using SvarosNamai.Web.Models;
 using SvarosNamai.Web.Service.IService;
 using SvarosNamai.Web.Utility;
+using System;
 
 namespace SvarosNamai.Web.Service
 {
@@ -14,6 +15,26 @@ namespace SvarosNamai.Web.Service
             _baseService = baseService;
         }
 
+        public async Task<ResponseDto> ChangeOrderStatus(OrderStatusChangeDto orderInfo)
+        {
+            return await _baseService.SendAsync(new RequestDto()
+            {
+                ApiType = SD.ApiType.PUT,
+                Data = orderInfo,
+                Url = SD.OrderAPIBase + "/api/order/OrderStatusChange"
+            });
+
+        }
+
+        public async Task<ResponseDto> ChangeProductPrices(IEnumerable<OrderLineDto> lines)
+        {
+            return await _baseService.SendAsync(new RequestDto()
+            {
+                ApiType = SD.ApiType.PUT,
+                Data = lines,
+                Url = SD.OrderAPIBase + "/api/order/AddPricesToProducts"
+            });
+        }
 
         public async Task<ResponseDto?> GetAllOrdersAsync()
         {

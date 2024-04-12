@@ -7,5 +7,7 @@ namespace SvarosNamai.Web.Service.IService
         Task<ResponseDto?> GetAllOrdersAsync();
         Task<ResponseDto?> GetOrderAsync(int orderId);
         Task<ResponseDto?> GetOrderLines(int orderId);
+        Task<ResponseDto> ChangeOrderStatus(OrderStatusChangeDto orderInfo);
+        Task<ResponseDto> ChangeProductPrices(IEnumerable<OrderLineDto> lines);
     }
 }

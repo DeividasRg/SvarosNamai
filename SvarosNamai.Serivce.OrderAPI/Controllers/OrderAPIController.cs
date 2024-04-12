@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using SvarosNamai.Serivce.OrderAPI.Models;
+using SvarosNamai.Serivce.OrderAPI.Models.Dtos;
 using SvarosNamai.Serivce.OrderAPI.Service.IService;
 using SvarosNamai.Serivce.OrderAPI.Utility;
 using SvarosNamai.Service.OrderAPI.Data;
@@ -97,14 +98,14 @@ namespace SvarosNamai.Serivce.OrderAPI.Controllers
 
         [Authorize]
         [HttpPut("OrderStatusChange")]
-        public async Task<ResponseDto> OrderStatusChange(int status, int orderId)
+        public async Task<ResponseDto> OrderStatusChange(OrderStatusChangeDto orderInfo)
         {
             try
             {
-                Order orderCheck = _db.Orders.Find(orderId);
+                Order orderCheck = _db.Orders.Find(orderInfo.orderId);
                 if (orderCheck != null)
                 {
-                    int statusCheck = OrderStatusses.GetStatusConstant(status);
+                    int statusCheck = OrderStatusses.GetStatusConstant(orderInfo.status);
                     if (statusCheck == 99)
                     {
                         _response.Message = "Not a valid status";
@@ -123,7 +124,7 @@ namespace SvarosNamai.Serivce.OrderAPI.Controllers
                     {
                         ConfirmationEmailDto info = _mapper.Map<ConfirmationEmailDto>(orderCheck);
 
-                        switch (status)
+                        switch (orderInfo.status)
                         {
                             case OrderStatusses.Status_Approved:
 
@@ -153,6 +154,15 @@ namespace SvarosNamai.Serivce.OrderAPI.Controllers
                             case OrderStatusses.Status_Completed:
                                 OrderForInvoiceDto order = _mapper.Map<OrderForInvoiceDto>(orderCheck);
                                 order.Lines = _mapper.Map<IEnumerable<OrderLinesForInvoiceDto>>(_db.OrderLines.Where(u => u.Order.OrderId == orderCheck.OrderId));
+
+                                foreach(var line in order.Lines)
+                                {
+                                    if(line.Price == 0 || line.Price == null)
+                                    {
+                                        throw new Exception("Not all product lines have a price");
+                                    }
+                                }
+
                                 order.Status = OrderStatusses.Status_Completed;
                                 ResponseDto generateInvoice = await _invoice.GenerateInvoice(order);
                                 if (generateInvoice.IsSuccess)
@@ -214,11 +224,16 @@ namespace SvarosNamai.Serivce.OrderAPI.Controllers
 
         [Authorize]
         [HttpPut("AddPricesToProducts")]
-        public async Task<ResponseDto> AddPricesToProducts(IEnumerable<OrderLine> orderlines)
+        public async Task<ResponseDto> AddPricesToProducts(IEnumerable<OrderLineDto> orderlines)
         {
             try
             {
-                foreach (var line in orderlines)
+                IEnumerable<OrderLine> mappedLines = _mapper.Map<IEnumerable<OrderLine>>(orderlines).ToList();
+                if(mappedLines.Count() == 0 || mappedLines.Count() == null)
+                {
+                    throw new Exception("No Order Lines");
+                }
+                foreach (var line in mappedLines)
                 {
                     var currentLine = _db.OrderLines.Find(line.OrderLineId);
 
@@ -266,8 +281,6 @@ namespace SvarosNamai.Serivce.OrderAPI.Controllers
         {
             Order order = _db.Orders.Find(orderId);
             OrderDto orderDto = _mapper.Map<OrderDto>(order);
-            orderDto.Hour = order.Reservation.Hour;
-            orderDto.Date = order.Reservation.Date;
             _response.Result = orderDto;
             return _response;
         }
@@ -276,8 +289,8 @@ namespace SvarosNamai.Serivce.OrderAPI.Controllers
         [HttpGet("GetOrderlines/{orderId}")]
         public async Task<ResponseDto> GetOrderLines(int orderId)
         {
-            IEnumerable<OrderLine> orderLines = _db.OrderLines.Where(u => u.Order.OrderId == orderId);
-            IEnumerable<OrderLinesForInvoiceDto> orderForSend = _mapper.Map<IEnumerable<OrderLinesForInvoiceDto>>(orderLines);
+            IEnumerable<OrderLine> orderLines = _db.OrderLines.Where(u => u.Order.OrderId == orderId).ToList();
+            IEnumerable<OrderLineDto> orderForSend = _mapper.Map<IEnumerable<OrderLineDto>>(orderLines);
             _response.Result = orderForSend;
             return _response;
         }
