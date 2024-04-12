@@ -34,6 +34,7 @@
                                         <td>
                                             <div class="input-group">
                                                 <input type="number" step="0.01" class="form-control" asp-for="@Model.Lines[i].Price" />
+                                                <span class="input-group-addon">€</span>
                                                 <input type="hidden" class="form-control" asp-for="@Model.Lines[i].OrderLineId" />
                                                 <input type="hidden" class="form-control" asp-for="@Model.Lines[i].OrderId" />
                                                 <input type="hidden" class="form-control" asp-for="@Model.Lines[i].ProductName" />
