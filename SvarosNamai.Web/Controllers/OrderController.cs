@@ -64,7 +64,7 @@ namespace SvarosNamai.Web.Controllers
 
             return View(list);
         }
-
+        [HttpGet]
         [Authorize]
         public async Task<IActionResult> Details(int orderId)
         {
