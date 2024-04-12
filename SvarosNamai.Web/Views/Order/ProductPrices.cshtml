@@ -22,7 +22,7 @@
                             <thead>
                                 <tr>
                                     <th>Paslaugos pavadinimas</th>
-                                    <th>Paslaugos kaina (€)</th>
+                                    <th>Paslaugos kaina</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -36,7 +36,9 @@
                                                 <span class="input-group-text">€</span>
                                             </div>
                                             <!-- Hidden input field for OrderLineId -->
-                                            <input type="hidden" name="lines[@line.OrderLineId].OrderLineId" value="@line.OrderLineId" />
+                                            <input type="hidden" asp-for="@line.OrderLineId" value="@line.OrderLineId" />
+                                            <input type="hidden" asp-for="@line.OrderId" value="@line.OrderId" />
+                                            <input type="hidden" asp-for="@line.ProductName" value="@line.ProductName" />
                                         </td>
                                     </tr>
                                 }

@@ -17,12 +17,12 @@ namespace SvarosNamai.Web.Controllers
         [Authorize]
         public async Task<IActionResult> ProductPrices(int orderId)
         {
-            IEnumerable<OrderLineDto> lines = new List<OrderLineDto>();
+            List<OrderLineDto> lines = new List<OrderLineDto>();
             ResponseDto linesResponse = await _orderService.GetOrderLines(orderId);
 
             if(linesResponse != null && linesResponse.IsSuccess)
             {
-                lines = JsonConvert.DeserializeObject<IEnumerable<OrderLineDto>>(linesResponse.Result.ToString());
+                lines = JsonConvert.DeserializeObject<List<OrderLineDto>>(linesResponse.Result.ToString());
                 ProductPricesViewDto products = new()
                 {
                     Lines = lines,
@@ -36,7 +36,7 @@ namespace SvarosNamai.Web.Controllers
 
         [Authorize]
         [HttpPost]
-        public async Task<IActionResult> ProductPrices(ProductPricesViewDto products)
+        public async Task<IActionResult> ProductPrices([FromForm]ProductPricesViewDto products)
         {
 
             int orderId = products.OrderId;
