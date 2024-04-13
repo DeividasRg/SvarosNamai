@@ -23,7 +23,6 @@ namespace SvarosNamai.Service.InvoiceAPI.Controllers
 {
     [Route("api/invoice")]
     [ApiController]
-    [Authorize]
     public class InvoiceController : ControllerBase
     {
         private readonly AppDbContext _db;
@@ -171,7 +170,7 @@ namespace SvarosNamai.Service.InvoiceAPI.Controllers
             return _response;
         }
 
-
+        [Authorize]
         [HttpGet("DownloadInvoice/{orderId}")]
         public async Task<IActionResult> DownloadInvoice(int orderId)
         {
