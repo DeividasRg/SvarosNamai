@@ -19,7 +19,7 @@ namespace SvarosNamai.Web.Service
             return await _baseService.SendAsync(new RequestDto()
             {
                 ApiType = SD.ApiType.GET,
-                Url = SD.OrderAPIBase + "/api/product/GetProducts"
+                Url = SD.ProductAPIBase + "/api/product/GetProducts"
             });
         }
     }

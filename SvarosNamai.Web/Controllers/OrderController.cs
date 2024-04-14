@@ -76,7 +76,7 @@ namespace SvarosNamai.Web.Controllers
                     OrderId = orderId
                 };
 
-                var productResponse = _productService.GetAllProductsAsync();
+                var productResponse = await _productService.GetAllProductsAsync();
                 IEnumerable<ProductDto> allProductList = JsonConvert.DeserializeObject<IEnumerable<ProductDto>>(productResponse.Result.ToString());
                 IEnumerable<ProductDto> productsWithNoOrderLines = allProductList
                 .Where(product => !products.Lines.Any(line => line.ProductName == product.Name));

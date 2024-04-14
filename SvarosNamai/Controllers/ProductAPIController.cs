@@ -33,7 +33,6 @@ namespace SvarosNamai.Service.ProductAPI.Controllers
             _error = error;
         }
 
-        [Authorize]
         [HttpGet("GetProducts")]
         public ResponseDto GetProducts()
         {
