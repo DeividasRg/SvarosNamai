@@ -91,11 +91,30 @@ namespace SvarosNamai.Web.Controllers
         [Authorize]
         public async Task<IActionResult> ChangeOrderStatus(int orderId, int status)
         {
-            OrderStatusChangeDto order = new()
+            OrderStatusChangeDto order = new OrderStatusChangeDto();
+
+            if (status == 1)
             {
-                orderId = orderId,
-                status = status
-            };
+                var responseDto = await _orderService.GetOrderLines(orderId);
+                IEnumerable<OrderLineDto> orderLines = JsonConvert.DeserializeObject<IEnumerable<OrderLineDto>>(responseDto.Result.ToString());
+                string messageForSend = "Pasiūlymas: \n";
+
+                foreach (var line in orderLines)
+                {
+                    messageForSend += $"{line.ProductName} : {line.Price} € \n";
+                }
+                
+                order.orderId = orderId;
+                order.status = status;
+                order.message = messageForSend;
+                
+
+            }
+            else
+            {
+                order.orderId = orderId;
+                order.status = status;
+            }
 
             ResponseDto response = await _orderService.ChangeOrderStatus(order);
 

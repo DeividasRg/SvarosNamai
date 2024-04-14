@@ -13,5 +13,6 @@ namespace SvarosNamai.Service.OrderAPI.Models.Dtos
         public int Hour { get; set; }
         public string Address { get; set; }
         public byte[]? pdfFile { get; set; }
+        public string? message { get; set; }
     }
 }

@@ -132,6 +132,7 @@ namespace SvarosNamai.Serivce.OrderAPI.Controllers
                                 {
                                     throw new Exception("Order already completed");
                                 }
+                                info.message = orderInfo.message;
 
                                 orderCheck.Status = OrderStatusses.Status_Approved;
                                 info.OrderStatus = OrderStatusses.Status_Approved;
