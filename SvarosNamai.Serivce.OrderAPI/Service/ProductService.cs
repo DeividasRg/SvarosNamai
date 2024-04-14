@@ -5,6 +5,7 @@ using SvarosNamai.Service.OrderAPI.Models.Dtos;
 using System;
 using System.Net.Http;
 using System.Threading.Tasks;
+using static iText.StyledXmlParser.Jsoup.Select.Evaluator;
 
 namespace SvarosNamai.Serivce.OrderAPI.Service
 {
@@ -12,11 +13,15 @@ namespace SvarosNamai.Serivce.OrderAPI.Service
     {
         private readonly IHttpClientFactory _httpClientFactory;
         private IMapper _mapper;
+        private IErrorLogger _error;
+        private ResponseDto _response;
 
-        public ProductService(IHttpClientFactory httpClientFactory, IMapper mapper)
+        public ProductService(IHttpClientFactory httpClientFactory, IMapper mapper, IErrorLogger error)
         {
             _httpClientFactory = httpClientFactory;
             _mapper = mapper;
+            _error = error;
+            _response = new ResponseDto();
         }
 
 
@@ -40,9 +45,36 @@ namespace SvarosNamai.Serivce.OrderAPI.Service
             }
             catch (Exception ex) 
             {
+                _error.LogError(ex.Message);
                 throw new Exception(ex.ToString());
             }
-            return new BundleDto();
+        }
+
+        public async Task<ResponseDto> GetProduct(int productId)
+        {
+            try
+            {
+                var client = _httpClientFactory.CreateClient("Product");
+                var response = await client.GetAsync($"/api/product/GetProduct/{productId}");
+                var apiContent = await response.Content.ReadAsStringAsync();
+                var resp = JsonConvert.DeserializeObject<ResponseDto>(apiContent);
+                if(resp.IsSuccess)
+                {
+                    return resp;
+                }
+                else
+                {
+                    throw new Exception("GetProduct didn't receive a positive response");
+                }
+
+            }
+            catch(Exception ex)
+            {
+                _error.LogError(ex.Message);
+                _response.IsSuccess = false;
+                _response.Message = ex.Message;
+                return _response;
+            }
         }
     }
 }

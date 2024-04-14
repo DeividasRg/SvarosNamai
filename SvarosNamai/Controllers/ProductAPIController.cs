@@ -118,7 +118,6 @@ namespace SvarosNamai.Service.ProductAPI.Controllers
 
 
 
-        [Authorize]
         [HttpGet("GetProduct/{productId}")]
         public ResponseDto GetProduct(int productId)
         {

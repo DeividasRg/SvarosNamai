@@ -203,25 +203,52 @@ namespace SvarosNamai.Serivce.OrderAPI.Controllers
 
         [Authorize]
         [HttpPost("AddProductToOrder")]
-        public async Task<ResponseDto> AddProductToOrder(OrderLine orderLine)
+        public async Task<ResponseDto> AddProductToOrder(ProductToAddToOrderDto info)
         {
             try
             {
-                var checkOrder = _db.Orders.Find(orderLine.Order);
-                if (checkOrder != null && checkOrder.Status != 2)
+                var orderCheck = await _db.Orders.FindAsync(info.orderId);
+                var productCheck = await _productService.GetProduct(info.productId);
+
+
+
+                if (orderCheck != null && productCheck.IsSuccess)
                 {
-                    await _db.OrderLines.AddAsync(orderLine);
+                    ProductDto product = JsonConvert.DeserializeObject<ProductDto>(productCheck.Result.ToString());
+
+                    bool orderLineCheck = _db.OrderLines.Any(u => u.Order.OrderId == info.orderId && u.ProductName == product.Name);
+                    if(orderLineCheck)
+                    {
+                        throw new Exception("OrderLine already exists");
+                    }
+
+                    OrderLine line = new OrderLine()
+                    {
+                        Order = orderCheck,
+                        ProductName = product.Name,
+                        Price = 0
+                    };
+
+                    await _db.OrderLines.AddAsync(line);
                     await _db.SaveChangesAsync();
+
+                    _response.Message = "Successfully added";
+                    return _response;
+                }
+                else
+                {
+                    throw new Exception("Order or Product doesn't exist");
                 }
             }
             catch(Exception ex)
             {
+                _error.LogError(ex.Message);
                 _response.IsSuccess = false;
                 _response.Message = ex.Message;
-                _error.LogError(ex.Message);
+                return _response;
             }
-            return _response;
         }
+
 
         [Authorize]
         [HttpPut("AddPricesToProducts")]
