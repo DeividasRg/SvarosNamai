@@ -15,6 +15,16 @@ namespace SvarosNamai.Web.Service
             _baseService = baseService;
         }
 
+        public async Task<ResponseDto> AddProductToOrder(ProductToAddToOrderDto info)
+        {
+            return await _baseService.SendAsync(new RequestDto()
+            {
+                ApiType = SD.ApiType.POST,
+                Data = info,
+                Url = SD.OrderAPIBase + "/api/order/AddProductToOrder"
+            });
+        }
+
         public async Task<ResponseDto> ChangeOrderStatus(OrderStatusChangeDto orderInfo)
         {
             return await _baseService.SendAsync(new RequestDto()

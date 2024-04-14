@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System;
 
-namespace SvarosNamai.Service.ProductAPI.Models.Dtos
+namespace SvarosNamai.Web.Models
 {
     public class ProductDto
     {

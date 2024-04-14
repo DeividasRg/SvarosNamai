@@ -1,0 +1,49 @@
+﻿@model ProductPricesViewDto
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <form asp-controller="Order" asp-action="ProductPrices" method="post">
+                <!-- Hidden input field for orderId -->
+                <input type="hidden" name="orderId" value="@Model.OrderId" />
+
+                <div class="card shadow border-0 mt-4">
+                    <div class="card-header bg-secondary bg-gradient ml-0 py-3">
+                        <div class="row">
+                            <div class="col-12 text-center">
+                                <h1 class="text-white">Paslaugos</h1>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body p-4">
+                        <div class="row pb-3">
+                        </div>
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Paslaugos pavadinimas</th>
+                                    <th>Paslaugos kaina</th>
+                                    <th>Panaikinti</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach(var line in Model.Lines)
+                                {
+                                    <tr>
+                                        <td>@line.ProductName</td>
+                                        <td>@line.Price</td>
+                                        <td><i class="bi bi-trash"></i></td>
+                                    </tr>
+                                }
+
+
+                            </tbody>
+                        </table>
+                        <button asp-controller="Order" asp-action="BundleProductsToAdd" asp-route-orderId ="@Model.OrderId" type="submit" class="btn btn-success form-control my-1">Pridėti paslaugą</button>
+                        <button asp-controller="Order" asp-action="OrderIndex" class="btn btn-light form-control my-1">Grįžti į užsakymus</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

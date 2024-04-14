@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Newtonsoft.Json;
 using SvarosNamai.Web.Models;
 using SvarosNamai.Web.Service.IService;
@@ -9,9 +10,11 @@ namespace SvarosNamai.Web.Controllers
     public class OrderController : Controller
     {
         private readonly IOrderService _orderService;
-        public OrderController(IOrderService orderService)
+        private readonly IProductService _productService;
+        public OrderController(IOrderService orderService, IProductService productService)
         {
             _orderService = orderService;
+            _productService = productService;
         }
 
         [Authorize]
@@ -31,6 +34,69 @@ namespace SvarosNamai.Web.Controllers
                 };
                 return View(products);
             }
+            return RedirectToAction("Details", new { orderId = orderId });
+
+        }
+
+        [Authorize]
+        [HttpGet]
+        public async Task<IActionResult> BundleProducts(int orderId)
+        {
+            List<OrderLineDto> lines = new List<OrderLineDto>();
+            ResponseDto linesResponse = await _orderService.GetOrderLines(orderId);
+
+            if (linesResponse != null && linesResponse.IsSuccess)
+            {
+                lines = JsonConvert.DeserializeObject<List<OrderLineDto>>(linesResponse.Result.ToString());
+                ProductPricesViewDto products = new()
+                {
+                    Lines = lines,
+                    OrderId = orderId
+                };
+                return View(products);
+            }
+
+            return RedirectToAction("Details", new { orderId = orderId });
+
+        }
+
+        [Authorize]
+        [HttpGet]
+        public async Task<IActionResult> BundleProductsToAdd(int orderId)
+        {
+            List<OrderLineDto> lines = new List<OrderLineDto>();
+            ResponseDto linesResponse = await _orderService.GetOrderLines(orderId);
+
+            if (linesResponse != null && linesResponse.IsSuccess)
+            {
+                lines = JsonConvert.DeserializeObject<List<OrderLineDto>>(linesResponse.Result.ToString());
+                ProductPricesViewDto products = new()
+                {
+                    Lines = lines,
+                    OrderId = orderId
+                };
+
+                var productResponse = _productService.GetAllProductsAsync();
+                IEnumerable<ProductDto> allProductList = JsonConvert.DeserializeObject<IEnumerable<ProductDto>>(productResponse.Result.ToString());
+                IEnumerable<ProductDto> productsWithNoOrderLines = allProductList
+                .Where(product => !products.Lines.Any(line => line.ProductName == product.Name));
+
+                var productListToAdd = new List<SelectListItem>();
+
+
+                foreach(var line in productsWithNoOrderLines)
+                {
+                    productListToAdd.Add(new SelectListItem { Text = line.Name, Value = line.ProductId.ToString() });
+                };
+
+                ViewBag.Products = productListToAdd;
+
+
+                return View(products);
+            }
+            
+            
+
             return RedirectToAction("Details", new { orderId = orderId });
 
         }

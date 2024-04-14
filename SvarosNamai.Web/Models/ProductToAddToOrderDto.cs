@@ -1,4 +1,4 @@
-﻿namespace SvarosNamai.Serivce.OrderAPI.Models.Dtos
+﻿namespace SvarosNamai.Web.Models
 {
     public class ProductToAddToOrderDto
     {
