@@ -32,16 +32,9 @@
                                     <tr>
                                         <td>@line.ProductName</td>
                                         <td>@line.Price</td>
-                                        <form asp-controller="Order" asp-action="RemoveProductFromOrder" method="delete">
-                                            <input type="hidden" name="orderId" value="@Model.OrderId" />
-                                            <input type="hidden" name="productName" value="@line.ProductName" />
                                         <td>
-                                            <button type="submit" class="form-control btn btn-success">
-                                                <i class="bi bi-trash"></i>
-                                            </button>
+                                            <a asp-controller="Order" asp-action="RemoveProductFromOrder" asp-route-orderId="@Model.OrderId" asp-route-productName="@line.ProductName"><i class="bi bi-trash"></i></a>
                                         </td>
-                </form>
-
                                     </tr>
                                 }
                             </tbody>

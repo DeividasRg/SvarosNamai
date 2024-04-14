@@ -101,7 +101,7 @@ namespace SvarosNamai.Web.Controllers
 
         }
 
-        [HttpDelete]
+        [Authorize]
         public async Task<IActionResult> RemoveProductFromOrder(int orderId, string productName)
         {
             ProductOrderDto product = new()
@@ -172,7 +172,6 @@ namespace SvarosNamai.Web.Controllers
 
             return View(list);
         }
-        [HttpGet]
         [Authorize]
         public async Task<IActionResult> Details(int orderId)
         {
