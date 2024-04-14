@@ -202,8 +202,48 @@ namespace SvarosNamai.Serivce.OrderAPI.Controllers
         }
 
         [Authorize]
+        [HttpDelete("RemoveProductFromOrder")]
+        public async Task<ResponseDto> RemoveProductFromOrder(ProductOrderDto info)
+        {
+            try
+            {
+                var orderCheck = await _db.Orders.FindAsync(info.orderId);
+                var productCheck = await _productService.GetProductByName(info.productName);
+                if (orderCheck != null && productCheck.IsSuccess)
+                {
+                    ProductDto product = JsonConvert.DeserializeObject<ProductDto>(productCheck.Result.ToString());
+
+                    OrderLine orderLineCheck = _db.OrderLines.FirstOrDefault(u => u.Order.OrderId == info.orderId && u.ProductName == product.Name);
+                    if (orderLineCheck != null)
+                    {
+                        _db.OrderLines.Remove(orderLineCheck);
+                        await _db.SaveChangesAsync();
+                        _response.Message = "Removed";
+                        return _response;
+                    }
+                    else
+                    {
+                        throw new Exception("No orderline to delete");
+                    }
+                }
+                else
+                {
+                    throw new Exception("Order or Product doesn't exist");
+                }
+
+            }
+            catch (Exception ex)
+            {
+                _response.IsSuccess = false;
+                _response.Message=ex.Message;
+                _error.LogError(ex.Message);
+                return _response;
+            }
+        }
+
+        [Authorize]
         [HttpPost("AddProductToOrder")]
-        public async Task<ResponseDto> AddProductToOrder(ProductToAddToOrderDto info)
+        public async Task<ResponseDto> AddProductToOrder(ProductOrderDto info)
         {
             try
             {

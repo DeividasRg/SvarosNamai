@@ -15,7 +15,7 @@ namespace SvarosNamai.Web.Service
             _baseService = baseService;
         }
 
-        public async Task<ResponseDto> AddProductToOrder(ProductToAddToOrderDto info)
+        public async Task<ResponseDto> AddProductToOrder(ProductOrderDto info)
         {
             return await _baseService.SendAsync(new RequestDto()
             {
@@ -70,6 +70,16 @@ namespace SvarosNamai.Web.Service
             {
                 ApiType = SD.ApiType.GET,
                 Url = SD.OrderAPIBase + "/api/order/GetOrderlines/" + orderId
+            });
+        }
+
+        public async Task<ResponseDto> RemoveProductFromOrder(ProductOrderDto info)
+        {
+            return await _baseService.SendAsync(new RequestDto()
+            {
+                ApiType = SD.ApiType.DELETE,
+                Data = info,
+                Url = SD.OrderAPIBase + "/api/order/RemoveProductFromOrder"
             });
         }
     }

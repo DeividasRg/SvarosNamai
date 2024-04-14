@@ -7,5 +7,6 @@ namespace SvarosNamai.Serivce.OrderAPI.Service.IService
     {
         Task<BundleDto> GetBundle(int id);
         Task<ResponseDto> GetProduct(int productId);
+        Task<ResponseDto> GetProductByName(string productName);
     }
 }

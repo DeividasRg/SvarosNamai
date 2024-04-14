@@ -76,5 +76,32 @@ namespace SvarosNamai.Serivce.OrderAPI.Service
                 return _response;
             }
         }
+
+        public async Task<ResponseDto> GetProductByName(string productName)
+        {
+            try
+            {
+                var client = _httpClientFactory.CreateClient("Product");
+                var response = await client.GetAsync($"/api/product/GetProductByName/{productName}");
+                var apiContent = await response.Content.ReadAsStringAsync();
+                var resp = JsonConvert.DeserializeObject<ResponseDto>(apiContent);
+                if (resp.IsSuccess)
+                {
+                    return resp;
+                }
+                else
+                {
+                    throw new Exception("GetProductByName didn't receive a positive response");
+                }
+
+            }
+            catch (Exception ex)
+            {
+                _error.LogError(ex.Message);
+                _response.IsSuccess = false;
+                _response.Message = ex.Message;
+                return _response;
+            }
+        }
     }
 }

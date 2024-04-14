@@ -9,6 +9,7 @@ namespace SvarosNamai.Web.Service.IService
         Task<ResponseDto?> GetOrderLines(int orderId);
         Task<ResponseDto> ChangeOrderStatus(OrderStatusChangeDto orderInfo);
         Task<ResponseDto> ChangeProductPrices(IEnumerable<OrderLineDto> lines);
-        Task<ResponseDto> AddProductToOrder(ProductToAddToOrderDto info);
+        Task<ResponseDto> AddProductToOrder(ProductOrderDto info);
+        Task<ResponseDto> RemoveProductFromOrder(ProductOrderDto info);
     }
 }

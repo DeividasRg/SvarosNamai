@@ -101,6 +101,48 @@ namespace SvarosNamai.Web.Controllers
 
         }
 
+        [HttpDelete]
+        public async Task<IActionResult> RemoveProductFromOrder(int orderId, string productName)
+        {
+            ProductOrderDto product = new()
+            {
+                productName = productName,
+                orderId = orderId
+            };
+
+            var response = await _orderService.RemoveProductFromOrder(product);
+            if (response.IsSuccess)
+            {
+                return RedirectToAction("BundleProducts", new { orderId = orderId });
+            }
+            else
+            {
+                throw new Exception(response.Message);
+            }
+
+        }
+
+        [Authorize]
+        [HttpPost]
+        public async Task<IActionResult> BundleProductsToAdd(ProductPricesViewDto info)
+        {
+            ProductOrderDto product = new()
+            {
+                productId = info.productId,
+                orderId = info.OrderId
+            };
+
+            var response = await _orderService.AddProductToOrder(product);
+            if(response.IsSuccess)
+            {
+                return RedirectToAction("BundleProducts", new {orderId = info.OrderId});
+            }
+            else
+            {
+                throw new Exception(response.Message);
+            }
+        }
+
         [Authorize]
         [HttpPost]
         public async Task<IActionResult> ProductPrices([FromForm]ProductPricesViewDto products)
@@ -186,5 +228,7 @@ namespace SvarosNamai.Web.Controllers
 
             return RedirectToAction("Details", new { orderId = orderId });
         }
+
+
     }
 }

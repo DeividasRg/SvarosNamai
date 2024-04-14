@@ -143,6 +143,32 @@ namespace SvarosNamai.Service.ProductAPI.Controllers
             return _response;
         }
 
+        [HttpGet("GetProductByName/{productName}")]
+        public ResponseDto GetProductByName(string productName)
+        {
+            try
+            {
+                Product product = _db.Products.FirstOrDefault(u => u.Name.ToLower() == productName.ToLower());
+                if (product != null)
+                {
+                    _response.Result = product;
+                    _response.Message = "Successfully Retrieved";
+                    return _response;
+                }
+                else
+                {
+                    throw new Exception("Product doesn't exist");
+                }
+            }
+            catch (Exception ex)
+            {
+                _response.IsSuccess = false;
+                _response.Message = ex.Message;
+                _error.LogError(_response.Message);
+            }
+            return _response;
+        }
+
         [Authorize]
         [HttpPost("AddBundle")]
         public async Task<ResponseDto> AddBundle(BundleToAddDto bundle)
