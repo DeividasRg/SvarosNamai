@@ -1,6 +1,4 @@
-﻿@model OrderDetailDto
-
-@{
+﻿@{
     bool linesPriced = true;
     foreach(var line in Model.Lines)
     {
@@ -11,6 +9,7 @@
         }
     }
 }
+@model OrderDetailDto
 
 
 <div class="container">
@@ -102,9 +101,7 @@
                                 </td>
                         </tbody>
                     </table>
-                    <button type="button" class="btn btn-success">
-                        <a asp-controller="Order" asp-action="Details" asp-route-orderId="@Model.OrderId">Grįžti į užsakymą</a>
-                    </button>
+                    <button asp-controller="Order" asp-action="Details" asp-route-orderId="@Model.Order.OrderId" class="btn btn-light form-control my-1">Grįžti į užsakymus</button>
                 </div>
         </div>
     </div>
