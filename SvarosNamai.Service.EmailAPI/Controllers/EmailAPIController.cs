@@ -142,8 +142,15 @@ namespace SvarosNamai.Service.EmailAPI.Controllers
                         subject = $"Užsakymas {info.OrderId} patvirtinimas";
                         break;
                     case -1:
-                        message = $"Jūsų užsakymas Nr.{info.OrderId} atšauktas \n \n Priežastis: {info.message}";
-                        subject = $"Užsakymas {info.OrderId} atšauktas;";
+                        if(info.message != null)
+                        {
+                            message = $"Jūsų užsakymas Nr.{info.OrderId} atšauktas \n \n Priežastis: {info.message}";
+                        }
+                        else
+                        {
+                            message = $"Jūsų užsakymas Nr.{info.OrderId} atšauktas";
+                        }
+                        subject = $"Užsakymas {info.OrderId} atšauktas";
                         break;
                     default:
                         throw new Exception();

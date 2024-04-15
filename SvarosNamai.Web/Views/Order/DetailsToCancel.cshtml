@@ -92,6 +92,7 @@
                         <td colspan="2">
                             <input name="message" class="form-control" placeholder="Priežastis" />
                             <button type="submit" class="btn btn-danger form-control my-1">Atšaukti</button>
+                        <button asp-controller="Order" asp-action="Details" asp-route-orderId="@Model.Order.OrderId" class="btn btn-light form-control my-1">Grįžti į užsakymus</button>
                         </td>
                         <input type="hidden" name="orderId" value="@Model.Order.OrderId" />
                         <input type="hidden" name="status" value="-1" />
@@ -101,7 +102,6 @@
                                 </td>
                         </tbody>
                     </table>
-                    <button asp-controller="Order" asp-action="Details" asp-route-orderId="@Model.Order.OrderId" class="btn btn-light form-control my-1">Grįžti į užsakymus</button>
                 </div>
         </div>
     </div>
