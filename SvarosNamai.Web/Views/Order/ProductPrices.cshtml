@@ -46,7 +46,8 @@
 
                             </tbody>
                         </table>
-                        <button type="submit" class="btn btn-success">Patvirtinti</button>
+                        <button type="submit" class="btn btn-success form-control">Patvirtinti</button>
+                        <button asp-controller="Order" asp-action="Details" asp-route-orderId="@Model.OrderId" class="btn btn-light my-1 form-control">Grįžti į užsakymą</button>
                     </div>
                 </div>
             </form>

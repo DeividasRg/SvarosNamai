@@ -38,27 +38,7 @@ namespace SvarosNamai.Web.Controllers
 
         }
 
-        [Authorize]
-        [HttpGet]
-        public async Task<IActionResult> BundleProducts(int orderId)
-        {
-            List<OrderLineDto> lines = new List<OrderLineDto>();
-            ResponseDto linesResponse = await _orderService.GetOrderLines(orderId);
 
-            if (linesResponse != null && linesResponse.IsSuccess)
-            {
-                lines = JsonConvert.DeserializeObject<List<OrderLineDto>>(linesResponse.Result.ToString());
-                ProductPricesViewDto products = new()
-                {
-                    Lines = lines,
-                    OrderId = orderId
-                };
-                return View(products);
-            }
-
-            return RedirectToAction("Details", new { orderId = orderId });
-
-        }
 
         [Authorize]
         [HttpGet]

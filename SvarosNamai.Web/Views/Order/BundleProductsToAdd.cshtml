@@ -43,7 +43,7 @@
                             <option disabled selected>---Paslaugos---</option>
                         </select>
                         <button type="submit" class="form-control btn btn-success" value="Submit">Pridėti</button>
-                        <button asp-controller="Order" asp-action="OrderIndex" class="btn btn-light form-control my-1">Grįžti į užsakymus</button>
+                        <button asp-controller="Order" asp-action="Details" asp-route-orderId="@Model.OrderId" class="btn btn-light form-control my-1">Grįžti į užsakymą</button>
                     </div>
                 </div>
             </form>

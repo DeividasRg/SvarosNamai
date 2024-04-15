@@ -105,7 +105,7 @@
                                         <a asp-controller="Order" asp-action="ProductPrices" method="get" asp-route-orderId="@Model.Order.OrderId" style="color: inherit; text-decoration: none;">Keisti kainas</a>
                                     </button>
                                     <button type="button" class="btn btn-info form-control my-1">
-                                        <a asp-controller="Order" asp-action="BundleProducts" asp-route-orderId="@Model.Order.OrderId" style="color: inherit; text-decoration: none;">Keisti paslaugas</a>
+                                        <a asp-controller="Order" asp-action="BundleProductsToAdd" asp-route-orderId="@Model.Order.OrderId" style="color: inherit; text-decoration: none;">Keisti paslaugas</a>
                                     </button>
                                     <button asp-controller="Order" asp-action="ChangeOrderStatus" asp-route-status="-1" asp-route-orderId="@Model.Order.OrderId" type="submit" class="btn btn-danger form-control my-1">Atšaukti</button>
 
@@ -117,7 +117,7 @@
                                         <a asp-controller="Order" asp-action="ProductPrices" method="get" asp-route-orderId="@Model.Order.OrderId" style="color: inherit; text-decoration: none;">Keisti kainas</a>
                                     </button>
                                     <button type="button" class="btn btn-info form-control my-1">
-                                        <a asp-controller="Order" asp-action="BundleProducts" asp-route-orderId="@Model.Order.OrderId" style="color: inherit; text-decoration: none;">Keisti paslaugas</a>
+                                        <a asp-controller="Order" asp-action="BundleProductsToAdd" asp-route-orderId="@Model.Order.OrderId" style="color: inherit; text-decoration: none;">Keisti paslaugas</a>
                                     </button>
 
                                     <button asp-controller="Order" asp-action="ChangeOrderStatus" asp-route-status="-1" asp-route-orderId="@Model.Order.OrderId" type="submit" class="btn btn-danger form-control my-1">Atšaukti</button>
