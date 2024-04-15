@@ -145,6 +145,7 @@ namespace SvarosNamai.Serivce.OrderAPI.Controllers
                                 {
                                     throw new Exception("Order already completed");
                                 }
+                                info.message = orderInfo.message;
 
                                 orderCheck.Status = OrderStatusses.Status_Cancelled;
                                 orderCheck.Reservation.IsActive = false;

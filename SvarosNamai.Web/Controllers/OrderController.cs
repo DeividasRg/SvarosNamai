@@ -18,7 +18,6 @@ namespace SvarosNamai.Web.Controllers
         }
 
         [Authorize]
-        [HttpGet]
         public async Task<IActionResult> ProductPrices(int orderId)
         {
             List<OrderLineDto> lines = new List<OrderLineDto>();
@@ -34,6 +33,10 @@ namespace SvarosNamai.Web.Controllers
                 };
                 return View(products);
             }
+            else
+            {
+                TempData["error"] = linesResponse.Message;
+            }
             return RedirectToAction("Details", new { orderId = orderId });
 
         }
@@ -41,7 +44,6 @@ namespace SvarosNamai.Web.Controllers
 
 
         [Authorize]
-        [HttpGet]
         public async Task<IActionResult> BundleProductsToAdd(int orderId)
         {
             List<OrderLineDto> lines = new List<OrderLineDto>();
@@ -74,6 +76,10 @@ namespace SvarosNamai.Web.Controllers
 
                 return View(products);
             }
+            else
+            {
+				TempData["error"] = linesResponse.Message;
+			}
             
             
 
@@ -93,11 +99,13 @@ namespace SvarosNamai.Web.Controllers
             var response = await _orderService.RemoveProductFromOrder(product);
             if (response.IsSuccess)
             {
-                return RedirectToAction("BundleProducts", new { orderId = orderId });
+                TempData["success"] = "Paslauga išimta";
+                return RedirectToAction("BundleProductsToAdd", new { orderId = orderId });
             }
             else
             {
-                throw new Exception(response.Message);
+				TempData["error"] = response.Message;
+				throw new Exception(response.Message);
             }
 
         }
@@ -115,11 +123,13 @@ namespace SvarosNamai.Web.Controllers
             var response = await _orderService.AddProductToOrder(product);
             if(response.IsSuccess)
             {
-                return RedirectToAction("BundleProducts", new {orderId = info.OrderId});
+                TempData["success"] = "Paslauga pridėta";
+                return RedirectToAction("BundleProductsToAdd", new {orderId = info.OrderId});
             }
             else
             {
-                throw new Exception(response.Message);
+				TempData["error"] = response.Message;
+				throw new Exception(response.Message);
             }
         }
 
@@ -133,10 +143,11 @@ namespace SvarosNamai.Web.Controllers
 
             if(response != null && response.IsSuccess)
             {
+                TempData["success"] = "Kainos atnaujintos";
                 return RedirectToAction("Details", new { orderId = orderId });
             }
-
-            return RedirectToAction("Details", new {orderId = orderId});
+			TempData["error"] = response.Message;
+			return RedirectToAction("Details", new {orderId = orderId});
         }
 
         [Authorize]
@@ -149,8 +160,11 @@ namespace SvarosNamai.Web.Controllers
             {
                 list = JsonConvert.DeserializeObject<List<OrderDto>>(response.Result.ToString());
             }
-
-            return View(list);
+            else
+            {
+			    TempData["error"] = response.Message;
+            }
+			return View(list);
         }
         [Authorize]
         public async Task<IActionResult> Details(int orderId)
@@ -166,6 +180,10 @@ namespace SvarosNamai.Web.Controllers
                 order = JsonConvert.DeserializeObject<OrderDto>(orderResponse.Result.ToString());
                 lines = JsonConvert.DeserializeObject<IEnumerable<OrderLineDto>>(linesResponse.Result.ToString());
             }
+            else
+            {
+				TempData["error"] = orderResponse.Message + linesResponse.Message;
+			}
 
             OrderDetailDto orderDetailDto = new OrderDetailDto
             {
@@ -176,7 +194,34 @@ namespace SvarosNamai.Web.Controllers
         }
 
         [Authorize]
-        public async Task<IActionResult> ChangeOrderStatus(int orderId, int status)
+        public async Task<IActionResult> DetailsToCancel(int orderId)
+        {
+            OrderDto order = new();
+            IEnumerable<OrderLineDto> lines = new List<OrderLineDto>();
+            ResponseDto orderResponse = await _orderService.GetOrderAsync(orderId);
+            ResponseDto linesResponse = await _orderService.GetOrderLines(orderId);
+
+
+            if (orderResponse != null && orderResponse.IsSuccess && linesResponse != null && linesResponse.IsSuccess)
+            {
+                order = JsonConvert.DeserializeObject<OrderDto>(orderResponse.Result.ToString());
+                lines = JsonConvert.DeserializeObject<IEnumerable<OrderLineDto>>(linesResponse.Result.ToString());
+            }
+            else
+            {
+                TempData["error"] = orderResponse.Message + linesResponse.Message;
+            }
+
+            OrderDetailDto orderDetailDto = new OrderDetailDto
+            {
+                Order = order,
+                Lines = lines
+            };
+            return View(orderDetailDto);
+        }
+
+        [Authorize]
+        public async Task<IActionResult> ChangeOrderStatus(int orderId, int status, string? message)
         {
             OrderStatusChangeDto order = new OrderStatusChangeDto();
 
@@ -197,6 +242,12 @@ namespace SvarosNamai.Web.Controllers
                 
 
             }
+            else if(status == -1)
+            {
+                order.orderId = orderId;
+                order.status = status;
+                order.message = message;
+            }
             else
             {
                 order.orderId = orderId;
@@ -204,6 +255,19 @@ namespace SvarosNamai.Web.Controllers
             }
 
             ResponseDto response = await _orderService.ChangeOrderStatus(order);
+            if(!response.IsSuccess)
+            {
+                TempData["error"] = response?.Message;
+
+			}
+            if(status == -1)
+            {
+                TempData["success"] = "Užsakymas atšauktas";
+            }
+            else
+            {
+                TempData["success"] = "Užsakymo statusas atnaujintas";
+            }
 
             return RedirectToAction("Details", new { orderId = orderId });
         }

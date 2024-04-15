@@ -1,0 +1,112 @@
+﻿@model OrderDetailDto
+
+@{
+    bool linesPriced = true;
+    foreach(var line in Model.Lines)
+    {
+        if(line.Price == 0 || line.Price == null)
+        {
+            linesPriced = false;
+            break;
+        }
+    }
+}
+
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card shadow border-0 mt-4">
+                <div class="card-header bg-secondary bg-gradient ml-0 py-3">
+                    <div class="row">
+                        <div class="col-12 text-center">
+                            <h1 class="text-white">Užsakymas nr. @Model.Order.OrderId</h1>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body p-4">
+                    <div class="row pb-3">
+                    </div>
+                    <table class="table">
+                        <tbody>
+                            <tr>
+                                <td>Vardas Pavardė:</td>
+                                <td>@Model.Order.Name @Model.Order.LastName</td>
+                            </tr>
+                            <tr>
+                                <td>Telefonas:</td>
+                                <td>@Model.Order.PhoneNumber</td>
+                            </tr>
+                            <tr>
+                                <td>El.paštas:</td>
+                                <td>@Model.Order.Email</td>
+                            </tr>
+                            <tr>
+                                <td>Adresas:</td>
+                                <td>@Model.Order.Street @Model.Order.HouseNo@(Model.Order.HouseLetter != null ? Model.Order.HouseLetter : "") @(Model.Order.ApartmentNo != null ? (" - " + Model.Order.ApartmentNo) : ""), @Model.Order.City</td>
+                            </tr>
+                            <tr>
+                                <td>Data:</td>
+                                <td>@Model.Order.Date</td>
+                            </tr>
+                            <tr>
+                                <td>Valanda:</td>
+                                <td>@Model.Order.Hour</td>
+                            </tr>
+                            <tr>
+                                <td>Statusas:</td>
+                                <td>@(SvarosNamai.Web.Utility.SD.GetStatusDescription(Model.Order.Status))</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card shadow border-0 mt-4">
+                <div class="card-header bg-secondary bg-gradient ml-0 py-3">
+                    <div class="row">
+                        <div class="col-12 text-center">
+                            <h1 class="text-white">Paslaugos</h1>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body p-4">
+                    <div class="row pb-3">
+                    </div>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Paslaugos pavadinimas</th>
+                                <th>Paslaugos kaina</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach(var line in Model.Lines)
+                            {
+                            <tr>
+                                <td>@line.ProductName</td>
+                                <td>@($"{line.Price} €") </td>
+                            </tr>
+                            }
+                            <form asp-controller="Order" asp-action="ChangeOrderStatus" method="post">
+                        <td colspan="2">
+                            <input name="message" class="form-control" placeholder="Priežastis" />
+                            <button type="submit" class="btn btn-danger form-control my-1">Atšaukti</button>
+                        </td>
+                        <input type="hidden" name="orderId" value="@Model.Order.OrderId" />
+                        <input type="hidden" name="status" value="-1" />
+                        </form>
+
+
+                                </td>
+                        </tbody>
+                    </table>
+                    <button type="button" class="btn btn-success">
+                        <a asp-controller="Order" asp-action="Details" asp-route-orderId="@Model.OrderId">Grįžti į užsakymą</a>
+                    </button>
+                </div>
+        </div>
+    </div>
+</div>
+
