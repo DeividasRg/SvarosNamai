@@ -15,7 +15,7 @@
 			</div>
 
 		</div>
-		<table class="table">
+		<table id="tblData" class="table table-bordered table-striped pt-3" style="width:100%">
 			<thead>
 				<tr>
 					<th>
@@ -36,33 +36,12 @@
 					<th></th>
 				</tr>
 			</thead>
-			<tbody>
-				@foreach(var order in Model)
-				{
-				<tr>
-					<td> @order.OrderId
-					</td>
-						<td>
-							@order.Name @order.LastName
-						</td>
-						<td>
-							@order.Street @order.HouseNo@(order.HouseLetter != null ?  order.HouseLetter : "") @(order.ApartmentNo != null ? (" - " + order.ApartmentNo) : ""), @order.City
-					</td>
-						<td>
-							@order.Date,  <b>@order.Hour valanda</b>
-					</td>
-						<td>
-							@(SvarosNamai.Web.Utility.SD.GetStatusDescription(order.Status))
-						</td>
-					<td>
-						<a class="btn btn-success asp-controller="Order" asp-action="Details" asp-route-orderId="@order.OrderId"><i class="bi bi-search"></i></a>
-					</td>
-				</tr>
-				}
-
-			</tbody>
 		</table>
 
 	</div>
 
 </div>
+
+@SectionWriters Scripts{
+	<script src="~/js/order.js"></script>
+}

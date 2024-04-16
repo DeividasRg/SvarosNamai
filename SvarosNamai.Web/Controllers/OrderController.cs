@@ -272,6 +272,25 @@ namespace SvarosNamai.Web.Controllers
             return RedirectToAction("Details", new { orderId = orderId });
         }
 
+        [HttpGet] 
+        public IActionResult GetAll()
+        {
+            IEnumerable<OrderDto> list;
+
+
+            ResponseDto response = _orderService.GetAllOrdersAsync().GetAwaiter().GetResult();
+
+            if(response != null && response.IsSuccess)
+            {
+                list = JsonConvert.DeserializeObject<List<OrderDto>>(response.Result.ToString());
+            }
+            else
+            {
+                list = new List<OrderDto>();
+            }
+            return Json(new { data = list });
+        }
+
 
     }
 }
