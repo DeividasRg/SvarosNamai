@@ -23,10 +23,22 @@ function loadDataTable() {
             },
             { data: 'hour', width: "5%" },
             {
-                data: function (row) {
-                    return SD.GetStatusDescription(row.Status);
-                },
-                width: "10%"
+                data: 'status',
+                width: "10%",
+                render: function (data) {
+                    switch (data) {
+                        case -1:
+                            return 'Atšauktas';
+                        case 0:
+                            return 'Laukiama patvirtinimo';
+                        case 1:
+                            return 'Patvirtintas';
+                        case 2:
+                            return 'Užbaigtas';
+                        default:
+                            return '';
+                    }
+                }
             }
         ]
     });

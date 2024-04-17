@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Newtonsoft.Json;
 using SvarosNamai.Web.Models;
 using SvarosNamai.Web.Service.IService;
+using static SvarosNamai.Web.Utility.SD;
 
 namespace SvarosNamai.Web.Controllers
 {
@@ -23,7 +24,7 @@ namespace SvarosNamai.Web.Controllers
             List<OrderLineDto> lines = new List<OrderLineDto>();
             ResponseDto linesResponse = await _orderService.GetOrderLines(orderId);
 
-            if(linesResponse != null && linesResponse.IsSuccess)
+            if (linesResponse != null && linesResponse.IsSuccess)
             {
                 lines = JsonConvert.DeserializeObject<List<OrderLineDto>>(linesResponse.Result.ToString());
                 ProductPricesViewDto products = new()
@@ -66,7 +67,7 @@ namespace SvarosNamai.Web.Controllers
                 var productListToAdd = new List<SelectListItem>();
 
 
-                foreach(var line in productsWithNoOrderLines)
+                foreach (var line in productsWithNoOrderLines)
                 {
                     productListToAdd.Add(new SelectListItem { Text = line.Name, Value = line.ProductId.ToString() });
                 };
@@ -78,10 +79,10 @@ namespace SvarosNamai.Web.Controllers
             }
             else
             {
-				TempData["error"] = linesResponse.Message;
-			}
-            
-            
+                TempData["error"] = linesResponse.Message;
+            }
+
+
 
             return RedirectToAction("Details", new { orderId = orderId });
 
@@ -104,8 +105,8 @@ namespace SvarosNamai.Web.Controllers
             }
             else
             {
-				TempData["error"] = response.Message;
-				throw new Exception(response.Message);
+                TempData["error"] = response.Message;
+                throw new Exception(response.Message);
             }
 
         }
@@ -121,33 +122,33 @@ namespace SvarosNamai.Web.Controllers
             };
 
             var response = await _orderService.AddProductToOrder(product);
-            if(response.IsSuccess)
+            if (response.IsSuccess)
             {
                 TempData["success"] = "Paslauga pridėta";
-                return RedirectToAction("BundleProductsToAdd", new {orderId = info.OrderId});
+                return RedirectToAction("BundleProductsToAdd", new { orderId = info.OrderId });
             }
             else
             {
-				TempData["error"] = response.Message;
-				throw new Exception(response.Message);
+                TempData["error"] = response.Message;
+                throw new Exception(response.Message);
             }
         }
 
         [Authorize]
         [HttpPost]
-        public async Task<IActionResult> ProductPrices([FromForm]ProductPricesViewDto products)
+        public async Task<IActionResult> ProductPrices([FromForm] ProductPricesViewDto products)
         {
 
             int orderId = products.OrderId;
             ResponseDto response = await _orderService.ChangeProductPrices(products.Lines);
 
-            if(response != null && response.IsSuccess)
+            if (response != null && response.IsSuccess)
             {
                 TempData["success"] = "Kainos atnaujintos";
                 return RedirectToAction("Details", new { orderId = orderId });
             }
-			TempData["error"] = response.Message;
-			return RedirectToAction("Details", new {orderId = orderId});
+            TempData["error"] = response.Message;
+            return RedirectToAction("Details", new { orderId = orderId });
         }
 
         [Authorize]
@@ -156,15 +157,15 @@ namespace SvarosNamai.Web.Controllers
             List<OrderDto>? list = new();
             ResponseDto response = await _orderService.GetAllOrdersAsync();
 
-            if(response != null && response.IsSuccess)
+            if (response != null && response.IsSuccess)
             {
                 list = JsonConvert.DeserializeObject<List<OrderDto>>(response.Result.ToString());
             }
             else
             {
-			    TempData["error"] = response.Message;
+                TempData["error"] = response.Message;
             }
-			return View(list);
+            return View(list);
         }
         [Authorize]
         public async Task<IActionResult> Details(int orderId)
@@ -173,7 +174,7 @@ namespace SvarosNamai.Web.Controllers
             IEnumerable<OrderLineDto> lines = new List<OrderLineDto>();
             ResponseDto orderResponse = await _orderService.GetOrderAsync(orderId);
             ResponseDto linesResponse = await _orderService.GetOrderLines(orderId);
-            
+
 
             if (orderResponse != null && orderResponse.IsSuccess && linesResponse != null && linesResponse.IsSuccess)
             {
@@ -182,15 +183,15 @@ namespace SvarosNamai.Web.Controllers
             }
             else
             {
-				TempData["error"] = orderResponse.Message + linesResponse.Message;
-			}
+                TempData["error"] = orderResponse.Message + linesResponse.Message;
+            }
 
             OrderDetailDto orderDetailDto = new OrderDetailDto
             {
                 Order = order,
                 Lines = lines
             };
-                return View(orderDetailDto);
+            return View(orderDetailDto);
         }
 
         [Authorize]
@@ -235,14 +236,14 @@ namespace SvarosNamai.Web.Controllers
                 {
                     messageForSend += $"{line.ProductName} : {line.Price} € \n";
                 }
-                
+
                 order.orderId = orderId;
                 order.status = status;
                 order.message = messageForSend;
-                
+
 
             }
-            else if(status == -1)
+            else if (status == -1)
             {
                 order.orderId = orderId;
                 order.status = status;
@@ -255,12 +256,12 @@ namespace SvarosNamai.Web.Controllers
             }
 
             ResponseDto response = await _orderService.ChangeOrderStatus(order);
-            if(!response.IsSuccess)
+            if (!response.IsSuccess)
             {
                 TempData["error"] = response?.Message;
 
-			}
-            if(status == -1)
+            }
+            if (status == -1)
             {
                 TempData["success"] = "Užsakymas atšauktas";
             }
@@ -272,7 +273,7 @@ namespace SvarosNamai.Web.Controllers
             return RedirectToAction("Details", new { orderId = orderId });
         }
 
-        [HttpGet] 
+        [HttpGet]
         public IActionResult GetAll()
         {
             IEnumerable<OrderDto> list;
@@ -280,7 +281,7 @@ namespace SvarosNamai.Web.Controllers
 
             ResponseDto response = _orderService.GetAllOrdersAsync().GetAwaiter().GetResult();
 
-            if(response != null && response.IsSuccess)
+            if (response != null && response.IsSuccess)
             {
                 list = JsonConvert.DeserializeObject<List<OrderDto>>(response.Result.ToString());
             }
@@ -289,6 +290,24 @@ namespace SvarosNamai.Web.Controllers
                 list = new List<OrderDto>();
             }
             return Json(new { data = list });
+        }
+
+        [HttpGet]
+        public IActionResult GetStatusDescription([FromQuery]int statusCode)
+        {
+                switch (statusCode)
+                {
+                    case (int)OrderStatus.Pending:
+                        return Json("Laukiantis patvirtinimo"); 
+                    case (int)OrderStatus.Approved:
+                        return Json("Patvirtintas");
+                    case (int)OrderStatus.Completed:
+                        return Json("Užbaigtas");
+                    case (int)OrderStatus.Cancelled:
+                        return Json("Atšauktas");
+                    default:
+                        return Json("Nežinomas"); 
+                }
         }
 
 
