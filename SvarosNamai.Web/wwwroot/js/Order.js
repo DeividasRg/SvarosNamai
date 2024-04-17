@@ -8,7 +8,6 @@ function loadDataTable() {
     dataTable = $('#tblData').DataTable({
         "ajax": { url: "/order/GetAll" },
         "language": {
-            "url": "//cdn.datatables.net/plug-ins/1.11.5/i18n/Lithuanian.json",
             "paginate": {
                 "first": "Pirmas",
                 "last": "Paskutinis",
@@ -37,6 +36,7 @@ function loadDataTable() {
                 width: "30%",
                 title: "Adresas"
             },
+            { data: 'date', width: "10%", title: "Data" },
             {
                 data: 'hour',
                 width: "10%",
@@ -46,8 +46,18 @@ function loadDataTable() {
                 }
             },
             {
+                data: 'creationDate',
+                width: "15%",
+                title: "Pateikimo laikas",
+                render: function (data) {
+                    var date = new Date(data);
+                    var formattedDate = date.getFullYear() + '-' + padZero(date.getMonth() + 1) + '-' + padZero(date.getDate()) + ' ' + padZero(date.getHours()) + ':' + padZero(date.getMinutes()) + ':' + padZero(date.getSeconds());
+                    return formattedDate;
+                }
+            },
+            {
                 data: 'status',
-                width: "30%",
+                width: "15%",
                 title: "Statusas",
                 render: function (data) {
                     switch (data) {
@@ -72,9 +82,14 @@ function loadDataTable() {
                     <a href="/order/Details?orderId=${data}" class="btn btn-primary mx-2"><i class="bi bi-pencil-square"></i></a>
                     </div>`
                 },
-                width: "10%"
-            },
-            { data: 'orderId', width: "3%", title: "Užsakymo numeris" },
-        ]
+                width: "7%"
+            }
+        ],
+        "order": [[5, "desc"]] // Sort by the 'creationDate' column in descending order (column index is zero-based)
     });
+}
+
+// Function to pad zero to single-digit numbers
+function padZero(num) {
+    return (num < 10 ? '0' : '') + num;
 }
