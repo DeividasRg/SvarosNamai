@@ -122,9 +122,9 @@
 
                                     <button asp-controller="Order" asp-action="DetailsToCancel" asp-route-orderId="@Model.Order.OrderId" type="submit" class="btn btn-danger form-control my-1">Atšaukti</button>
                                     }
-                                    @if(Model.Order.Status ==2)
+                                    @if(Model.Order.Status == 2)
                                     {
-                                    <button type="submit" class="btn btn-info form-control my-1">Atsisiųsti sąskaitą faktūrą</button>
+                                    <button asp-controller="Order" asp-action="DownloadFile" asp-route-orderId="@Model.Order.OrderId" class="btn btn-info form-control my-1">Atsisiųsti sąskaitą faktūrą</button>
                                     }
                                     @if (Model.Order.Status == -1)
                                     {

@@ -12,10 +12,12 @@ namespace SvarosNamai.Web.Controllers
     {
         private readonly IOrderService _orderService;
         private readonly IProductService _productService;
-        public OrderController(IOrderService orderService, IProductService productService)
+        private readonly IInvoiceService _invoice;
+        public OrderController(IOrderService orderService, IProductService productService, IInvoiceService invoice)
         {
             _orderService = orderService;
             _productService = productService;
+            _invoice = invoice;
         }
 
         [Authorize]
@@ -147,8 +149,11 @@ namespace SvarosNamai.Web.Controllers
                 TempData["success"] = "Kainos atnaujintos";
                 return RedirectToAction("Details", new { orderId = orderId });
             }
-            TempData["error"] = response.Message;
-            return RedirectToAction("Details", new { orderId = orderId });
+            else
+            {
+                TempData["error"] = response.Message;
+                return RedirectToAction("Details", new { orderId = orderId });
+            }
         }
 
         [Authorize]
@@ -259,6 +264,7 @@ namespace SvarosNamai.Web.Controllers
             if (!response.IsSuccess)
             {
                 TempData["error"] = response?.Message;
+                return RedirectToAction("Details", new { orderId = orderId });
 
             }
             if (status == -1)
@@ -267,7 +273,7 @@ namespace SvarosNamai.Web.Controllers
             }
             else
             {
-                TempData["success"] = "Užsakymo statusas atnaujintas";
+                TempData["success"] = $"Užsakymo statusas atnaujintas \n {response.Message} ";
             }
 
             return RedirectToAction("Details", new { orderId = orderId });
@@ -308,6 +314,28 @@ namespace SvarosNamai.Web.Controllers
                     default:
                         return Json("Nežinomas"); 
                 }
+        }
+
+        [HttpPost("DownloadInvoice")]
+        public async Task<IActionResult> DownloadFile(int orderId)
+        {
+            
+            ResponseDto response = await _invoice.GetInvoice(orderId);
+
+            if(response != null && response.IsSuccess)
+            {
+                byte[] bytes = JsonConvert.DeserializeObject<byte[]>(response.Result.ToString());
+                var stream = new MemoryStream(bytes);
+
+                    Response.Headers.Add("Content-Disposition", $"attachment; filename={orderId}.pdf");
+                    return new FileStreamResult(stream, "application/octet-stream");
+                
+            }
+            else
+            {
+                TempData["error"] = "SF neegzistuoja";
+                return RedirectToAction("Details", new { orderId = orderId });
+            }
         }
 
 

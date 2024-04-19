@@ -137,6 +137,10 @@ namespace SvarosNamai.Serivce.OrderAPI.Controllers
                                 orderCheck.Status = OrderStatusses.Status_Approved;
                                 info.OrderStatus = OrderStatusses.Status_Approved;
                                 var emailSendForApproved = await _email.SendConfirmationEmail(info);
+                                if(!emailSendForApproved.IsSuccess)
+                                {
+                                    _response.Message = "Neišsiųstas laiškas";
+                                }
                                 await _db.SaveChangesAsync();
                                 break;
                             case OrderStatusses.Status_Cancelled:
@@ -173,7 +177,9 @@ namespace SvarosNamai.Serivce.OrderAPI.Controllers
                                     var emailConfirmationSend = await _email.SendCompleteEmail(info);
                                     if (!emailConfirmationSend.IsSuccess)
                                     {
-                                        throw new Exception($"{emailConfirmationSend.Message}");
+                                        _response.Message = "Neišsiųstas laiškas";
+                                        orderCheck.Status = OrderStatusses.Status_Completed;
+                                        await _db.SaveChangesAsync();
                                     }
                                     else
                                     {
@@ -306,13 +312,21 @@ namespace SvarosNamai.Serivce.OrderAPI.Controllers
                 {
                     var currentLine = _db.OrderLines.Find(line.OrderLineId);
 
-                    if (currentLine != null)
+                    if (currentLine != null )
                     {
-                        currentLine.Price = line.Price;
+                        if (line.Price >= 0)
+                        {
+                            currentLine.Price = line.Price;
+                        }
+                        else
+                        {
+                            throw new Exception("Kaina negali būti mažiau nei 0");
+                        }
+                        
                     }
                     else
                     {
-                        throw new Exception("Line doesn't exist");
+                        throw new Exception("Produktas neegzistuoja");
                     }
                 }
                 await _db.SaveChangesAsync();
@@ -320,7 +334,7 @@ namespace SvarosNamai.Serivce.OrderAPI.Controllers
             catch(Exception ex)
             {
                 _response.IsSuccess = false;
-                _response.Result = ex.Message;
+                _response.Message = ex.Message;
                 _error.LogError(ex.Message);
             }
             return _response;

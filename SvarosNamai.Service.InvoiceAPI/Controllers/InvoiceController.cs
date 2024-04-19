@@ -172,7 +172,7 @@ namespace SvarosNamai.Service.InvoiceAPI.Controllers
 
         [Authorize]
         [HttpGet("DownloadInvoice/{orderId}")]
-        public async Task<IActionResult> DownloadInvoice(int orderId)
+        public async Task<ResponseDto> DownloadInvoice(int orderId)
         {
             try
             {
@@ -180,7 +180,10 @@ namespace SvarosNamai.Service.InvoiceAPI.Controllers
                 var invoice = _db.Invoices.Where(u => u.OrderId == orderId).FirstOrDefault();
                 if(invoice != null)
                 {
-                return PhysicalFile(invoice.Path, "application/octet-stream", $"{invoice.InvoiceName}.pdf");
+
+                    byte[] bytes = System.IO.File.ReadAllBytes(invoice.Path);
+                    _response.Result = JsonConvert.SerializeObject(bytes);
+                    
                 }
                 else
                 {
@@ -192,9 +195,11 @@ namespace SvarosNamai.Service.InvoiceAPI.Controllers
             }
             catch(Exception ex)
             {
+                _response.IsSuccess = false;
+                _response.Message = ex.Message;
                 _error.LogError(_response.Message);
-                return new NotFoundObjectResult(ex.Message);
             }
+            return _response;
         }
     }
 }
