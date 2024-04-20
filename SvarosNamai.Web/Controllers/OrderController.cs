@@ -242,34 +242,18 @@ namespace SvarosNamai.Web.Controllers
         {
             OrderStatusChangeDto order = new OrderStatusChangeDto();
 
-            if (status == 1)
-            {
-                var responseDto = await _orderService.GetOrderLines(orderId);
-                IEnumerable<OrderLineDto> orderLines = JsonConvert.DeserializeObject<IEnumerable<OrderLineDto>>(responseDto.Result.ToString());
-                string messageForSend = "Pasiūlymas: \n";
 
-                foreach (var line in orderLines)
+             if (status == -1)
                 {
-                    messageForSend += $"{line.ProductName} : {line.Price} € \n";
-                }
-
-                order.orderId = orderId;
-                order.status = status;
-                order.message = messageForSend;
-
-
-            }
-            else if (status == -1)
-            {
                 order.orderId = orderId;
                 order.status = status;
                 order.message = message;
-            }
+                }
             else
-            {
+                {
                 order.orderId = orderId;
                 order.status = status;
-            }
+                }
 
             ResponseDto response = await _orderService.ChangeOrderStatus(order);
             if (!response.IsSuccess)
