@@ -26,7 +26,7 @@ namespace SvarosNamai.Web.Controllers
             List<OrderLineDto> lines = new List<OrderLineDto>();
             ResponseDto linesResponse = await _orderService.GetOrderLines(orderId);
 
-            if (linesResponse != null && linesResponse.IsSuccess)
+            if (linesResponse.Result != null)
             {
                 lines = JsonConvert.DeserializeObject<List<OrderLineDto>>(linesResponse.Result.ToString());
                 ProductPricesViewDto products = new()
@@ -38,7 +38,18 @@ namespace SvarosNamai.Web.Controllers
             }
             else
             {
-                TempData["error"] = linesResponse.Message;
+                ProductPricesViewDto products = new()
+                {
+                    Lines = new List<OrderLineDto>()
+                    {
+                        new OrderLineDto()
+                        {
+                            ProductName = "No Products Added"
+                        }
+                    },
+                    OrderId = orderId
+                };
+                return View(products);
             }
             return RedirectToAction("Details", new { orderId = orderId });
 

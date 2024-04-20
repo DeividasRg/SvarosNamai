@@ -48,26 +48,13 @@ namespace SvarosNamai.Serivce.OrderAPI.Controllers
             try
             {
                 BundleDto bundleFromDb = await _productService.GetBundle(bundleId);
-                if (bundleFromDb != null && bundleFromDb.Products != null)
+                if (bundleFromDb != null)
                 {
                     Order orderToDb = _mapper.Map<Order>(order);
-                    orderToDb.CreationDate = DateTime.Now;
-                    orderToDb.Price = bundleFromDb.Price;
+                    orderToDb.Price = ((order.SquareFoot * 2.4) / 60) * bundleFromDb.HourPrice;
                     await _db.Orders.AddAsync(orderToDb);
 
-
-
-                    foreach (var product in bundleFromDb.Products)
-                    {
-                        OrderLine orderline = new OrderLine();
-                        orderline.Order = orderToDb;
-                        orderline.ProductName = product.Name;
-                        await _db.OrderLines.AddAsync(orderline);
-                        await _db.SaveChangesAsync();
-                    }
                     //Send An Email
-
-
                     var emailSend = await _email.SendConfirmationEmail(_mapper.Map<ConfirmationEmailDto>(orderToDb));
 
 
@@ -132,8 +119,7 @@ namespace SvarosNamai.Serivce.OrderAPI.Controllers
                                 {
                                     throw new Exception("Order already completed");
                                 }
-                                info.message = orderInfo.message;
-
+                                
                                 orderCheck.Status = OrderStatusses.Status_Approved;
                                 info.OrderStatus = OrderStatusses.Status_Approved;
                                 var emailSendForApproved = await _email.SendConfirmationEmail(info);

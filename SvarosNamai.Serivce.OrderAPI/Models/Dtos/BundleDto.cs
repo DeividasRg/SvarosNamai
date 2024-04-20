@@ -5,9 +5,9 @@ namespace SvarosNamai.Service.OrderAPI.Models.Dtos
 {
     public class BundleDto
     {
+        public int BundleId { get; set; }
         public string BundleName { get; set; }
-        public double Price { get; set; }
+        public double HourPrice { get; set; }
         public double? Discount { get; set; }
-        public IEnumerable<ProductDto> Products { get; set; }
     }
 }

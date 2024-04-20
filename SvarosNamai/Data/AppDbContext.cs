@@ -11,7 +11,6 @@ namespace SvarosNamai.Service.ProductAPI.Data
         }
         public DbSet<Bundle> Bundles { get; set; }
         public DbSet<Product> Products { get; set; }
-        public DbSet<ProductBundle> ProductBundle { get; set; }
-
+        
     }
 }

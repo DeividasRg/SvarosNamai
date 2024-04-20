@@ -14,9 +14,8 @@ namespace SvarosNamai.Service.ProductAPI.Models
         [Required]
         public string BundleName { get; set; }
         [Range(1,100)]
-        public double Price { get; set; }
-        public double? Discount { get; set; }
-        public DateTime DateCreated { get; set; }
+        public double HourPrice { get; set; }
+        public DateTime DateCreated { get; set; } = DateTime.Now;
         public DateTime? DateUpdated { get; set; }
         [Required]
         public bool IsActive {  get; set; } = false;

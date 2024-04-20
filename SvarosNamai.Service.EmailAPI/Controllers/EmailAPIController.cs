@@ -137,8 +137,7 @@ namespace SvarosNamai.Service.EmailAPI.Controllers
                             subject = $"Užsakymas {info.OrderId} pateiktas";
                             break;
                         case 1:
-                            message = $"Jūsų užsakymas Nr.{info.OrderId} patvirtintas adresu {info.Address}, {info.Date} dieną {info.Hour} valandą. \n \n" +
-                            $" {info.message}";
+                        message = $"Jūsų užsakymas Nr.{info.OrderId} patvirtintas adresu {info.Address}, {info.Date} dieną {info.Hour} valandą.";
                         subject = $"Užsakymas {info.OrderId} patvirtinimas";
                         break;
                     case -1:

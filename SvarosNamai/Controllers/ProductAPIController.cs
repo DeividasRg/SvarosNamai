@@ -49,18 +49,6 @@ namespace SvarosNamai.Service.ProductAPI.Controllers
                 if (bundlesFromDB != null)
                 {
                     IEnumerable<BundleDto> bundleDtosFromDb = _mapper.Map<IEnumerable<BundleDto>>(bundlesFromDB);
-                    foreach (var bundle in bundleDtosFromDb)
-                    {
-                        var productIds = _db.ProductBundle
-                        .Where(u => u.BundleId == bundle.BundleId)
-                        .Select(u => u.ProductId)
-                        .ToList();
-
-                        var productsUnmapped = _db.Products
-                            .Where(u => productIds.Contains(u.ProductId));
-
-                        bundle.Products = _mapper.Map<IEnumerable<ProductDto>>(productsUnmapped);
-                    }
                     _response.Result = bundleDtosFromDb;
                 }
                 else
@@ -85,16 +73,6 @@ namespace SvarosNamai.Service.ProductAPI.Controllers
                 BundleDto bundle = _mapper.Map<BundleDto>(_db.Bundles.Find(bundleId));
                 if (bundle != null)
                 {
-                    var productIds = _db.ProductBundle
-                        .Where(u => u.BundleId == bundleId)
-                        .Select(u => u.ProductId)
-                        .ToList();
-
-                    var productsUnmapped = _db.Products
-                        .Where(u => productIds.Contains(u.ProductId));
-
-                    bundle.Products = _mapper.Map<IEnumerable<ProductDto>>(productsUnmapped);
-
                     _response.Result = bundle;
                     _response.Message = "Successfully Retrieved";
                     return _response;
@@ -225,78 +203,7 @@ namespace SvarosNamai.Service.ProductAPI.Controllers
             }
             return _response;
         }
-        [Authorize]
-        [HttpPost("AddProductToBundle")]
-        public async Task<ResponseDto> AddProductToBundle(ProductBundleDto productBundle)
-        {
-            try
-            {
-                var bundleIdCheck =  await _db.Bundles.FirstOrDefaultAsync(u => u.BundleId == productBundle.BundleId);
-                if (bundleIdCheck != null)
-                {
-
-                    foreach (var produkt in productBundle.ProductIds)
-                    {
-                        var productCheck = await _db.Products.FirstOrDefaultAsync(u => u.ProductId == produkt);
-                        if (productCheck != null)
-                        {
-                            if (!_db.ProductBundle.Any(u => u.ProductId == produkt && u.BundleId == productBundle.BundleId))
-                            {
-                                ProductBundle bundleToDb = new ProductBundle()
-                                {
-                                    BundleId = productBundle.BundleId,
-                                    ProductId = produkt
-                                };
-                                _db.ProductBundle.Add(bundleToDb);
-                            }
-                        }
-                        else
-                        {
-                            throw new Exception("Product doesn't exist");
-                        }
-                    }
-                    await _db.SaveChangesAsync();
-                }
-                else
-                {
-                    throw new Exception("Bundle doesn't exist");
-                }
-                
-            }
-            catch (Exception ex)
-            {
-                _response.IsSuccess = false;
-                _response.Message = ex.Message;
-                _error.LogError(_response.Message);
-            }
-            return _response;
-        }
-        [Authorize]
-        [HttpDelete("RemoveProductFromBundle/{id}")]
-        public async Task<ResponseDto> RemoveProductFromBundle(int id)
-        {
-            try
-            {
-                var check = await _db.ProductBundle.FindAsync(id);
-                if (check != null)
-                {
-                    _db.ProductBundle.Remove(check);
-                    _db.SaveChanges();
-                    
-                }
-                else
-                {
-                    throw new Exception("id doesn't exist");
-                }
-            }
-            catch(Exception ex)
-            {
-                _response.IsSuccess = false;
-                _response.Message = ex.Message;
-                _error.LogError(_response.Message);
-            }
-            return _response;
-        }
+        
 
         [Authorize]
         [HttpDelete("DeleteProduct/{id}")]
@@ -307,16 +214,8 @@ namespace SvarosNamai.Service.ProductAPI.Controllers
                 var check = await _db.Products.FindAsync(id);
                 if (check != null)
                 {
-                    var bundleCheck = await _db.ProductBundle.AnyAsync(u => u.ProductId == id);
-                    if (bundleCheck == false)
-                    {
                         _db.Products.Remove(check);
                         _db.SaveChanges();
-                    }
-                    else
-                    {
-                        throw new Exception("Product is assigned to a bundle");
-                    }
                 }
                 else
                 {
