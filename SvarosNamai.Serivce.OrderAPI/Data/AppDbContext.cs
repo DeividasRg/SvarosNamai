@@ -16,7 +16,8 @@ namespace SvarosNamai.Service.OrderAPI.Data
 
         public DbSet<Order> Orders {  get; set; }
         public DbSet<OrderLine> OrderLines { get; set; }
-        public DbSet<Reservations> Reservations { get; set; }   
+        public DbSet<Reservations> Reservations { get; set; } 
+        public DbSet<OrderLog> OrderLogs { get; set; }  
 
 
 

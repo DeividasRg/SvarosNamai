@@ -129,6 +129,17 @@ namespace SvarosNamai.Serivce.OrderAPI.Controllers
                                     _response.Message = "Neišsiųstas laiškas";
                                 }
                                 await _db.SaveChangesAsync();
+
+                                OrderLog orderLogApproved = new()
+                                {
+                                    OrderId = orderCheck.OrderId,
+                                    OrderStatus = OrderStatusses.Status_Approved,
+                                    Email = User.Identity.Name,
+                                    Time = DateTime.Now
+                                };
+                                await _db.OrderLogs.AddAsync(orderLogApproved);
+                                await _db.SaveChangesAsync();
+
                                 break;
                             case OrderStatusses.Status_Cancelled:
 
@@ -143,6 +154,17 @@ namespace SvarosNamai.Serivce.OrderAPI.Controllers
                                 info.OrderStatus = OrderStatusses.Status_Cancelled;
                                 var emailSendForCancelled = await _email.SendConfirmationEmail(info);
                                 await _db.SaveChangesAsync();
+
+                                OrderLog orderLogCancelled = new()
+                                {
+                                    OrderId = orderCheck.OrderId,
+                                    OrderStatus = OrderStatusses.Status_Cancelled,
+                                    Email = User.Identity.Name,
+                                    Time = DateTime.Now
+                                };
+                                _db.OrderLogs.AddAsync(orderLogCancelled);
+                                await _db.SaveChangesAsync();
+
                                 break;
                             case OrderStatusses.Status_Completed:
                                 OrderForInvoiceDto order = _mapper.Map<OrderForInvoiceDto>(orderCheck);
@@ -173,6 +195,17 @@ namespace SvarosNamai.Serivce.OrderAPI.Controllers
                                         orderCheck.Status = OrderStatusses.Status_Completed;
                                         await _db.SaveChangesAsync();
                                     }
+
+                                    OrderLog orderLogCompleted = new()
+                                    {
+                                        OrderId = orderCheck.OrderId,
+                                        OrderStatus = OrderStatusses.Status_Completed,
+                                        Email = User.Identity.Name,
+                                        Time = DateTime.Now
+                                    };
+                                    _db.OrderLogs.AddAsync(orderLogCompleted);
+                                    await _db.SaveChangesAsync();
+
                                 }
                                 else
                                 {
@@ -187,6 +220,17 @@ namespace SvarosNamai.Serivce.OrderAPI.Controllers
                                 {
                                     throw new Exception("Laiškas neišsiųstas");
                                 }
+
+                                OrderLog orderLogAddition = new()
+                                {
+                                    OrderId = orderCheck.OrderId,
+                                    OrderStatus = OrderStatusses.Status_Addition,
+                                    Email = User.Identity.Name,
+                                    Time = DateTime.Now
+                                };
+                                _db.OrderLogs.AddAsync(orderLogAddition);
+                                await _db.SaveChangesAsync();
+
                                 break;
                             default:
                                 break;
