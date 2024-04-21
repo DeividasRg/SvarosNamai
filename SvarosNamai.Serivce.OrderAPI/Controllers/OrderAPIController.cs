@@ -53,6 +53,7 @@ namespace SvarosNamai.Serivce.OrderAPI.Controllers
                     Order orderToDb = _mapper.Map<Order>(order);
                     orderToDb.Price = ((order.SquareFoot * 2.4) / 60) * bundleFromDb.HourPrice;
                     await _db.Orders.AddAsync(orderToDb);
+                    await _db.SaveChangesAsync();
 
                     //Send An Email
                     var emailSend = await _email.SendConfirmationEmail(_mapper.Map<ConfirmationEmailDto>(orderToDb));
@@ -178,6 +179,15 @@ namespace SvarosNamai.Serivce.OrderAPI.Controllers
                                     throw new Exception($"{generateInvoice.Message}");
                                 }
                                 break;
+                            case OrderStatusses.Status_Addition:
+                                info.OrderStatus = OrderStatusses.Status_Addition;
+                                info.message = orderInfo.message;
+                                ResponseDto response = await _email.SendConfirmationEmail(info);
+                                if(!response.IsSuccess)
+                                {
+                                    throw new Exception("Laiškas neišsiųstas");
+                                }
+                                break;
                             default:
                                 break;
                         }
@@ -283,48 +293,7 @@ namespace SvarosNamai.Serivce.OrderAPI.Controllers
         }
 
 
-        [Authorize]
-        [HttpPut("AddPricesToProducts")]
-        public async Task<ResponseDto> AddPricesToProducts(IEnumerable<OrderLineDto> orderlines)
-        {
-            try
-            {
-                IEnumerable<OrderLine> mappedLines = _mapper.Map<IEnumerable<OrderLine>>(orderlines).ToList();
-                if(mappedLines.Count() == 0 || mappedLines.Count() == null)
-                {
-                    throw new Exception("No Order Lines");
-                }
-                foreach (var line in mappedLines)
-                {
-                    var currentLine = _db.OrderLines.Find(line.OrderLineId);
-
-                    if (currentLine != null )
-                    {
-                        if (line.Price >= 0)
-                        {
-                            currentLine.Price = line.Price;
-                        }
-                        else
-                        {
-                            throw new Exception("Kaina negali būti mažiau nei 0");
-                        }
-                        
-                    }
-                    else
-                    {
-                        throw new Exception("Produktas neegzistuoja");
-                    }
-                }
-                await _db.SaveChangesAsync();
-            }
-            catch(Exception ex)
-            {
-                _response.IsSuccess = false;
-                _response.Message = ex.Message;
-                _error.LogError(ex.Message);
-            }
-            return _response;
-        }
+       
         [Authorize]
 		[HttpGet("GetOrders")]
 		public async Task<ResponseDto> GetOrders()
@@ -354,7 +323,6 @@ namespace SvarosNamai.Serivce.OrderAPI.Controllers
             return _response;
         }
 
-        //[Authorize]
         [HttpGet("GetOrderlines/{orderId}")]
         public async Task<ResponseDto> GetOrderLines(int orderId)
         {

@@ -8,6 +8,7 @@ namespace SvarosNamai.Serivce.OrderAPI.Utility
         public const int Status_Approved = 1;
         public const int Status_Completed = 2;
         public const int Status_Cancelled = -1;
+        public const int Status_Addition = 5;
 
 
         public static int GetStatusConstant(int status)
@@ -22,6 +23,8 @@ namespace SvarosNamai.Serivce.OrderAPI.Utility
                     return Status_Completed;
                 case Status_Cancelled:
                     return Status_Cancelled;
+                case Status_Addition:
+                    return Status_Addition;
                 default:
                     return 99;
             }

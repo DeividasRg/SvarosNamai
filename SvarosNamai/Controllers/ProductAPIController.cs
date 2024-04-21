@@ -265,6 +265,32 @@ namespace SvarosNamai.Service.ProductAPI.Controllers
             return _response;
         }
 
+        [HttpPut("ChangeProductPrice")]
+        public async Task<ResponseDto> ChangeProductPrice(ProductDto product)
+        {
+            try
+            {
+                Product productFromDB = await _db.Products.FindAsync(product.ProductId);
+                if (productFromDB != null)
+                {
+                    productFromDB.Price = product.Price;
+                    productFromDB.DateUpdated = DateTime.Now;
+                    await _db.SaveChangesAsync();
+                }
+                else
+                {
+                    throw new Exception("Product doesn't exist");
+                }
+            }
+            catch(Exception ex)
+            {
+                _response.IsSuccess = false;
+                _response.Message = ex.Message;
+                _error.LogError(ex.Message);
+            }
+            return _response;
+        }
+
 
     }
 }

@@ -36,16 +36,6 @@ namespace SvarosNamai.Web.Service
 
         }
 
-        public async Task<ResponseDto> ChangeProductPrices(IEnumerable<OrderLineDto> lines)
-        {
-            return await _baseService.SendAsync(new RequestDto()
-            {
-                ApiType = SD.ApiType.PUT,
-                Data = lines,
-                Url = SD.OrderAPIBase + "/api/order/AddPricesToProducts"
-            });
-        }
-
         public async Task<ResponseDto?> GetAllOrdersAsync()
         {
             return await _baseService.SendAsync(new RequestDto()

@@ -2,9 +2,9 @@
 
 @{
     bool linesPriced = true;
-    foreach(var line in Model.Lines)
+    foreach (var line in Model.Lines)
     {
-        if(line.Price == 0 || line.Price == null)
+        if (line.Price == 0 || line.Price == null)
         {
             linesPriced = false;
             break;
@@ -14,129 +14,224 @@
 
 
 <form asp-controller="Order">
-<div class="container">
-    <div class="row">
-        <div class="col-md-6">
-            <div class="card shadow border-0 mt-4">
-                <div class="card-header bg-secondary bg-gradient ml-0 py-3">
-                    <div class="row">
-                        <div class="col-12 text-center">
-                            <h1 class="text-white">Užsakymas nr. @Model.Order.OrderId</h1>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card shadow border-0 mt-4">
+                    <div class="card-header bg-secondary bg-gradient ml-0 py-3">
+                        <div class="row">
+                            <div class="col-12 text-center">
+                                <h1 class="text-white">Užsakymas nr. @Model.Order.OrderId</h1>
+                            </div>
                         </div>
                     </div>
-                </div>
-                <div class="card-body p-4">
-                    <div class="row pb-3">
+                    <div class="card-body p-4">
+                        <div class="row pb-3">
+                        </div>
+                        <table class="table">
+                            <tbody>
+                                @if (!@Model.Order.IsCompany)
+                                {
+                                    <tr>
+                                        <td>Vardas Pavardė:</td>
+                                        <td>@Model.Order.Name @Model.Order.LastName</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Telefonas:</td>
+                                        <td>@Model.Order.PhoneNumber</td>
+                                    </tr>
+                                    <tr>
+                                        <td>El.paštas:</td>
+                                        <td>@Model.Order.Email</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Adresas:</td>
+                                        <td>@Model.Order.Street @Model.Order.HouseNo@(Model.Order.HouseLetter != null ? Model.Order.HouseLetter : "") @(Model.Order.ApartmentNo != null ? (" - " + Model.Order.ApartmentNo) : ""), @Model.Order.City</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Plotas:</td>
+                                        <td>@Model.Order.SquareFoot <b>m2</b></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Data:</td>
+                                        <td>@Model.Order.Date</td>
+                                    </tr>
+                                    @if (Model.Lines.Count() > 0)
+                                    {
+
+                                        double? sumPrice = 0;
+                                        foreach (var line in Model.Lines)
+                                        {
+                                            sumPrice += line.Price;
+                                        }
+
+                                        <tr>
+                                            <td>Kaina</td>
+                                            <td>@(Model.Order.Price.ToString("0.00")) + @sumPrice €</td>
+                                        </tr>
+                                    }
+                                    else
+                                    {
+                                        <tr>
+                                            <td>Kaina</td>
+                                            <td>@(Model.Order.Price.ToString("0.00")) €</td>
+                                        </tr>
+                                    }
+
+                                    <tr>
+                                        <td>Valanda:</td>
+                                        <td>@Model.Order.Hour</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Statusas:</td>
+                                        <td>@(SvarosNamai.Web.Utility.SD.GetStatusDescription(Model.Order.Status))</td>
+                                    </tr>
+                                }
+                                else
+                                {
+                                    <tr>
+                                        <td>Įmonės pavadinimas:</td>
+                                        <td>@Model.Order.CompanyName</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Įmonės kodas:</td>
+                                        <td>@Model.Order.CompanyNumber</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Telefonas:</td>
+                                        <td>@Model.Order.PhoneNumber</td>
+                                    </tr>
+                                    <tr>
+                                        <td>El.paštas:</td>
+                                        <td>@Model.Order.Email</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Adresas:</td>
+                                        <td>@Model.Order.Street @Model.Order.HouseNo@(Model.Order.HouseLetter != null ? Model.Order.HouseLetter : "") @(Model.Order.ApartmentNo != null ? (" - " + Model.Order.ApartmentNo) : ""), @Model.Order.City</td>
+                                    </tr>
+                                    @if (Model.Lines.Count() > 0)
+                                    {
+
+                                        double? sumPrice = 0;
+                                        foreach (var line in Model.Lines)
+                                        {
+                                            sumPrice += line.Price;
+                                        }
+
+                                        <tr>
+                                            <td>Kaina</td>
+                                            <td>@(Model.Order.Price.ToString("0.00")) + @sumPrice €</td>
+                                        </tr>
+                                    }
+                                    else
+                                    {
+                                        <tr>
+                                            <td>Kaina</td>
+                                            <td>@(Model.Order.Price.ToString("0.00")) €</td>
+                                        </tr>
+                                    }
+                                    <tr>
+                                        <td>Plotas:</td>
+                                        <td>@Model.Order.SquareFoot <b>m2</b></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Data:</td>
+                                        <td>@Model.Order.Date</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Valanda:</td>
+                                        <td>@Model.Order.Hour</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Statusas:</td>
+                                        <td>@(SvarosNamai.Web.Utility.SD.GetStatusDescription(Model.Order.Status))</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
                     </div>
-                    <table class="table">
-                        <tbody>
-                            <tr>
-                                <td>Vardas Pavardė:</td>
-                                <td>@Model.Order.Name @Model.Order.LastName</td>
-                            </tr>
-                            <tr>
-                                <td>Telefonas:</td>
-                                <td>@Model.Order.PhoneNumber</td>
-                            </tr>
-                            <tr>
-                                <td>El.paštas:</td>
-                                <td>@Model.Order.Email</td>
-                            </tr>
-                            <tr>
-                                <td>Adresas:</td>
-                                <td>@Model.Order.Street @Model.Order.HouseNo@(Model.Order.HouseLetter != null ? Model.Order.HouseLetter : "") @(Model.Order.ApartmentNo != null ? (" - " + Model.Order.ApartmentNo) : ""), @Model.Order.City</td>
-                            </tr>
-                            <tr>
-                                <td>Data:</td>
-                                <td>@Model.Order.Date</td>
-                            </tr>
-                            <tr>
-                                <td>Valanda:</td>
-                                <td>@Model.Order.Hour</td>
-                            </tr>
-                            <tr>
-                                <td>Statusas:</td>
-                                <td>@(SvarosNamai.Web.Utility.SD.GetStatusDescription(Model.Order.Status))</td>
-                            </tr>
-                        </tbody>
-                    </table>
                 </div>
             </div>
-        </div>
-        <div class="col-md-6">
-            <div class="card shadow border-0 mt-4">
-                <div class="card-header bg-secondary bg-gradient ml-0 py-3">
-                    <div class="row">
-                        <div class="col-12 text-center">
-                            <h1 class="text-white">Paslaugos</h1>
+            <div class="col-md-6">
+                <div class="card shadow border-0 mt-4">
+                    <div class="card-header bg-secondary bg-gradient ml-0 py-3">
+                        <div class="row">
+                            <div class="col-12 text-center">
+                                <h1 class="text-white">Paslaugos</h1>
+                            </div>
                         </div>
                     </div>
-                </div>
-                <div class="card-body p-4">
-                    <div class="row pb-3">
-                    </div>
-                    <table class="table">
-                        <thead>
-                            <tr>
-                                <th>Paslaugos pavadinimas</th>
-                                <th>Paslaugos kaina</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach(var line in Model.Lines)
+                    <div class="card-body p-4">
+                        <div class="row pb-3">
+                        </div>
+                        <table class="table">
+                            @if (Model.Lines.Count() > 0)
                             {
-                            <tr>
-                                <td>@line.ProductName</td>
-                                <td>@($"{line.Price} €") </td>
-                            </tr>
+                                <thead>
+                                    <tr>
+                                        <th>Paslaugos pavadinimas</th>
+                                        <th>Paslaugos kaina</th>
+                                    </tr>
+                                </thead>
                             }
-                                    <td colspan="2">
-                                @if(Model.Order.Status == 0)
+                            else
+                            {
+                                <thead>
+                                    <tr>
+                                        <th class="text-center">Nėra papildomų paslaugų</th>
+                                    </tr>
+                                </thead>
+                            }
+                            <tbody>
+                                @foreach (var line in Model.Lines)
+                                {
+                                    <tr>
+                                        <td>@line.ProductName</td>
+                                        <td>@($"{line.Price} €") </td>
+                                    </tr>
+                                }
+
+
+                            <td colspan="2">
+                                    @if (Model.Order.Status == 0)
                                     {
-                                        if(linesPriced == true)
-                                        {
-                                            <button asp-controller="Order" asp-action="ChangeOrderStatus" asp-route-status="1" asp-route-orderId="@Model.Order.OrderId" type="submit" class="btn btn-success form-control my-1">Patvirtinti</button>
-                                        }
-                                        else
-                                        {
-                                        <button asp-controller="Order" asp-action="ChangeOrderStatus" asp-route-status="1" asp-route-orderId="@Model.Order.OrderId" type="submit" class="btn btn-success form-control my-1 disabled">Patvirtinti</button>
-                                        }
-                                        <button type="button" class="btn btn-warning form-control my-1">
-                                        <a asp-controller="Order" asp-action="ProductPrices" method="get" asp-route-orderId="@Model.Order.OrderId" style="color: inherit; text-decoration: none;">Keisti kainas</a>
-                                    </button>
-                                    <button type="button" class="btn btn-info form-control my-1">
-                                        <a asp-controller="Order" asp-action="BundleProductsToAdd" asp-route-orderId="@Model.Order.OrderId" style="color: inherit; text-decoration: none;">Keisti paslaugas</a>
-                                    </button>
+                                    <button asp-controller="Order" asp-action="ChangeOrderStatus" asp-route-status="1" asp-route-orderId="@Model.Order.OrderId" type="submit" class="btn btn-success form-control my-1">Patvirtinti</button>
                                     <button asp-controller="Order" asp-action="DetailsToCancel" asp-route-orderId="@Model.Order.OrderId" type="submit" class="btn btn-danger form-control my-1">Atšaukti</button>
 
                                     }
                                     @if (Model.Order.Status == 1)
                                     {
                                     <button asp-controller="Order" asp-action="ChangeOrderStatus" asp-route-status="2" asp-route-orderId="@Model.Order.OrderId" type="submit" class="btn btn-success form-control my-1">Užbaigti užsakymą</button>
-                                    <button type="button" class="btn btn-warning form-control my-1">
-                                        <a asp-controller="Order" asp-action="ProductPrices" method="get" asp-route-orderId="@Model.Order.OrderId" style="color: inherit; text-decoration: none;">Keisti kainas</a>
-                                    </button>
-                                    <button type="button" class="btn btn-info form-control my-1">
-                                        <a asp-controller="Order" asp-action="BundleProductsToAdd" asp-route-orderId="@Model.Order.OrderId" style="color: inherit; text-decoration: none;">Keisti paslaugas</a>
-                                    </button>
+                                        if (Model.Lines.Count() > 0)
+                                        {
+                                        <button type="button" class="btn btn-info form-control my-1">
+                                            <a asp-controller="Order" asp-action="BundleProductsToAdd" asp-route-orderId="@Model.Order.OrderId" style="color: inherit; text-decoration: none;">Keisti paslaugas</a>
+                                            </button>
+                                        }
+                                        else
+                                        {
+                                        <button type="button" class="btn btn-info form-control my-1">
+                                            <a asp-controller="Order" asp-action="BundleProductsToAdd" asp-route-orderId="@Model.Order.OrderId" style="color: inherit; text-decoration: none;">Pridėti paslaugas</a>
+                                        </button>
+                                        }
 
                                     <button asp-controller="Order" asp-action="DetailsToCancel" asp-route-orderId="@Model.Order.OrderId" type="submit" class="btn btn-danger form-control my-1">Atšaukti</button>
                                     }
-                                    @if(Model.Order.Status == 2)
+                                    @if (Model.Order.Status == 2)
                                     {
                                     <button asp-controller="Order" asp-action="DownloadFile" asp-route-orderId="@Model.Order.OrderId" class="btn btn-info form-control my-1">Atsisiųsti sąskaitą faktūrą</button>
                                     }
                                     @if (Model.Order.Status == -1)
                                     {
-                                        
+
                                     }
                                 <button asp-controller="Order" asp-action="OrderIndex" class="btn btn-light form-control my-1">Grįžti į užsakymus</button>
-                                </td>
-                        </tbody>
-                    </table>
+                            </td>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
 </form>

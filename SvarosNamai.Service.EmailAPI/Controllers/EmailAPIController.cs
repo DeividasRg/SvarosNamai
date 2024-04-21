@@ -124,8 +124,6 @@ namespace SvarosNamai.Service.EmailAPI.Controllers
         {
             try
             {
-
-
                 string message;
                 string subject;
 
@@ -133,9 +131,18 @@ namespace SvarosNamai.Service.EmailAPI.Controllers
                 switch (info.OrderStatus)
                 {
                         case 0:
-                            message = $"Jūsų užsakymas Nr.{info.OrderId} pateiktas, laukite patvirtinimo";
+                        if (!info.IsCompany)
+                        {
+                            message = $"Jūsų užsakymas Nr.{info.OrderId} pateiktas, laukite patvirtinimo \n \n Užsakymo informacija: \n \n Paštas: {info.Email} \n Vardas Pavardė: {info.Name} {info.LastName} \n Data: {info.Date} \n Valanda: {info.Hour} \n Adresas: {info.Address}" ;
                             subject = $"Užsakymas {info.OrderId} pateiktas";
                             break;
+                        }
+                        else
+                        {
+                            message = $"Jūsų užsakymas Nr.{info.OrderId} pateiktas, laukite patvirtinimo \n \n Užsakymo informacija: \n \n Paštas: {info.Email} \n Įmonės pavadinimas: {info.CompanyName} \n Įmonės kodas: {info.CompanyCode} \n Data: {info.Date} \n Valanda: {info.Hour} \n Adresas: {info.Address}";
+                            subject = $"Užsakymas {info.OrderId} pateiktas";
+                            break;
+                        }
                         case 1:
                         message = $"Jūsų užsakymas Nr.{info.OrderId} patvirtintas adresu {info.Address}, {info.Date} dieną {info.Hour} valandą.";
                         subject = $"Užsakymas {info.OrderId} patvirtinimas";
@@ -150,6 +157,10 @@ namespace SvarosNamai.Service.EmailAPI.Controllers
                             message = $"Jūsų užsakymas Nr.{info.OrderId} atšauktas";
                         }
                         subject = $"Užsakymas {info.OrderId} atšauktas";
+                        break;
+                    case 5:
+                        message = $"Jums pridėta papildoma paslauga. \n \n {info.message}";
+                        subject = $"Užsakymui {info.OrderId} pridėta papildoma paslauga";
                         break;
                     default:
                         throw new Exception();

@@ -27,6 +27,8 @@ namespace SvarosNamai.Web.Models
         public int Status { get; set; }
         public DateTime CreationDate { get; set; }
         public double SquareFoot { get; set; }
+        public bool IsCompany { get; set; } = false;
+        public double Price { get; set; }
 
     }
 }

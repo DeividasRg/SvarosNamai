@@ -10,8 +10,7 @@ namespace SvarosNamai.Service.ProductAPI.Models
     public class BundleToAddDto
     {
         public string BundleName { get; set; }
-        [Range(1,100)]
-        public double Price { get; set; }
+        public double HourPrice { get; set; }
        
     }
 }

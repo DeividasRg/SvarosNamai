@@ -20,40 +20,6 @@ namespace SvarosNamai.Web.Controllers
             _invoice = invoice;
         }
 
-        [Authorize]
-        public async Task<IActionResult> ProductPrices(int orderId)
-        {
-            List<OrderLineDto> lines = new List<OrderLineDto>();
-            ResponseDto linesResponse = await _orderService.GetOrderLines(orderId);
-
-            if (linesResponse.Result != null)
-            {
-                lines = JsonConvert.DeserializeObject<List<OrderLineDto>>(linesResponse.Result.ToString());
-                ProductPricesViewDto products = new()
-                {
-                    Lines = lines,
-                    OrderId = orderId
-                };
-                return View(products);
-            }
-            else
-            {
-                ProductPricesViewDto products = new()
-                {
-                    Lines = new List<OrderLineDto>()
-                    {
-                        new OrderLineDto()
-                        {
-                            ProductName = "No Products Added"
-                        }
-                    },
-                    OrderId = orderId
-                };
-                return View(products);
-            }
-            return RedirectToAction("Details", new { orderId = orderId });
-
-        }
 
 
 
@@ -137,35 +103,52 @@ namespace SvarosNamai.Web.Controllers
             var response = await _orderService.AddProductToOrder(product);
             if (response.IsSuccess)
             {
-                TempData["success"] = "Paslauga pridėta";
+                var orderLineResponse = await _orderService.GetOrderLines(info.OrderId);
+                if (orderLineResponse.IsSuccess)
+                {
+                    IEnumerable<OrderLineDto> orderLines = JsonConvert.DeserializeObject<IEnumerable<OrderLineDto>>(orderLineResponse.Result.ToString());
+                    string text = "Papildomos paslaugos: \n \n";
+
+                    foreach (var line in orderLines)
+                    {
+                        text += $"Pavadinimas: {line.ProductName}, Kaina: {line.Price}";
+                    }
+
+                    OrderStatusChangeDto order = new()
+                    {
+                        orderId = info.OrderId,
+                        status = 5,
+                        message = text
+
+                    };
+                    var emailSend = await _orderService.ChangeOrderStatus(order);
+
+                    if (emailSend.IsSuccess)
+                    {
+                        TempData["success"] = "Paslauga pridėta, laiškas išsiųstas";
+                        return RedirectToAction("BundleProductsToAdd", new { orderId = info.OrderId });
+                    }
+                    else
+                    {
+                        TempData["success"] = "Paslauga pridėta, laiškas neišsiųstas";
+                        return RedirectToAction("BundleProductsToAdd", new { orderId = info.OrderId });
+                    }
+
+                }
+                else
+                {
+                    TempData["success"] = "Paslauga pridėta, laiškas neišsiųstas";
+                    return RedirectToAction("BundleProductsToAdd", new { orderId = info.OrderId });
+                }
+            }
+
+            else
+            {
+                TempData["error"] = response.Message;
                 return RedirectToAction("BundleProductsToAdd", new { orderId = info.OrderId });
             }
-            else
-            {
-                TempData["error"] = response.Message;
-                throw new Exception(response.Message);
-            }
         }
 
-        [Authorize]
-        [HttpPost]
-        public async Task<IActionResult> ProductPrices([FromForm] ProductPricesViewDto products)
-        {
-
-            int orderId = products.OrderId;
-            ResponseDto response = await _orderService.ChangeProductPrices(products.Lines);
-
-            if (response != null && response.IsSuccess)
-            {
-                TempData["success"] = "Kainos atnaujintos";
-                return RedirectToAction("Details", new { orderId = orderId });
-            }
-            else
-            {
-                TempData["error"] = response.Message;
-                return RedirectToAction("Details", new { orderId = orderId });
-            }
-        }
 
         [Authorize]
         public async Task<IActionResult> OrderIndex()
@@ -243,17 +226,17 @@ namespace SvarosNamai.Web.Controllers
             OrderStatusChangeDto order = new OrderStatusChangeDto();
 
 
-             if (status == -1)
-                {
+            if (status == -1)
+            {
                 order.orderId = orderId;
                 order.status = status;
                 order.message = message;
-                }
+            }
             else
-                {
+            {
                 order.orderId = orderId;
                 order.status = status;
-                }
+            }
 
             ResponseDto response = await _orderService.ChangeOrderStatus(order);
             if (!response.IsSuccess)
@@ -294,37 +277,37 @@ namespace SvarosNamai.Web.Controllers
         }
 
         [HttpGet]
-        public IActionResult GetStatusDescription([FromQuery]int statusCode)
+        public IActionResult GetStatusDescription([FromQuery] int statusCode)
         {
-                switch (statusCode)
-                {
-                    case (int)OrderStatus.Pending:
-                        return Json("Laukiantis patvirtinimo"); 
-                    case (int)OrderStatus.Approved:
-                        return Json("Patvirtintas");
-                    case (int)OrderStatus.Completed:
-                        return Json("Užbaigtas");
-                    case (int)OrderStatus.Cancelled:
-                        return Json("Atšauktas");
-                    default:
-                        return Json("Nežinomas"); 
-                }
+            switch (statusCode)
+            {
+                case (int)OrderStatus.Pending:
+                    return Json("Laukiantis patvirtinimo");
+                case (int)OrderStatus.Approved:
+                    return Json("Patvirtintas");
+                case (int)OrderStatus.Completed:
+                    return Json("Užbaigtas");
+                case (int)OrderStatus.Cancelled:
+                    return Json("Atšauktas");
+                default:
+                    return Json("Nežinomas");
+            }
         }
 
         [HttpPost("DownloadInvoice")]
         public async Task<IActionResult> DownloadFile(int orderId)
         {
-            
+
             ResponseDto response = await _invoice.GetInvoice(orderId);
 
-            if(response != null && response.IsSuccess)
+            if (response != null && response.IsSuccess)
             {
                 byte[] bytes = JsonConvert.DeserializeObject<byte[]>(response.Result.ToString());
                 var stream = new MemoryStream(bytes);
 
-                    Response.Headers.Add("Content-Disposition", $"attachment; filename={orderId}.pdf");
-                    return new FileStreamResult(stream, "application/octet-stream");
-                
+                Response.Headers.Add("Content-Disposition", $"attachment; filename={orderId}.pdf");
+                return new FileStreamResult(stream, "application/octet-stream");
+
             }
             else
             {

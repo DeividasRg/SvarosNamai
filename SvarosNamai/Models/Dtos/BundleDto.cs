@@ -8,6 +8,5 @@ namespace SvarosNamai.Service.ProductAPI.Models.Dtos
         public int BundleId { get; set; }
         public string BundleName { get; set; }
         public double HourPrice { get; set; }
-        public double? Discount { get; set; }
      }
 }

@@ -3,61 +3,44 @@
 <head>
     <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/dataTables.bootstrap4.css" />
 
-<style>
-    .dataTables_wrapper .dataTables_paginate .paginate_button {
-        padding: 0.5em 0.75em;
-        margin-left: 0.25em;
-        border-radius: 0.25em;
-        color: #fff;
-        border: 1px solid #ddd;
-    }
-</style>
+    <style>
+        .dataTables_wrapper .dataTables_paginate .paginate_button {
+            padding: 0.5em 0.75em;
+            margin-left: 0.25em;
+            border-radius: 0.25em;
+            color: #fff;
+            border: 1px solid #ddd;
+        }
+    </style>
 </head>
 
-<div class="card shadow border-0 mt-4">
-    <div class="card-header bg-secondary bg-gradient ml-0 py-3">
-        <div class="row">
-            <div class="col-12 text-center">
-                <h1 class="text-white">Užsakymų sąrašas</h1>
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-40">
+            <!-- Adjust the column width as needed -->
+            <div class="card shadow border-0 mt-4">
+                <div class="card-header bg-secondary bg-gradient ml-0 py-3">
+                    <h1 class="text-center text-white">Užsakymų sąrašas</h1>
+                </div>
+                <div class="card-body p-4">
+                    <table id="tblData" class="table table-bordered table-striped pt-3" style="width:100%">
+                        <thead>
+                            <tr>
+                                <th>Užsakymo numeris</th>
+                                <th>Vardas Pavardė / Įmonės pavadinimas</th>
+                                <th>Įmonės kodas</th>
+                                <th>Adresas</th>
+                                <th>Data</th>
+                                <th>Laikas</th>
+                                <th>Statusas</th>
+                                <th>Ar įmonė?</th>
+                                <th>Funkcijos</th>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
             </div>
         </div>
-    </div>
-    <div class="card-body p-4">
-        <div class="row pb-3">
-            <div class="col-6">
-            </div>
-
-        </div>
-        <table id="tblData" class="table table-bordered table-striped pt-3" style="width:100%">
-            <thead>
-                <tr>
-                    <th>
-                        Užsakymo numeris
-                    </th>
-                    <th>
-                        Vardas Pavardė
-                    </th>
-                    <th>
-                        Adresas
-                    </th>
-                    <th>
-                        Data
-                    </th>
-                    <th>
-                        Laikas
-                    </th>
-                    <th>
-                        Statusas
-                    </th>
-                    <th>
-                        Pateikimo data
-                    </th>
-                    <th>
-                        Funkcijos
-                    </th>
-                </tr>
-            </thead>
-        </table>
     </div>
 </div>
 

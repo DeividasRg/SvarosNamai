@@ -24,10 +24,25 @@ function loadDataTable() {
             { data: 'orderId', width: "3%", title: "Užsakymo numeris" },
             {
                 data: function (row) {
-                    return row.name + ' ' + row.lastName;
+                    if (row.isCompany) {
+                        return row.companyName;
+                    } else {
+                        return row.name + ' ' + row.lastName;
+                    }
                 },
                 width: "20%",
-                title: "Vardas Pavardė"
+                title: "Vardas Pavardė / Įmonės pavadinimas"
+            },
+            {
+                data: function (row) {
+                    if (row.isCompany) {
+                        return row.companyNumber;
+                    } else {
+                        return '';
+                    }
+                },
+                width: "20%",
+                title: "Įmonės kodas"
             },
             {
                 data: function (row) {
@@ -43,16 +58,6 @@ function loadDataTable() {
                 title: "Laikas",
                 render: function (data) {
                     return data + ' valanda';
-                }
-            },
-            {
-                data: 'creationDate',
-                width: "15%",
-                title: "Pateikimo laikas",
-                render: function (data) {
-                    var date = new Date(data);
-                    var formattedDate = date.getFullYear() + '-' + padZero(date.getMonth() + 1) + '-' + padZero(date.getDate()) + ' ' + padZero(date.getHours()) + ':' + padZero(date.getMinutes()) + ':' + padZero(date.getSeconds());
-                    return formattedDate;
                 }
             },
             {
@@ -75,21 +80,44 @@ function loadDataTable() {
                 }
             },
             {
+                data: 'isCompany',
+                width: "3%",
+                title: "Ar įmonė?",
+                render: function (data) {
+                    return data ? 'Taip' : 'Ne';
+                },
+                orderable: false
+            },
+            {
                 data: 'orderId',
                 title: "Funkcijos",
                 "render": function (data) {
                     return `<div class="w-75 btn-group" role="group">
-                    <a href="/order/Details?orderId=${data}" class="btn btn-primary mx-2"><i class="bi bi-pencil-square"></i></a>
-                    </div>`
+                            <a href="/order/Details?orderId=${data}" class="btn btn-primary mx-2"><i class="bi bi-pencil-square"></i></a>
+                            </div>`
                 },
-                width: "7%"
+                width: "7%",
+                orderable: false
             }
         ],
         "order": [[5, "desc"]] // Sort by the 'creationDate' column in descending order (column index is zero-based)
     });
+
+    // Add filter to "Ar Įmonė?" column
+    addFilter();
 }
 
-// Function to pad zero to single-digit numbers
-function padZero(num) {
-    return (num < 10 ? '0' : '') + num;
+function addFilter() {
+    var table = $('#tblData').DataTable();
+
+    // Create select element for filtering
+    var select = $('<select><option value="">Visi</option><option value="Taip">Taip</option><option value="Ne">Ne</option></select>')
+        .appendTo($('#tblData').find('thead tr:eq(0) th:eq(7)'))
+        .on('change', function () {
+            var val = $.fn.dataTable.util.escapeRegex(
+                $(this).val()
+            );
+
+            table.columns(7).search(val ? '^' + val + '$' : '', true, false).draw();
+        });
 }
