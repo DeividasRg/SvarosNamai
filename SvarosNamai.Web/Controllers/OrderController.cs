@@ -316,9 +316,14 @@ namespace SvarosNamai.Web.Controllers
             }
         }
 
-        public async Task<IActionResult> OrderCreate(bool isCompany)
+        public async Task<IActionResult> OrderCreate()
         {
-
+            OrderToAddDto dto = new OrderToAddDto();
+            return View(dto);
+        }
+        public async Task<IActionResult> OrderCreateLegal()
+        {
+            return View();
         }
 
 

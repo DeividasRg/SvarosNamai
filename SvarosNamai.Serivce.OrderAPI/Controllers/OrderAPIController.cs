@@ -44,15 +44,15 @@ namespace SvarosNamai.Serivce.OrderAPI.Controllers
 
 
         [HttpPost("CreateOrder")]
-        public async Task<ResponseDto> CreateOrder(OrderDto order, int bundleId)
+        public async Task<ResponseDto> CreateOrder(OrderToAddDto order)
         {
             try
             {
-                BundleDto bundleFromDb = await _productService.GetBundle(bundleId);
+                BundleDto bundleFromDb = await _productService.GetBundle(order.BundleId);
                 if (bundleFromDb != null)
                 {
                     Order orderToDb = _mapper.Map<Order>(order);
-                    orderToDb.Price = ((order.SquareFoot * 2.4) / 60) * bundleFromDb.HourPrice;
+                    orderToDb.Price = ((order.Order.SquareFoot * 2.4) / 60) * bundleFromDb.HourPrice;
                     await _db.Orders.AddAsync(orderToDb);
                     await _db.SaveChangesAsync();
 
