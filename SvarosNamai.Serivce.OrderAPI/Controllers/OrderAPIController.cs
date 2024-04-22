@@ -14,6 +14,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace SvarosNamai.Serivce.OrderAPI.Controllers
@@ -23,7 +24,7 @@ namespace SvarosNamai.Serivce.OrderAPI.Controllers
     public class OrderAPIController : ControllerBase
     {
         private readonly AppDbContext _db;
-        private  ResponseDto _response;
+        private ResponseDto _response;
         private readonly IMapper _mapper;
         private readonly IProductService _productService;
         private readonly IEmailService _email;
@@ -116,15 +117,15 @@ namespace SvarosNamai.Serivce.OrderAPI.Controllers
                         {
                             case OrderStatusses.Status_Approved:
 
-                                if(orderCheck.Status == OrderStatusses.Status_Completed)
+                                if (orderCheck.Status == OrderStatusses.Status_Completed)
                                 {
                                     throw new Exception("Order already completed");
                                 }
-                                
+
                                 orderCheck.Status = OrderStatusses.Status_Approved;
                                 info.OrderStatus = OrderStatusses.Status_Approved;
                                 var emailSendForApproved = await _email.SendConfirmationEmail(info);
-                                if(!emailSendForApproved.IsSuccess)
+                                if (!emailSendForApproved.IsSuccess)
                                 {
                                     _response.Message = "Neišsiųstas laiškas";
                                 }
@@ -134,7 +135,7 @@ namespace SvarosNamai.Serivce.OrderAPI.Controllers
                                 {
                                     OrderId = orderCheck.OrderId,
                                     OrderStatus = OrderStatusses.Status_Approved,
-                                    Email = User.Identity.Name,
+                                    Email = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value,
                                     Time = DateTime.Now
                                 };
                                 await _db.OrderLogs.AddAsync(orderLogApproved);
@@ -159,7 +160,7 @@ namespace SvarosNamai.Serivce.OrderAPI.Controllers
                                 {
                                     OrderId = orderCheck.OrderId,
                                     OrderStatus = OrderStatusses.Status_Cancelled,
-                                    Email = User.Identity.Name,
+                                    Email = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value,
                                     Time = DateTime.Now
                                 };
                                 _db.OrderLogs.AddAsync(orderLogCancelled);
@@ -170,9 +171,9 @@ namespace SvarosNamai.Serivce.OrderAPI.Controllers
                                 OrderForInvoiceDto order = _mapper.Map<OrderForInvoiceDto>(orderCheck);
                                 order.Lines = _mapper.Map<IEnumerable<OrderLinesForInvoiceDto>>(_db.OrderLines.Where(u => u.Order.OrderId == orderCheck.OrderId));
 
-                                foreach(var line in order.Lines)
+                                foreach (var line in order.Lines)
                                 {
-                                    if(line.Price == 0 || line.Price == null)
+                                    if (line.Price == 0 || line.Price == null)
                                     {
                                         throw new Exception("Not all product lines have a price");
                                     }
@@ -200,7 +201,7 @@ namespace SvarosNamai.Serivce.OrderAPI.Controllers
                                     {
                                         OrderId = orderCheck.OrderId,
                                         OrderStatus = OrderStatusses.Status_Completed,
-                                        Email = User.Identity.Name,
+                                        Email = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value,
                                         Time = DateTime.Now
                                     };
                                     _db.OrderLogs.AddAsync(orderLogCompleted);
@@ -216,7 +217,7 @@ namespace SvarosNamai.Serivce.OrderAPI.Controllers
                                 info.OrderStatus = OrderStatusses.Status_Addition;
                                 info.message = orderInfo.message;
                                 ResponseDto response = await _email.SendConfirmationEmail(info);
-                                if(!response.IsSuccess)
+                                if (!response.IsSuccess)
                                 {
                                     throw new Exception("Laiškas neišsiųstas");
                                 }
@@ -225,7 +226,7 @@ namespace SvarosNamai.Serivce.OrderAPI.Controllers
                                 {
                                     OrderId = orderCheck.OrderId,
                                     OrderStatus = OrderStatusses.Status_Addition,
-                                    Email = User.Identity.Name,
+                                    Email = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value,
                                     Time = DateTime.Now
                                 };
                                 _db.OrderLogs.AddAsync(orderLogAddition);
@@ -282,7 +283,7 @@ namespace SvarosNamai.Serivce.OrderAPI.Controllers
             catch (Exception ex)
             {
                 _response.IsSuccess = false;
-                _response.Message=ex.Message;
+                _response.Message = ex.Message;
                 _error.LogError(ex.Message);
                 return _response;
             }
@@ -304,7 +305,7 @@ namespace SvarosNamai.Serivce.OrderAPI.Controllers
                     ProductDto product = JsonConvert.DeserializeObject<ProductDto>(productCheck.Result.ToString());
 
                     bool orderLineCheck = _db.OrderLines.Any(u => u.Order.OrderId == info.orderId && u.ProductName == product.Name);
-                    if(orderLineCheck)
+                    if (orderLineCheck)
                     {
                         throw new Exception("OrderLine already exists");
                     }
@@ -327,7 +328,7 @@ namespace SvarosNamai.Serivce.OrderAPI.Controllers
                     throw new Exception("Order or Product doesn't exist");
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 _error.LogError(ex.Message);
                 _response.IsSuccess = false;
@@ -337,25 +338,25 @@ namespace SvarosNamai.Serivce.OrderAPI.Controllers
         }
 
 
-       
+
         [Authorize]
-		[HttpGet("GetOrders")]
-		public async Task<ResponseDto> GetOrders()
-		{
-			IEnumerable<Order> orders = _db.Orders.ToList();
-			List<OrderDto> orderDtos = new List<OrderDto>(); 
+        [HttpGet("GetOrders")]
+        public async Task<ResponseDto> GetOrders()
+        {
+            IEnumerable<Order> orders = _db.Orders.ToList();
+            List<OrderDto> orderDtos = new List<OrderDto>();
 
-			foreach (var order in orders)
-			{
-				var orderDto = _mapper.Map<OrderDto>(order);
-				orderDto.Hour = order.Reservation.Hour;
-				orderDto.Date = order.Reservation.Date;
-				orderDtos.Add(orderDto); 
-			}
+            foreach (var order in orders)
+            {
+                var orderDto = _mapper.Map<OrderDto>(order);
+                orderDto.Hour = order.Reservation.Hour;
+                orderDto.Date = order.Reservation.Date;
+                orderDtos.Add(orderDto);
+            }
 
-			_response.Result = orderDtos;
-			return _response;
-		}
+            _response.Result = orderDtos;
+            return _response;
+        }
 
         [Authorize]
         [HttpGet("GetOrder/{orderId}")]
