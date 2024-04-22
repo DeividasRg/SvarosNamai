@@ -8,7 +8,7 @@ namespace SvarosNamai.Serivce.OrderAPI.Models
         [Key]
         public int OrderLogId { get; set; }
         public int OrderId {  get; set; }
-        public int OrderStatus { get; set; }
+        public int NewOrderStatus { get; set; }
         public string Email {  get; set; }
         public DateTime Time {  get; set; }
     }

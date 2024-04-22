@@ -134,7 +134,7 @@ namespace SvarosNamai.Serivce.OrderAPI.Controllers
                                 OrderLog orderLogApproved = new()
                                 {
                                     OrderId = orderCheck.OrderId,
-                                    OrderStatus = OrderStatusses.Status_Approved,
+                                    NewOrderStatus = OrderStatusses.Status_Approved,
                                     Email = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value,
                                     Time = DateTime.Now
                                 };
@@ -159,7 +159,7 @@ namespace SvarosNamai.Serivce.OrderAPI.Controllers
                                 OrderLog orderLogCancelled = new()
                                 {
                                     OrderId = orderCheck.OrderId,
-                                    OrderStatus = OrderStatusses.Status_Cancelled,
+                                    NewOrderStatus = OrderStatusses.Status_Cancelled,
                                     Email = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value,
                                     Time = DateTime.Now
                                 };
@@ -200,7 +200,7 @@ namespace SvarosNamai.Serivce.OrderAPI.Controllers
                                     OrderLog orderLogCompleted = new()
                                     {
                                         OrderId = orderCheck.OrderId,
-                                        OrderStatus = OrderStatusses.Status_Completed,
+                                        NewOrderStatus = OrderStatusses.Status_Completed,
                                         Email = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value,
                                         Time = DateTime.Now
                                     };
@@ -225,7 +225,7 @@ namespace SvarosNamai.Serivce.OrderAPI.Controllers
                                 OrderLog orderLogAddition = new()
                                 {
                                     OrderId = orderCheck.OrderId,
-                                    OrderStatus = OrderStatusses.Status_Addition,
+                                    NewOrderStatus = OrderStatusses.Status_Addition,
                                     Email = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value,
                                     Time = DateTime.Now
                                 };
