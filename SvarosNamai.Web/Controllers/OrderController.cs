@@ -316,6 +316,11 @@ namespace SvarosNamai.Web.Controllers
             }
         }
 
+        public async Task<IActionResult> OrderCreate(bool isCompany)
+        {
+
+        }
+
 
     }
 }

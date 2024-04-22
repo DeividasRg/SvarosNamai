@@ -79,6 +79,7 @@ function loadDataTable() {
                     }
                 }
             },
+            { data: 'creationDate', width: "3%", title: "Pateikimo laikas" },
             {
                 data: 'isCompany',
                 width: "3%",
@@ -112,12 +113,12 @@ function addFilter() {
 
     // Create select element for filtering
     var select = $('<select><option value="">Visi</option><option value="Taip">Taip</option><option value="Ne">Ne</option></select>')
-        .appendTo($('#tblData').find('thead tr:eq(0) th:eq(7)'))
+        .appendTo($('#tblData').find('thead tr:eq(0) th:eq(8)'))
         .on('change', function () {
             var val = $.fn.dataTable.util.escapeRegex(
                 $(this).val()
             );
 
-            table.columns(7).search(val ? '^' + val + '$' : '', true, false).draw();
+            table.columns(8).search(val ? '^' + val + '$' : '', true, false).draw();
         });
 }
