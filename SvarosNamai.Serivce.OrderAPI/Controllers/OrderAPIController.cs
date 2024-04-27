@@ -377,6 +377,30 @@ namespace SvarosNamai.Serivce.OrderAPI.Controllers
             return _response;
         }
 
+        [HttpGet("GetReservations")]
+        public async Task<ResponseDto> GetReservations(ReservationsIntervalDto dates)
+        {
+            try
+            {
+                var reservations = _db.Reservations
+                             .Where(r => r.Date >= dates.StartDate && r.Date < dates.EndDate && r.IsActive && r.Hour >= 8 && r.Hour <= 17)
+                             .OrderBy(r => r.Date)
+                             .ThenBy(r => r.Hour)
+                             .ToList();
+
+                _response.Result = reservations;
+
+
+            }
+            catch(Exception ex)
+            {
+                _response.IsSuccess = false;
+                _response.Message = ex.Message;
+                _error.LogError(ex.Message);
+            }
+            return _response;
+        }
+
 
     }
 }

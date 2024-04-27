@@ -1,0 +1,93 @@
+﻿@model OrderDto
+
+<form asp-controller="Order" asp-action="OrderCreate">
+    <br />
+    <div class="container border p-3">
+        <h1 class="text-white text-center">Sukurti fizinį užsakymą</h1>
+
+        <hr />
+        <div class="row">
+            <div class="col-2">
+                <label class="control-label pt-2" style="font-size:20px;">Vardas</label>
+            </div>
+            <div class="col-10 pb-3">
+                <input asp-for="Name" class="form-control" />
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+            <div class="col-2">
+                <label class="control-label pt-2" style="font-size:20px;">Pavardė</label>
+            </div>
+            <div class="col-10 pb-3">
+                <input asp-for="LastName" class="form-control" />
+                <span asp-validation-for="LastName" class="text-danger"></span>
+            </div>
+            <div class="col-2">
+                <label class="control-label pt-2" style="font-size:20px;">Miestas</label>
+            </div>
+            <div class="col-10 pb-3">
+                <input asp-for="City" class="form-control" />
+                <span asp-validation-for="City" class="text-danger"></span>
+            </div>
+            <div class="col-2">
+                <label class="control-label pt-2" style="font-size:20px;">Gatvė</label>
+            </div>
+            <div class="col-10 pb-3">
+                <input asp-for="City" class="form-control" />
+                <span asp-validation-for="Street" class="text-danger"></span>
+            </div>
+            <div class="col-2">
+                <label class="control-label pt-2" style="font-size:20px;">Namo skaičius</label>
+            </div>
+            <div class="col-10 pb-3">
+                <input asp-for="HouseNo" class="form-control" />
+                <span asp-validation-for="HouseNo" class="text-danger"></span>
+            </div>
+            <div class="col-2">
+                <label class="control-label pt-2" style="font-size:20px;">Namo raidė</label>
+            </div>
+            <div class="col-10 pb-3">
+                <input asp-for="HouseLetter" class="form-control" />
+                <span asp-validation-for="HouseLetter" class="text-danger"></span>
+            </div>
+            <div class="col-2">
+                <label class="control-label pt-2" style="font-size:20px;">Butas</label>
+            </div>
+            <div class="col-10 pb-3">
+                <input asp-for="ApartmentNo" class="form-control" />
+                <span asp-validation-for="ApartmentNo" class="text-danger"></span>
+            </div>
+            <div class="col-2">
+                <label class="control-label pt-2" style="font-size:20px;">Paštas</label>
+            </div>
+            <div class="col-10 pb-3">
+                <input asp-for="Email" class="form-control" />
+                <span asp-validation-for="Email" class="text-danger"></span>
+            </div>
+            <div class="col-2">
+                <label class="control-label pt-2" style="font-size:20px;">Telefono Nr.</label>
+            </div>
+            <div class="col-10 pb-3">
+                <input asp-for="PhoneNumber" class="form-control" />
+                <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+            </div>
+
+            <div class="col-5 offset-2">
+
+                <a asp-action="OrderIndex" class="btn-primary btn form-control ">Grįžti atgal</a>
+            </div>
+            <div class="col-5">
+                <input type="submit" value="Sukurti" class="btn btn-success form-control" />
+
+            </div>
+
+        </div>
+
+        <div>
+        </div>
+    </div>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+
+}

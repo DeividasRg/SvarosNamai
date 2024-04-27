@@ -63,6 +63,16 @@ namespace SvarosNamai.Web.Service
             });
         }
 
+        public async Task<ResponseDto> GetReservations(ReservationsIntervalDto dates)
+        {
+            return await _baseService.SendAsync(new RequestDto()
+            {
+                ApiType = SD.ApiType.GET,
+                Data = dates,
+                Url = SD.OrderAPIBase + "/api/order/GetReservations"
+            });
+        }
+
         public async Task<ResponseDto> RemoveProductFromOrder(ProductOrderDto info)
         {
             return await _baseService.SendAsync(new RequestDto()
@@ -72,5 +82,6 @@ namespace SvarosNamai.Web.Service
                 Url = SD.OrderAPIBase + "/api/order/RemoveProductFromOrder"
             });
         }
+
     }
 }

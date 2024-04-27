@@ -319,6 +319,18 @@ namespace SvarosNamai.Web.Controllers
         public async Task<IActionResult> OrderCreate(bool isCompany)
         {
 
+            ReservationsIntervalDto dates = new()
+            {
+                StartDate = DateOnly.FromDateTime(DateTime.Today),
+                EndDate = DateOnly.FromDateTime(DateTime.Today).AddDays(7)
+
+            };
+
+
+
+            ResponseDto response = await _orderService.GetReservations(dates);
+
+            return View();
         }
 
 
