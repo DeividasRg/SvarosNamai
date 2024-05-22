@@ -336,7 +336,7 @@ namespace SvarosNamai.Web.Controllers
 
                 for(var date = dates.StartDate; date <= dates.EndDate; date = date.AddDays(1))
                 {
-                    for (int hour = 8; hour < 17; hour++)
+                    for (int hour = 10; hour < 18; hour++)
                     {
                         if(!reservations.Any(r => r.Date == date && r.Hour == hour))
                         {
@@ -344,7 +344,9 @@ namespace SvarosNamai.Web.Controllers
                         }
                     }
                 }
-                ViewBag.AvailableDates = availableDates;
+                ViewBag.AvailableDates = availableDates
+                .Select(dh => $"{dh.Date.ToString("yyyy-MM-dd")}, {dh.Hour}")
+                .ToList();
 
             }
             else

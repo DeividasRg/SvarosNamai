@@ -383,7 +383,7 @@ namespace SvarosNamai.Serivce.OrderAPI.Controllers
             try
             {
                 IEnumerable<Reservations> reservations = _db.Reservations
-                             .Where(r => r.Date >= dates.StartDate && r.Date < dates.EndDate && r.IsActive && r.Hour >= 8 && r.Hour <= 17)
+                             .Where(r => r.Date >= dates.StartDate && r.Date < dates.EndDate && r.IsActive && r.Hour >= 10 && r.Hour <= 17)
                              .OrderBy(r => r.Date)
                              .ThenBy(r => r.Hour)
                              .ToList();
