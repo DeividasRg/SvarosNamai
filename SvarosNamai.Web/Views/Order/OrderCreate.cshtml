@@ -1,5 +1,12 @@
 ﻿@model OrderDto
 
+
+@{
+    var availableDates = ViewBag.AvailableDates as List<(DateOnly Date, int Hour)>;
+    var distinctDates = availableDates.Select(d => d.Date).Distinct().ToList();
+    var distinctHours = availableDates.Select(d => d.Hour).Distinct().ToList();
+}
+
 <form asp-controller="Order" asp-action="OrderCreate">
     <br />
     <div class="container border p-3">
@@ -70,6 +77,35 @@
                 <input asp-for="PhoneNumber" class="form-control" />
                 <span asp-validation-for="PhoneNumber" class="text-danger"></span>
             </div>
+
+            
+            <div class="col-2">
+                <label class="control-label pt-2" style="font-size:20px;">Pasirinkite datą</label>
+            </div>
+            <div class="col-10 pb-3">
+                <select asp-for="Date" class="form-control">
+                    @foreach (var date in distinctDates)
+                    {
+                        <option value="@date">@date</option>
+                    }
+                </select>
+                <span asp-validation-for="Date" class="text-danger"></span>
+            </div>
+
+            <!-- Dropdown for selecting hour -->
+            <div class="col-2">
+                <label class="control-label pt-2" style="font-size:20px;">Pasirinkite valandą</label>
+            </div>
+            <div class="col-10 pb-3">
+                <select asp-for="Hour" class="form-control">
+                    @foreach (var hour in distinctHours)
+                    {
+                        <option value="@hour">@hour:00</option>
+                    }
+                </select>
+                <span asp-validation-for="Hour" class="text-danger"></span>
+            </div>
+
 
             <div class="col-5 offset-2">
 
