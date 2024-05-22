@@ -61,6 +61,7 @@ namespace SvarosNamai.Service.OrderAPI
                 config.CreateMap<OrderLine, OrderLinesForInvoiceDto>()
                 .ForMember(dest => dest.OrderId, opt => opt.MapFrom(src => src.Order.OrderId));
 
+                config.CreateMap<Reservations, ReservationsDto>();
 
 
 

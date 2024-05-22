@@ -326,9 +326,33 @@ namespace SvarosNamai.Web.Controllers
 
             };
 
-
-
             ResponseDto response = await _orderService.GetReservations(dates);
+
+            if (response.IsSuccess)
+            {
+                IEnumerable<ReservationsDto> reservations = JsonConvert.DeserializeObject<IEnumerable<ReservationsDto>>(response.Result.ToString());
+
+                var availableDates = new List<(DateOnly Date, int Hour)>();
+
+                for(var date = dates.StartDate; date <= dates.EndDate; date = date.AddDays(1))
+                {
+                    for (int hour = 8; hour < 17; hour++)
+                    {
+                        if(!reservations.Any(r => r.Date == date && r.Hour == hour))
+                        {
+                            availableDates.Add((date, hour));
+                        }
+                    }
+                }
+                ViewBag.AvailableDates = availableDates;
+
+            }
+            else
+            {
+                return NotFound();
+            }
+
+
 
             return View();
         }

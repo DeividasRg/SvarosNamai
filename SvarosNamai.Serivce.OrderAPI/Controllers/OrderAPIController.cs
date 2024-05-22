@@ -382,13 +382,13 @@ namespace SvarosNamai.Serivce.OrderAPI.Controllers
         {
             try
             {
-                var reservations = _db.Reservations
+                IEnumerable<Reservations> reservations = _db.Reservations
                              .Where(r => r.Date >= dates.StartDate && r.Date < dates.EndDate && r.IsActive && r.Hour >= 8 && r.Hour <= 17)
                              .OrderBy(r => r.Date)
                              .ThenBy(r => r.Hour)
                              .ToList();
 
-                _response.Result = reservations;
+                _response.Result = _mapper.Map<IEnumerable<ReservationsDto>>(reservations);
 
 
             }

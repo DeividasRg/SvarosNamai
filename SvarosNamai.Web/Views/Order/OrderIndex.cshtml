@@ -31,11 +31,11 @@
                                 <i class="bi bi-plus-square"> Fizinis</i>
                             </button>
                         </div>
-                        <div class="col-auto">
-                            <button class="btn form-control" style="background-color: grey; font-family: Arial, sans-serif; font-size: 15px; font-weight: bold;" onmouseover="this.style.backgroundColor='darkgrey'" onmouseout="this.style.backgroundColor='grey'">
-                                <i class="bi bi-plus-square"> Juridinis</i>
-                            </button>
-                        </div>
+                            <div class="col-auto">
+                                <button asp-controller="Order" asp-action="OrderCreate" asp-route-isCompany="true" type="submit" class="btn form-control" style="background-color: grey; font-family: Arial, sans-serif; font-size: 15px; font-weight: bold;" onmouseover="this.style.backgroundColor='darkgrey'" onmouseout="this.style.backgroundColor='grey'">
+                                    <i class="bi bi-plus-square"> Juridinis</i>
+                                </button>
+                            </div>
                     </div>
 
                 </div>
