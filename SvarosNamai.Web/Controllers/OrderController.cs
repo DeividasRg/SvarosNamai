@@ -354,9 +354,10 @@ namespace SvarosNamai.Web.Controllers
                 return NotFound();
             }
 
+            OrderDto order = new OrderDto();
+            order.IsCompany = isCompany;
 
-
-            return View();
+            return View(order);
         }
 
 

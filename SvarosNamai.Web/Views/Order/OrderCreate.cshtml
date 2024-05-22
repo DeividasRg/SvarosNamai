@@ -1,118 +1,98 @@
 ﻿@model OrderDto
 
-
-
-
-
-
-<form asp-controller="Order" asp-action="OrderCreate">
-    <br />
-    <div class="container border p-3">
-        <h1 class="text-white text-center">Sukurti fizinį užsakymą</h1>
-
-        <hr />
-        <div class="row">
-            <div class="col-2">
-                <label class="control-label pt-2" style="font-size:20px;">Vardas</label>
+<div class="container border p-3">
+    @if (!Model.IsCompany)
+    {
+        <form asp-controller="Order" asp-action="OrderCreate">
+            <h1 class="text-white text-center">Sukurti fizinį užsakymą</h1>
+            <hr />
+            <div class="row">
+                <div class="col-md-6">
+                    <h2 class="text-white text-center">Asmeninė informacija</h2>
+                    <hr />
+                    <div class="form-group">
+                        <label class="control-label" style="font-size:20px;">Vardas</label>
+                        <input asp-for="Name" class="form-control" />
+                        <span asp-validation-for="Name" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label" style="font-size:20px;">Pavardė</label>
+                        <input asp-for="LastName" class="form-control" />
+                        <span asp-validation-for="LastName" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label" style="font-size:20px;">Telefono Nr.</label>
+                        <input asp-for="PhoneNumber" class="form-control" />
+                        <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label" style="font-size:20px;">Paštas</label>
+                        <input asp-for="Email" class="form-control" />
+                        <span asp-validation-for="Email" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <h2 class="text-white text-center">Adresas ir laikas</h2>
+                    <hr />
+                    <div class="form-group">
+                        <label class="control-label" style="font-size:20px;">Miestas</label>
+                        <input asp-for="City" class="form-control" />
+                        <span asp-validation-for="City" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label" style="font-size:20px;">Gatvė</label>
+                        <input asp-for="Street" class="form-control" />
+                        <span asp-validation-for="Street" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label" style="font-size:20px;">Namo skaičius</label>
+                        <input asp-for="HouseNo" class="form-control" />
+                        <span asp-validation-for="HouseNo" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label" style="font-size:20px;">Namo raidė</label>
+                        <input asp-for="HouseLetter" class="form-control" />
+                        <span asp-validation-for="HouseLetter" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label" style="font-size:20px;">Butas</label>
+                        <input asp-for="ApartmentNo" class="form-control" />
+                        <span asp-validation-for="ApartmentNo" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label" style="font-size:20px;">Pasirinkite valandą</label>
+                        <style>
+                            .dropdown-option {
+                                text-align: center;
+                                font-family: 'Courier New', Courier, monospace;
+                            }
+                        </style>
+                        <select asp-for="Hour" class="form-control">
+                            @foreach (var dateHour in ViewBag.AvailableDates)
+                            {
+                                <option class="dropdown-option" value="@dateHour">@dateHour:00</option>
+                            }
+                        </select>
+                        <span asp-validation-for="Hour" class="text-danger"></span>
+                    </div>
+                </div>
             </div>
-            <div class="col-10 pb-3">
-                <input asp-for="Name" class="form-control" />
-                <span asp-validation-for="Name" class="text-danger"></span>
+            <div class="row">
+                <div class="col-md-6">
+                    <a asp-action="OrderIndex" class="btn-primary btn form-control">Grįžti atgal</a>
+                </div>
+                <div class="col-md-6">
+                    <input type="submit" value="Sukurti" class="btn btn-success form-control" />
+                </div>
             </div>
-            <div class="col-2">
-                <label class="control-label pt-2" style="font-size:20px;">Pavardė</label>
-            </div>
-            <div class="col-10 pb-3">
-                <input asp-for="LastName" class="form-control" />
-                <span asp-validation-for="LastName" class="text-danger"></span>
-            </div>
-            <div class="col-2">
-                <label class="control-label pt-2" style="font-size:20px;">Miestas</label>
-            </div>
-            <div class="col-10 pb-3">
-                <input asp-for="City" class="form-control" />
-                <span asp-validation-for="City" class="text-danger"></span>
-            </div>
-            <div class="col-2">
-                <label class="control-label pt-2" style="font-size:20px;">Gatvė</label>
-            </div>
-            <div class="col-10 pb-3">
-                <input asp-for="City" class="form-control" />
-                <span asp-validation-for="Street" class="text-danger"></span>
-            </div>
-            <div class="col-2">
-                <label class="control-label pt-2" style="font-size:20px;">Namo skaičius</label>
-            </div>
-            <div class="col-10 pb-3">
-                <input asp-for="HouseNo" class="form-control" />
-                <span asp-validation-for="HouseNo" class="text-danger"></span>
-            </div>
-            <div class="col-2">
-                <label class="control-label pt-2" style="font-size:20px;">Namo raidė</label>
-            </div>
-            <div class="col-10 pb-3">
-                <input asp-for="HouseLetter" class="form-control" />
-                <span asp-validation-for="HouseLetter" class="text-danger"></span>
-            </div>
-            <div class="col-2">
-                <label class="control-label pt-2" style="font-size:20px;">Butas</label>
-            </div>
-            <div class="col-10 pb-3">
-                <input asp-for="ApartmentNo" class="form-control" />
-                <span asp-validation-for="ApartmentNo" class="text-danger"></span>
-            </div>
-            <div class="col-2">
-                <label class="control-label pt-2" style="font-size:20px;">Paštas</label>
-            </div>
-            <div class="col-10 pb-3">
-                <input asp-for="Email" class="form-control" />
-                <span asp-validation-for="Email" class="text-danger"></span>
-            </div>
-            <div class="col-2">
-                <label class="control-label pt-2" style="font-size:20px;">Telefono Nr.</label>
-            </div>
-            <div class="col-10 pb-3">
-                <input asp-for="PhoneNumber" class="form-control" />
-                <span asp-validation-for="PhoneNumber" class="text-danger"></span>
-            </div>
-
-            <div class="col-2">
-                <label class="control-label pt-2" style="font-size:20px;">Pasirinkite valandą</label>
-            </div>
-            <div class="col-10 pb-3">
-                <style>
-                    .dropdown-option {
-                        text-align: center;
-                        font-family: 'Courier New', Courier, monospace;
-                    }
-                </style>
-                <select asp-for="Hour" class="form-control">
-                    @foreach (var dateHour in ViewBag.AvailableDates)
-                    {
-                        <option class="dropdown-option" value="@dateHour">@dateHour:00</option>
-                    }
-                </select>
-                <span asp-validation-for="Hour" class="text-danger"></span>
-            </div>
-
-
-            <div class="col-5 offset-2">
-
-                <a asp-action="OrderIndex" class="btn-primary btn form-control ">Grįžti atgal</a>
-            </div>
-            <div class="col-5">
-                <input type="submit" value="Sukurti" class="btn btn-success form-control" />
-
-            </div>
-
-        </div>
-
-        <div>
-        </div>
-    </div>
-</form>
+        </form>
+    }
+    else
+    {
+        <!-- Similar structure for company form -->
+    }
+</div>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
-
 }
