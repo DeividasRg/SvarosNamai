@@ -29,6 +29,7 @@ namespace SvarosNamai.Web.Models
         public double Price { get; set; }
         public int? BundleId { get; set; }
         public int? ProductId { get; set; }
+        public string DateHour { get; set; }
 
     }
 }

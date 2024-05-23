@@ -318,31 +318,60 @@ namespace SvarosNamai.Web.Controllers
 
         public async Task<IActionResult> OrderPreview(OrderDto order)
         {
-            ResponseDto bundleResponse = await _productService.GetBundle(order.BundleId);
-            ResponseDto productResponse = await _productService.GetProduct(order.ProductId);
 
-            if(bundleResponse.IsSuccess && productResponse.IsSuccess)
+            if (order.ProductId != null)
             {
+                ResponseDto productResponse = await _productService.GetProduct(order.ProductId);
+                ResponseDto bundleResponse = await _productService.GetBundle(order.BundleId);
 
-                BundleDto bundle = JsonConvert.DeserializeObject<BundleDto>(bundleResponse.Result.ToString());
-                ProductDto product = JsonConvert.DeserializeObject<ProductDto>(productResponse.Result.ToString());
-
-                order.Price = ((order.SquareMeters * 2.4) / 60) * bundle.HourPrice;
-
-
-                OrderPreviewDto preview = new OrderPreviewDto()
+                if (bundleResponse.IsSuccess && productResponse.IsSuccess)
                 {
-                    Order = order,
-                    Bundle = bundle,
-                    Product = product
-                };
 
-                return View(preview);
+                    BundleDto bundle = JsonConvert.DeserializeObject<BundleDto>(bundleResponse.Result.ToString());
+                    ProductDto product = JsonConvert.DeserializeObject<ProductDto>(productResponse.Result.ToString());
+
+                    order.Price = ((order.SquareMeters * 2.4) / 60) * bundle.HourPrice;
+
+
+                    OrderPreviewDto preview = new OrderPreviewDto()
+                    {
+                        Order = order,
+                        Bundle = bundle,
+                        Product = product
+                    };
+
+                    return View(preview);
+                }
+                else
+                {
+                    return NotFound();
+                }
             }
+            else
+            {
+                ResponseDto bundleResponse = await _productService.GetBundle(order.BundleId);
+                if (bundleResponse.IsSuccess)
+                {
+
+                    BundleDto bundle = JsonConvert.DeserializeObject<BundleDto>(bundleResponse.Result.ToString());
+
+                    order.Price = ((order.SquareMeters * 2.4) / 60) * bundle.HourPrice;
 
 
+                    OrderPreviewDto preview = new OrderPreviewDto()
+                    {
+                        Order = order,
+                        Bundle = bundle,
+                    };
 
-            return View();
+                    return View(preview);
+                }
+                else
+                {
+                    return NotFound();
+                }
+
+            }
         }
 
         public async Task<IActionResult> OrderCreate(bool isCompany)

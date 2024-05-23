@@ -4,7 +4,7 @@
     {
         public OrderDto Order {  get; set; }
         public BundleDto Bundle { get; set; }
-        public ProductDto Product { get; set; }
+        public ProductDto? Product { get; set; }
 
     }
 }
