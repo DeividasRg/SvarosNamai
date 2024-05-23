@@ -33,5 +33,23 @@ namespace SvarosNamai.Web.Service
                 Url = SD.ProductAPIBase + "/api/product/GetProducts"
             });
         }
+
+        public async Task<ResponseDto?> GetBundle(int? bundleId)
+        {
+            return await _baseService.SendAsync(new RequestDto()
+            {
+                ApiType = SD.ApiType.GET,
+                Url = SD.ProductAPIBase + "/api/product/GetBundle/"+bundleId
+            });
+        }
+
+        public async Task<ResponseDto?> GetProduct(int? productId)
+        {
+            return await _baseService.SendAsync(new RequestDto()
+            {
+                ApiType = SD.ApiType.GET,
+                Url = SD.ProductAPIBase + "/api/product/GetProduct/"+productId
+            });
+        }
     }
 }

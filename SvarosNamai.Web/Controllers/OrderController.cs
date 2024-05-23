@@ -318,6 +318,30 @@ namespace SvarosNamai.Web.Controllers
 
         public async Task<IActionResult> OrderPreview(OrderDto order)
         {
+            ResponseDto bundleResponse = await _productService.GetBundle(order.BundleId);
+            ResponseDto productResponse = await _productService.GetProduct(order.ProductId);
+
+            if(bundleResponse.IsSuccess && productResponse.IsSuccess)
+            {
+
+                BundleDto bundle = JsonConvert.DeserializeObject<BundleDto>(bundleResponse.Result.ToString());
+                ProductDto product = JsonConvert.DeserializeObject<ProductDto>(productResponse.Result.ToString());
+
+                order.Price = ((order.SquareMeters * 2.4) / 60) * bundle.HourPrice;
+
+
+                OrderPreviewDto preview = new OrderPreviewDto()
+                {
+                    Order = order,
+                    Bundle = bundle,
+                    Product = product
+                };
+
+                return View(preview);
+            }
+
+
+
             return View();
         }
 

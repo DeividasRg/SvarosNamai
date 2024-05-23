@@ -1,4 +1,4 @@
-﻿@model OrderDto
+﻿@model OrderPreviewDto
 
 <form asp-controller="Order" asp-action="CreateOrder">
     <div class="container">
@@ -23,7 +23,7 @@
                                     </tr>
                                     <tr>
                                         <td>Telefonas:</td>
-                                        <td>@Model.Order.PhoneNumber</td>
+                                        <td>@Model.PhoneNumber</td>
                                     </tr>
                                     <tr>
                                         <td>El.paštas:</td>
