@@ -319,6 +319,8 @@ namespace SvarosNamai.Web.Controllers
         public async Task<IActionResult> OrderPreview(OrderDto order)
         {
 
+            //Reikia padaryt kad atiduot Reservation modelį vietoj stringo
+
             if (order.ProductId != null)
             {
                 ResponseDto productResponse = await _productService.GetProduct(order.ProductId);
@@ -337,7 +339,8 @@ namespace SvarosNamai.Web.Controllers
                     {
                         Order = order,
                         Bundle = bundle,
-                        Product = product
+                        Product = product,
+                        FullPrice = order.Price + product.Price
                     };
 
                     return View(preview);

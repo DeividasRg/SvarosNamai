@@ -64,13 +64,20 @@
                                     <td>@Model.Bundle.BundleName kaina už @Model.Order.SquareMeters m2:</td>
                                     <td>@Model.Order.Price€</td>
                                 </tr>
-                                <tr></tr>
+                                @{
+                                    if(Model.Product != null)
+                                    {
+                                        <tr>
+                                            <td colspan="2" style="text-align:center"><b>Papildoma paslauga:</b></td>
+                                        </tr>
+                                        <tr>
+                                            <td>@Model.Product.Name</td>
+                                            <td>@Model.Product.Price€</td>
+                                        </tr>
+                                    }
+                                }
                                 <tr>
-                                    <td><b>Papildoma paslauga:</b></td>
-                                </tr>
-                                <tr>
-                                    <td>@Model.Product.Name</td>
-                                    <td>@Model.Product.Price€</td>
+                                    <td colspan="2" style="text-align:center"><b>Pilna kaina: @Model.FullPrice€</b></td>
                                 </tr>
                             </tbody>
                         </table>
