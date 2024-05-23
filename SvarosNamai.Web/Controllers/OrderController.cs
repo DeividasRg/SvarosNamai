@@ -326,13 +326,29 @@ namespace SvarosNamai.Web.Controllers
                 ResponseDto productResponse = await _productService.GetProduct(order.ProductId);
                 ResponseDto bundleResponse = await _productService.GetBundle(order.BundleId);
 
+
                 if (bundleResponse.IsSuccess && productResponse.IsSuccess)
                 {
 
                     BundleDto bundle = JsonConvert.DeserializeObject<BundleDto>(bundleResponse.Result.ToString());
                     ProductDto product = JsonConvert.DeserializeObject<ProductDto>(productResponse.Result.ToString());
 
-                    order.Price = ((order.SquareMeters * 2.4) / 60) * bundle.HourPrice;
+                    order.Price = Math.Round(((order.SquareMeters * 2.4) / 60) * bundle.HourPrice,2);
+
+                    ReservationsDto reservation = new ReservationsDto();
+
+                    DateOnly date = DateOnly.Parse(order.DateHour.Split(',')[0].Trim());
+                    if(TimeSpan.TryParse(order.DateHour.Split(',')[1].Trim(), out TimeSpan time))
+                    {
+                        reservation.Date = date;
+                        reservation.Hour = time.Hours;
+
+                        order.Reservation = reservation;
+                    }
+                    else
+                    {
+                        return NotFound();
+                    }
 
 
                     OrderPreviewDto preview = new OrderPreviewDto()

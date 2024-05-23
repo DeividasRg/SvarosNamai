@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SvarosNamai.Serivce.OrderAPI.Models.Dtos;
+using System;
 using System.ComponentModel.DataAnnotations;
 
 namespace SvarosNamai.Serivce.OrderAPI.Models
@@ -30,6 +31,7 @@ namespace SvarosNamai.Serivce.OrderAPI.Models
         public int? BundleId { get; set; }
         public int? ProductId { get; set; }
         public string DateHour { get; set; }
+        public ReservationsDto Reservation {  get; set; }
 
     }
 }
