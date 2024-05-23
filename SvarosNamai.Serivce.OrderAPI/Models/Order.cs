@@ -14,10 +14,8 @@ namespace SvarosNamai.Serivce.OrderAPI.Models
         [Required]
         public string Street { get; set; }
         [Required]
-        [Range(1,1000)]
-        public int HouseNo { get; set; }
+        public string HouseNo { get; set; }
         public int? ApartmentNo { get; set; }
-        public string? HouseLetter { get; set; }
         public string? Name { get; set; }
         public string? LastName {  get; set; }
         public string? CompanyNumber { get; set; }
@@ -32,6 +30,6 @@ namespace SvarosNamai.Serivce.OrderAPI.Models
         [ForeignKey("ReservationId")]
         public virtual Reservations Reservation { get; set; }
         public int Status { get; set; } = OrderStatusses.Status_Pending;
-        public double SquareFoot { get; set; }
+        public double SquareMeters { get; set; }
     }
 }

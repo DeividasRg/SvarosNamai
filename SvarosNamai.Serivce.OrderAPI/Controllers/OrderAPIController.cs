@@ -52,7 +52,7 @@ namespace SvarosNamai.Serivce.OrderAPI.Controllers
                 if (bundleFromDb != null)
                 {
                     Order orderToDb = _mapper.Map<Order>(order);
-                    orderToDb.Price = ((order.SquareFoot * 2.4) / 60) * bundleFromDb.HourPrice;
+                    orderToDb.Price = ((order.SquareMeters * 2.4) / 60) * bundleFromDb.HourPrice;
                     await _db.Orders.AddAsync(orderToDb);
                     await _db.SaveChangesAsync();
 

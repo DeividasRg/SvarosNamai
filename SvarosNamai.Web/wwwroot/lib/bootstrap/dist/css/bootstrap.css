@@ -13816,3 +13816,8 @@ textarea.form-control-lg {
     --bs-tooltip-bg: var(--bs-tertiary-bg);
     --bs-tooltip-color: var(--bs-emphasis-color);
 }
+
+.custom-input {
+    background-color: #f0f0f0; /* Change this to your desired color */
+    color: #333; /* Optional: change the text color */
+}

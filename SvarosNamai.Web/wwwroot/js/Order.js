@@ -46,7 +46,7 @@ function loadDataTable() {
             },
             {
                 data: function (row) {
-                    return row.street + ' ' + row.houseNo + (row.houseLetter != null ? row.houseLetter : "") + (row.apartmentNo != null ? " - " + row.apartmentNo : "") + ', ' + row.city;
+                    return row.street + ' ' + row.houseNo + (row.apartmentNo != null ? " - " + row.apartmentNo : "") + ', ' + row.city;
                 },
                 width: "30%",
                 title: "Adresas"

@@ -316,6 +316,11 @@ namespace SvarosNamai.Web.Controllers
             }
         }
 
+        public async Task<IActionResult> OrderPreview(OrderDto order)
+        {
+            return View();
+        }
+
         public async Task<IActionResult> OrderCreate(bool isCompany)
         {
 
@@ -326,11 +331,14 @@ namespace SvarosNamai.Web.Controllers
 
             };
 
-            ResponseDto response = await _orderService.GetReservations(dates);
+            ResponseDto reservationResponse = await _orderService.GetReservations(dates);
+            ResponseDto bundlesResponse = await _productService.GetAllActiveBundles();
+            ResponseDto productsResponse = await _productService.GetAllProductsAsync(); 
 
-            if (response.IsSuccess)
+
+            if (reservationResponse.IsSuccess && bundlesResponse.IsSuccess && productsResponse.IsSuccess)
             {
-                IEnumerable<ReservationsDto> reservations = JsonConvert.DeserializeObject<IEnumerable<ReservationsDto>>(response.Result.ToString());
+                IEnumerable<ReservationsDto> reservations = JsonConvert.DeserializeObject<IEnumerable<ReservationsDto>>(reservationResponse.Result.ToString());
 
                 var availableDates = new List<(DateOnly Date, int Hour)>();
 
@@ -344,6 +352,15 @@ namespace SvarosNamai.Web.Controllers
                         }
                     }
                 }
+
+                IEnumerable<BundleDto> bundles = JsonConvert.DeserializeObject<IEnumerable<BundleDto>>(bundlesResponse.Result.ToString());
+
+                IEnumerable<ProductDto> products = JsonConvert.DeserializeObject<IEnumerable<ProductDto>>(productsResponse.Result.ToString());
+
+                ViewBag.Products = products;
+
+                ViewBag.Bundles = bundles;
+
                 ViewBag.AvailableDates = availableDates
                 .Select(dh => $"{dh.Date.ToString("yyyy-MM-dd")}, {dh.Hour}")
                 .ToList();
