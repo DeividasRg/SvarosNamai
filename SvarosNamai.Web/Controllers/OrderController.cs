@@ -319,11 +319,12 @@ namespace SvarosNamai.Web.Controllers
         public async Task<IActionResult> OrderPreview(OrderDto order)
         {
 
-            //Reikia padaryt kad atiduot Reservation modelį vietoj stringo
 
             if (order.ProductId != null)
             {
-                ResponseDto productResponse = await _productService.GetProduct(order.ProductId);
+                int productId = Int32.Parse(order.ProductId);
+
+                ResponseDto productResponse = await _productService.GetProduct(productId);
                 ResponseDto bundleResponse = await _productService.GetBundle(order.BundleId);
 
 
@@ -369,18 +370,36 @@ namespace SvarosNamai.Web.Controllers
             else
             {
                 ResponseDto bundleResponse = await _productService.GetBundle(order.BundleId);
+
+
                 if (bundleResponse.IsSuccess)
                 {
 
                     BundleDto bundle = JsonConvert.DeserializeObject<BundleDto>(bundleResponse.Result.ToString());
 
-                    order.Price = ((order.SquareMeters * 2.4) / 60) * bundle.HourPrice;
+                    order.Price = Math.Round(((order.SquareMeters * 2.4) / 60) * bundle.HourPrice, 2);
+
+                    ReservationsDto reservation = new ReservationsDto();
+
+                    DateOnly date = DateOnly.Parse(order.DateHour.Split(',')[0].Trim());
+                    if (TimeSpan.TryParse(order.DateHour.Split(',')[1].Trim(), out TimeSpan time))
+                    {
+                        reservation.Date = date;
+                        reservation.Hour = time.Hours;
+
+                        order.Reservation = reservation;
+                    }
+                    else
+                    {
+                        return NotFound();
+                    }
 
 
                     OrderPreviewDto preview = new OrderPreviewDto()
                     {
                         Order = order,
                         Bundle = bundle,
+                        FullPrice = order.Price
                     };
 
                     return View(preview);
@@ -389,7 +408,6 @@ namespace SvarosNamai.Web.Controllers
                 {
                     return NotFound();
                 }
-
             }
         }
 

@@ -17,30 +17,30 @@
                         </div>
                         <table class="table">
                             <tbody>
-                                    <tr>
-                                        <td>Vardas Pavardė:</td>
-                                        <td>@Model.Order.Name @Model.Order.LastName</td>
-                                    </tr>
-                                    <tr>
-                                        <td>Telefonas:</td>
-                                        <td>@Model.Order.PhoneNumber</td>
-                                    </tr>
-                                    <tr>
-                                        <td>El.paštas:</td>
-                                        <td>@Model.Order.Email</td>
-                                    </tr>
-                                    <tr>
-                                        <td>Adresas:</td>
-                                        <td>@Model.Order.Street @Model.Order.HouseNo@(Model.Order.ApartmentNo != null ? (" - " + Model.Order.ApartmentNo) : ""), @Model.Order.City</td>
-                                    </tr>
-                                    <tr>
-                                        <td>Plotas:</td>
-                                        <td>@Model.Order.SquareMeters <b>m2</b></td>
-                                    </tr>
-                                    <tr>
-                                        <td>Data:</td>
-                                        <td>@Model.Order.Reservation.Date, @Model.Order.Reservation.Hour:00</td>
-                                    </tr>
+                                <tr>
+                                    <td>Vardas Pavardė:</td>
+                                    <td>@Model.Order.Name @Model.Order.LastName</td>
+                                </tr>
+                                <tr>
+                                    <td>Telefonas:</td>
+                                    <td>@Model.Order.PhoneNumber</td>
+                                </tr>
+                                <tr>
+                                    <td>El.paštas:</td>
+                                    <td>@Model.Order.Email</td>
+                                </tr>
+                                <tr>
+                                    <td>Adresas:</td>
+                                    <td>@Model.Order.Street @Model.Order.HouseNo@(Model.Order.ApartmentNo != null ? (" - " + Model.Order.ApartmentNo) : ""), @Model.Order.City</td>
+                                </tr>
+                                <tr>
+                                    <td>Plotas:</td>
+                                    <td>@Model.Order.SquareMeters <b>m2</b></td>
+                                </tr>
+                                <tr>
+                                    <td>Data:</td>
+                                    <td>@Model.Order.Reservation.Date, @Model.Order.Reservation.Hour:00</td>
+                                </tr>
                             </tbody>
                         </table>
                     </div>
@@ -62,22 +62,34 @@
                             <tbody>
                                 <tr>
                                     <td>@Model.Bundle.BundleName kaina už @Model.Order.SquareMeters m2:</td>
-                                    <td>@Model.Order.Price€</td>
+                                    <td>
+                                        <div class="input-group">
+                                            <input id="orderPrice" asp-for="@Model.Order.Price" class="form-control" placeholder="@Model.Order.Price" />
+                                            <span class="input-group-text">€</span>
+                                        </div>
+                                        <span asp-validation-for="Order.Price" class="text-danger"></span>
+                                    </td>
                                 </tr>
                                 @{
-                                    if(Model.Product != null)
+                                    if (Model.Product != null)
                                     {
                                         <tr>
                                             <td colspan="2" style="text-align:center"><b>Papildoma paslauga:</b></td>
                                         </tr>
                                         <tr>
                                             <td>@Model.Product.Name</td>
-                                            <td>@Model.Product.Price€</td>
+                                            <td>
+                                                <div class="input-group">
+                                                    <input id="productPrice" asp-for="@Model.Product.Price" class="form-control" placeholder="@Model.Product.Price" />
+                                                    <span class="input-group-text">€</span>
+                                                </div>
+                                                <span asp-validation-for="Product.Price" class="text-danger"></span>
+                                            </td>
                                         </tr>
                                     }
                                 }
                                 <tr>
-                                    <td colspan="2" style="text-align:center"><b>Pilna kaina: @Model.FullPrice€</b></td>
+                                    <td colspan="2" style="text-align:center"><b>Pilna kaina: <span id="fullPrice">@Model.FullPrice</span>€</b></td>
                                 </tr>
                             </tbody>
                         </table>
@@ -86,4 +98,35 @@
             </div>
         </div>
     </div>
+
+    <div class="container mt-4">
+        <div class="row">
+            <div class="col-md-12 text-center">
+                <input type="submit" value="Sukurti fizinį užsakymą" class="btn btn-success btn-lg mb-2" style="width: 50%;" />
+                <a asp-action="OrderCreate" class="btn btn-primary" style="width: 50%;">Grįžti atgal</a>
+            </div>
+        </div>
+    </div>
 </form>
+
+<script>
+    document.addEventListener('DOMContentLoaded', (event) => {
+        const orderPriceInput = document.getElementById('orderPrice');
+        const productPriceInput = document.getElementById('productPrice');
+        const fullPriceSpan = document.getElementById('fullPrice');
+
+        orderPriceInput.addEventListener('input', updateTotalPrice);
+        productPriceInput.addEventListener('input', updateTotalPrice);
+
+        function updateTotalPrice() {
+            const orderPrice = parseFloat(orderPriceInput.value) || 0;
+            const productPrice = parseFloat(productPriceInput.value) || 0;
+            const fullPrice = calculateFullPrice(orderPrice, productPrice);
+            fullPriceSpan.textContent = fullPrice.toFixed(2);
+        }
+
+        function calculateFullPrice(orderPrice, productPrice) {
+            return orderPrice + productPrice;
+        }
+    });
+</script>

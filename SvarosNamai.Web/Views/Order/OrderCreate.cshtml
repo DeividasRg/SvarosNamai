@@ -82,13 +82,14 @@
                             <label class="control-label" style="font-size:12px;">Papildomos paslauga</label>
                             <div class="custom-select">
                                 <select asp-for="ProductId" class="form-control custom-input custom-width">
+                                    <option class="dropdown-option" value="">-</option>
                                     @foreach (var product in ViewBag.Products)
                                     {
                                         <option class="dropdown-option" value="@product.ProductId">@product.Name, @product.Price€</option>
                                     }
                                 </select>
                             </div>
-                        <span asp-validation-for="BundleId" class="text-danger"></span>
+                        <span asp-validation-for="ProductId" class="text-danger"></span>
                     </div>
                     <div class="form-group text-center">
                         <label class="control-label" style="font-size:12px;">Kvadratūra m2</label>
