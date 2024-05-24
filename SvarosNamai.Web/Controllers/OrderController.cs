@@ -344,7 +344,6 @@ namespace SvarosNamai.Web.Controllers
                         reservation.Date = date;
                         reservation.Hour = time.Hours;
 
-                        order.Reservation = reservation;
                     }
                     else
                     {
@@ -379,15 +378,12 @@ namespace SvarosNamai.Web.Controllers
 
                     order.Price = Math.Round(((order.SquareMeters * 2.4) / 60) * bundle.HourPrice, 2);
 
-                    ReservationsDto reservation = new ReservationsDto();
 
                     DateOnly date = DateOnly.Parse(order.DateHour.Split(',')[0].Trim());
                     if (TimeSpan.TryParse(order.DateHour.Split(',')[1].Trim(), out TimeSpan time))
                     {
-                        reservation.Date = date;
-                        reservation.Hour = time.Hours;
-
-                        order.Reservation = reservation;
+                        order.Date = date;
+                        order.Hour = time.Hours;
                     }
                     else
                     {
@@ -409,6 +405,11 @@ namespace SvarosNamai.Web.Controllers
                     return NotFound();
                 }
             }
+        }
+
+        public async Task<IActionResult> CreateOrder(OrderPreviewDto preview)
+        {
+            return View();
         }
 
         public async Task<IActionResult> OrderCreate(bool isCompany)

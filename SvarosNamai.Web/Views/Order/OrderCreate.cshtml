@@ -4,6 +4,7 @@
     @if (!Model.IsCompany)
     {
         <form asp-controller="Order" asp-action="OrderPreview">
+            <input asp-for="IsCompany" hidden />
             <h1 class="text-white text-center">Sukurti fizinį užsakymą</h1>
             <hr />
             <div class="row">

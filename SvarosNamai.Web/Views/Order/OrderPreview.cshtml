@@ -1,6 +1,30 @@
 ﻿@model OrderPreviewDto
 
 <form asp-controller="Order" asp-action="CreateOrder">
+    <input asp-for="Order.City" hidden />
+    <input asp-for="Order.Street" hidden />
+    <input asp-for="Order.HouseNo" hidden />
+    <input asp-for="Order.ApartmentNo" hidden />
+    <input asp-for="Order.Name" hidden />
+    <input asp-for="Order.LastName" hidden />
+    <input asp-for="Order.CompanyNumber" hidden />
+    <input asp-for="Order.CompanyName" hidden />
+    <input asp-for="Order.PhoneNumber" hidden />
+    <input asp-for="Order.Email" hidden />
+    <input asp-for="Order.Hour" hidden />
+    <input asp-for="Order.Date" hidden />
+    <input asp-for="Order.IsCompany" hidden />
+    <input asp-for="Order.Price" hidden />
+    <input asp-for="Product.Name" hidden />
+    <input asp-for="Product.Description" hidden />
+    <input asp-for="Product.Price" hidden />
+    <input asp-for="Product.ProductId" hidden />
+    <input asp-for="Bundle.BundleName" hidden />
+    <input asp-for="Bundle.BundleId" hidden />
+    <input asp-for="Bundle.HourPrice" hidden />
+
+
+
     <div class="container">
         <div class="row">
             <div class="col-md-6">
@@ -39,7 +63,7 @@
                                 </tr>
                                 <tr>
                                     <td>Data:</td>
-                                    <td>@Model.Order.Reservation.Date, @Model.Order.Reservation.Hour:00</td>
+                                    <td>@Model.Order.Date, @Model.Order.Hour:00</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -63,11 +87,7 @@
                                 <tr>
                                     <td>@Model.Bundle.BundleName kaina už @Model.Order.SquareMeters m2:</td>
                                     <td>
-                                        <div class="input-group">
-                                            <input id="orderPrice" asp-for="@Model.Order.Price" class="form-control" placeholder="@Model.Order.Price" />
-                                            <span class="input-group-text">€</span>
-                                        </div>
-                                        <span asp-validation-for="Order.Price" class="text-danger"></span>
+                                        @Model.Order.Price€
                                     </td>
                                 </tr>
                                 @{
@@ -79,11 +99,7 @@
                                         <tr>
                                             <td>@Model.Product.Name</td>
                                             <td>
-                                                <div class="input-group">
-                                                    <input id="productPrice" asp-for="@Model.Product.Price" class="form-control" placeholder="@Model.Product.Price" />
-                                                    <span class="input-group-text">€</span>
-                                                </div>
-                                                <span asp-validation-for="Product.Price" class="text-danger"></span>
+                                                @Model.Product.Price€
                                             </td>
                                         </tr>
                                     }
@@ -109,24 +125,4 @@
     </div>
 </form>
 
-<script>
-    document.addEventListener('DOMContentLoaded', (event) => {
-        const orderPriceInput = document.getElementById('orderPrice');
-        const productPriceInput = document.getElementById('productPrice');
-        const fullPriceSpan = document.getElementById('fullPrice');
 
-        orderPriceInput.addEventListener('input', updateTotalPrice);
-        productPriceInput.addEventListener('input', updateTotalPrice);
-
-        function updateTotalPrice() {
-            const orderPrice = parseFloat(orderPriceInput.value) || 0;
-            const productPrice = parseFloat(productPriceInput.value) || 0;
-            const fullPrice = calculateFullPrice(orderPrice, productPrice);
-            fullPriceSpan.textContent = fullPrice.toFixed(2);
-        }
-
-        function calculateFullPrice(orderPrice, productPrice) {
-            return orderPrice + productPrice;
-        }
-    });
-</script>

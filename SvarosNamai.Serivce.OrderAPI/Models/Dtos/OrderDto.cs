@@ -31,7 +31,6 @@ namespace SvarosNamai.Serivce.OrderAPI.Models
         public int? BundleId { get; set; }
         public int? ProductId { get; set; }
         public string DateHour { get; set; }
-        public ReservationsDto Reservation {  get; set; }
 
     }
 }
