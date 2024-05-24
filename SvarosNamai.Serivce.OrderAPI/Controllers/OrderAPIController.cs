@@ -46,36 +46,39 @@ namespace SvarosNamai.Serivce.OrderAPI.Controllers
 
 
         [HttpPost("CreateOrder")]
-        public async Task<ResponseDto> CreateOrder(OrderDto order, int bundleId)
+        public async Task<ResponseDto> CreateOrder(CreateOrderDto createOrderDto)
         {
             try
             {
-                BundleDto bundleFromDb = await _productService.GetBundle(bundleId);
-                if (bundleFromDb != null)
+                if (createOrderDto.Bundle == null)
                 {
-                    Order orderToDb = _mapper.Map<Order>(order);
-                    orderToDb.Price = ((order.SquareMeters * 2.4) / 60) * bundleFromDb.HourPrice;
-                    await _db.Orders.AddAsync(orderToDb);
-                    await _db.SaveChangesAsync();
-
-                    //Send An Email
-                    var emailSend = await _email.SendConfirmationEmail(_mapper.Map<ConfirmationEmailDto>(orderToDb));
-
-
-                    if (emailSend.IsSuccess)
+                    BundleDto bundleFromDb = await _productService.GetBundle(createOrderDto.Order.BundleId);
+                    if (bundleFromDb != null)
                     {
-                        _response.Message = "Order Created";
+                        Order orderToDb = _mapper.Map<Order>(createOrderDto.Order);
+                        orderToDb.Price = ((createOrderDto.Order.SquareMeters * 2.4) / 60) * bundleFromDb.HourPrice;
+                        await _db.Orders.AddAsync(orderToDb);
+                        await _db.SaveChangesAsync();
+
+                        //Send An Email
+                        var emailSend = await _email.SendConfirmationEmail(_mapper.Map<ConfirmationEmailDto>(orderToDb));
+
+
+                        if (emailSend.IsSuccess)
+                        {
+                            _response.Message = "Order Created";
+                        }
+                        else
+                        {
+                            _response.Message = $"Order Created, Email not sent. Reason: {emailSend.Message}";
+                            _error.LogError(emailSend.Message);
+                            return _response;
+                        }
                     }
                     else
                     {
-                        _response.Message = $"Order Created, Email not sent. Reason: {emailSend.Message}";
-                        _error.LogError(emailSend.Message);
-                        return _response;
+                        throw new Exception("Bundle doesn't exist or doesn't have products");
                     }
-                }
-                else
-                {
-                    throw new Exception("Bundle doesn't exist or doesn't have products");
                 }
             }
             catch (Exception ex)

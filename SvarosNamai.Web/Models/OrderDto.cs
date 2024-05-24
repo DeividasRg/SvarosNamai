@@ -27,7 +27,7 @@ namespace SvarosNamai.Web.Models
         public double SquareMeters { get; set; }
         public bool IsCompany { get; set; } = false;
         public double Price { get; set; }
-        public int? BundleId { get; set; }
+        public int BundleId { get; set; }
         public string? ProductId { get; set; }
         public string? DateHour { get; set; }
 
