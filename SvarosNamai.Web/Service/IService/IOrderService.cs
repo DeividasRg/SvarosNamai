@@ -11,5 +11,6 @@ namespace SvarosNamai.Web.Service.IService
         Task<ResponseDto> AddProductToOrder(ProductOrderDto info);
         Task<ResponseDto> RemoveProductFromOrder(ProductOrderDto info);
         Task<ResponseDto> GetReservations(ReservationsIntervalDto dates);
+        Task<ResponseDto> CreateOrder(CreateOrderDto order);
     }
 }

@@ -79,7 +79,15 @@ function loadDataTable() {
                     }
                 }
             },
-            { data: 'creationDate', width: "3%", title: "Pateikimo laikas" },
+            {
+                data: 'creationDate',
+                width: "3%",
+                title: "Pateikimo laikas",
+                render: function (data) {
+                    // Replace "T" with a space and return the modified date string
+                    return data.replace('T', ' ');
+                }
+            },
             {
                 data: 'isCompany',
                 width: "3%",

@@ -1,4 +1,35 @@
 ﻿@model OrderDto
+<style>
+    .scrollable-checkboxes {
+        max-height: 200px; /* Adjust as needed */
+        width: 400px;
+        overflow: auto;
+        color: black;
+        border-radius: 20px;
+    }
+    .scrollable-checkboxes::-webkit-scrollbar {
+        display: none;
+    }
+
+    .checkbox-container {
+        background-color: rgba(240, 240, 240, 0.88);
+        color: black;
+        border-radius: 20px; /* Add rounded corners */
+    }
+
+        .checkbox-container .form-check {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .checkbox-container .form-check-input {
+            margin-right: 10px; /* Adjust as needed for spacing between checkbox and text */
+            background-color: grey;
+        }
+
+</style>
+
 
 <div class="container border p-3">
     @if (!Model.IsCompany)
@@ -12,7 +43,7 @@
                     <h4 class="text-white text-center">Asmeninė informacija</h4>
                     <div class="form-group">
                         <label class="control-label" style="font-size:12px;">Vardas</label>
-                        <input asp-for="Name" class="form-control custom-input" placeholder="@Model.Name" />
+                        <input asp-for="Name" class="form-control custom-input" />
                         <span asp-validation-for="Name" class="text-danger"></span>
                     </div>
                     <div class="form-group">
@@ -90,26 +121,133 @@
                                     }
                                 </select>
                             </div>
-                        <span asp-validation-for="ProductId" class="text-danger"></span>
-                    </div>
-                    <div class="form-group text-center">
-                        <label class="control-label" style="font-size:12px;">Kvadratūra m2</label>
-                        <input asp-for="SquareMeters" class="form-control custom-input custom-width" style="text-align:center" />
-                        <span asp-validation-for="SquareMeters" class="text-danger"></span>
+                            <span asp-validation-for="ProductId" class="text-danger"></span>
+                        </div>
+                        <div class="form-group text-center">
+                            <label class="control-label" style="font-size:12px;">Kvadratūra m2</label>
+                            <input asp-for="SquareMeters" class="form-control custom-input custom-width" style="text-align:center" />
+                            <span asp-validation-for="SquareMeters" class="text-danger"></span>
+                        </div>
                     </div>
                 </div>
-            </div>
-            <div class="row mt-4">
-                <div class="col-md-12 text-center">
-                    <input type="submit" value="Patvirtinti" class="btn btn-success btn-lg mb-2" style="width: 50%;" />
-                    <a asp-action="OrderIndex" class="btn btn-primary" style="width: 50%;">Grįžti atgal</a>
+                <div class="row mt-4">
+                    <div class="col-md-12 text-center">
+                        <input type="submit" value="Patvirtinti" class="btn btn-success btn-lg mb-2" style="width: 50%;" />
+                        <a asp-action="OrderIndex" class="btn btn-primary" style="width: 50%;">Grįžti atgal</a>
+                    </div>
                 </div>
-            </div>
         </form>
     }
     else
     {
-        <!-- Similar structure for company form -->
+        <form asp-controller="Order" asp-action="OrderPreview">
+            <input asp-for="IsCompany" hidden />
+            <h1 class="text-white text-center">Sukurti fizinį užsakymą</h1>
+            <hr />
+            <div class="row">
+                <div class="col-md-6">
+                    <h4 class="text-white text-center">Asmeninė informacija</h4>
+                    <div class="form-group">
+                        <label class="control-label" style="font-size:12px;">Įmonės pavadinimas</label>
+                        <input asp-for="CompanyName" class="form-control custom-input" />
+                        <span asp-validation-for="CompanyName" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label" style="font-size:12px;">Įmonės kodas</label>
+                        <input asp-for="CompanyNumber" class="form-control custom-input" />
+                        <span asp-validation-for="CompanyNumber" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label" style="font-size:12px;">Telefono Nr.</label>
+                        <input asp-for="PhoneNumber" class="form-control custom-input" />
+                        <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label" style="font-size:12px;">Paštas</label>
+                        <input asp-for="Email" class="form-control custom-input" />
+                        <span asp-validation-for="Email" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <h4 class="text-white text-center">Adresas ir laikas</h4>
+                    <div class="form-group">
+                        <label class="control-label" style="font-size:12px;">Miestas</label>
+                        <input asp-for="City" class="form-control custom-input" />
+                        <span asp-validation-for="City" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label" style="font-size:12px;">Gatvė</label>
+                        <input asp-for="Street" class="form-control custom-input" />
+                        <span asp-validation-for="Street" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label" style="font-size:12px;">Namas</label>
+                        <input asp-for="HouseNo" class="form-control custom-input" />
+                        <span asp-validation-for="HouseNo" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label" style="font-size:12px;">Butas</label>
+                        <input asp-for="ApartmentNo" class="form-control custom-input" />
+                        <span asp-validation-for="ApartmentNo" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12 d-flex flex-column align-items-center pt-5 pb-3">
+                    <div class="form-group text-center pb-3">
+                        <label class="control-label" style="font-size:12px;">Pasirinkite laiką</label>
+                        <div class="scrollable-checkboxes">
+                            <div class="checkbox-container">
+                                @foreach (var dateHour in ViewBag.AvailableDates)
+                                {
+                                    <div class="form-check">
+                                        <input asp-for="DateHour" type="checkbox" class="form-check-input" value="@dateHour">
+                                        <label class="form-check-label" for="checkbox-@dateHour:00">@dateHour:00</label>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                        <span asp-validation-for="DateHour" class="text-danger"></span>
+                    </div>
+
+
+                    <div class="form-group text-center pb-3">
+                        <label class="control-label" style="font-size:12px;">Pasirinkite paketą</label>
+                        <div class="custom-select">
+                            <select asp-for="BundleId" class="form-control custom-input custom-width">
+                                @foreach (var bundle in ViewBag.Bundles)
+                                {
+                                    <option class="dropdown-option" value="@bundle.BundleId">@bundle.BundleName, @bundle.HourPrice€/h</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="form-group text-center pb-3">
+                            <label class="control-label" style="font-size:12px;">Papildomos paslauga</label>
+                            <div class="custom-select">
+                                <select asp-for="ProductId" class="form-control custom-input custom-width">
+                                    <option class="dropdown-option" value="">-</option>
+                                    @foreach (var product in ViewBag.Products)
+                                    {
+                                        <option class="dropdown-option" value="@product.ProductId">@product.Name, @product.Price€</option>
+                                    }
+                                </select>
+                            </div>
+                            <span asp-validation-for="ProductId" class="text-danger"></span>
+                        </div>
+                        <div class="form-group text-center">
+                            <label class="control-label" style="font-size:12px;">Kvadratūra m2</label>
+                            <input asp-for="SquareMeters" class="form-control custom-input custom-width" style="text-align:center" />
+                            <span asp-validation-for="SquareMeters" class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="row mt-4">
+                    <div class="col-md-12 text-center">
+                        <input type="submit" value="Patvirtinti" class="btn btn-success btn-lg mb-2" style="width: 50%;" />
+                        <a asp-action="OrderIndex" class="btn btn-primary" style="width: 50%;">Grįžti atgal</a>
+                    </div>
+                </div>
+        </form>
     }
 </div>
 

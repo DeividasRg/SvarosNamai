@@ -23,7 +23,7 @@ namespace SvarosNamai.Web.Models
         public int Hour { get; set; }
         public DateOnly Date { get; set; }
         public int Status { get; set; }
-        public DateTime CreationDate { get; set; }
+        public DateTime CreationDate { get; set; } = DateTime.Now.RoundToNearestSecond();
         public double SquareMeters { get; set; }
         public bool IsCompany { get; set; } = false;
         public double Price { get; set; }
@@ -31,5 +31,13 @@ namespace SvarosNamai.Web.Models
         public string? ProductId { get; set; }
         public string? DateHour { get; set; }
 
+    }
+
+    public static class DateTimeExtensions
+    {
+        public static DateTime RoundToNearestSecond(this DateTime dateTime)
+        {
+            return new DateTime(dateTime.Ticks - (dateTime.Ticks % TimeSpan.TicksPerSecond), dateTime.Kind);
+        }
     }
 }

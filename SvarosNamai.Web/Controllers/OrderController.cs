@@ -334,12 +334,12 @@ namespace SvarosNamai.Web.Controllers
                     BundleDto bundle = JsonConvert.DeserializeObject<BundleDto>(bundleResponse.Result.ToString());
                     ProductDto product = JsonConvert.DeserializeObject<ProductDto>(productResponse.Result.ToString());
 
-                    order.Price = Math.Round(((order.SquareMeters * 2.4) / 60) * bundle.HourPrice,2);
+                    order.Price = Math.Round(((order.SquareMeters * 2.4) / 60) * bundle.HourPrice, 2);
 
                     ReservationsDto reservation = new ReservationsDto();
 
                     DateOnly date = DateOnly.Parse(order.DateHour.Split(',')[0].Trim());
-                    if(TimeSpan.TryParse(order.DateHour.Split(',')[1].Trim(), out TimeSpan time))
+                    if (TimeSpan.TryParse(order.DateHour.Split(',')[1].Trim(), out TimeSpan time))
                     {
                         reservation.Date = date;
                         reservation.Hour = time.Hours;
@@ -358,6 +358,8 @@ namespace SvarosNamai.Web.Controllers
                         Product = product,
                         FullPrice = order.Price + product.Price
                     };
+                    preview.Order.Date = reservation.Date;
+                    preview.Order.Hour = reservation.Hour;
 
                     return View(preview);
                 }
@@ -409,7 +411,27 @@ namespace SvarosNamai.Web.Controllers
 
         public async Task<IActionResult> CreateOrder(OrderPreviewDto preview)
         {
-            return View();
+            CreateOrderDto createOrderDto = new CreateOrderDto()
+            {
+                Bundle = preview.Bundle,
+                Order = preview.Order,
+                Product = preview.Product
+            };
+
+            ResponseDto response = await _orderService.CreateOrder(createOrderDto);
+
+            if (response.IsSuccess)
+            {
+                TempData["success"] = $"Užsakymas sukurtas ID - {response.Result.ToString()}";
+                return RedirectToAction("OrderIndex");
+            }
+            else
+            {
+                TempData["success"] = $"{response.Message}";
+                return RedirectToAction("OrderIndex");
+
+            }
+
         }
 
         public async Task<IActionResult> OrderCreate(bool isCompany)
@@ -424,7 +446,7 @@ namespace SvarosNamai.Web.Controllers
 
             ResponseDto reservationResponse = await _orderService.GetReservations(dates);
             ResponseDto bundlesResponse = await _productService.GetAllActiveBundles();
-            ResponseDto productsResponse = await _productService.GetAllProductsAsync(); 
+            ResponseDto productsResponse = await _productService.GetAllProductsAsync();
 
 
             if (reservationResponse.IsSuccess && bundlesResponse.IsSuccess && productsResponse.IsSuccess)
@@ -433,11 +455,11 @@ namespace SvarosNamai.Web.Controllers
 
                 var availableDates = new List<(DateOnly Date, int Hour)>();
 
-                for(var date = dates.StartDate; date <= dates.EndDate; date = date.AddDays(1))
+                for (var date = dates.StartDate; date <= dates.EndDate; date = date.AddDays(1))
                 {
                     for (int hour = 10; hour < 18; hour++)
                     {
-                        if(!reservations.Any(r => r.Date == date && r.Hour == hour))
+                        if (!reservations.Any(r => r.Date == date && r.Hour == hour))
                         {
                             availableDates.Add((date, hour));
                         }

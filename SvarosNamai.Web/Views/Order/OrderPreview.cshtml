@@ -15,6 +15,7 @@
     <input asp-for="Order.Date" hidden />
     <input asp-for="Order.IsCompany" hidden />
     <input asp-for="Order.Price" hidden />
+    <input asp-for="Order.SquareMeters" hidden />
     <input asp-for="Product.Name" hidden />
     <input asp-for="Product.Description" hidden />
     <input asp-for="Product.Price" hidden />
@@ -24,7 +25,8 @@
     <input asp-for="Bundle.HourPrice" hidden />
 
 
-
+    @if(!Model.Order.IsCompany)
+    {
     <div class="container">
         <div class="row">
             <div class="col-md-6">
@@ -122,7 +124,113 @@
                 <a asp-action="OrderCreate" class="btn btn-primary" style="width: 50%;">Grįžti atgal</a>
             </div>
         </div>
-    </div>
+        </div>
+    }
+    else
+    {
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="card shadow border-0 mt-4">
+                        <div class="card-header bg-secondary bg-gradient ml-0 py-3">
+                            <div class="row">
+                                <div class="col-12 text-center">
+                                    <h1 class="text-white">Užsakymo informacija</h1>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-body p-4">
+                            <div class="row pb-3">
+                            </div>
+                            <table class="table">
+                                <tbody>
+                                    <tr>
+                                        <td>Įmonės pavadinimas</td>
+                                        <td>@Model.Order.CompanyName</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Įmonės kodas</td>
+                                        <td>@Model.Order.CompanyNumber</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Telefonas:</td>
+                                        <td>@Model.Order.PhoneNumber</td>
+                                    </tr>
+                                    <tr>
+                                        <td>El.paštas:</td>
+                                        <td>@Model.Order.Email</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Adresas:</td>
+                                        <td>@Model.Order.Street @Model.Order.HouseNo@(Model.Order.ApartmentNo != null ? (" - " + Model.Order.ApartmentNo) : ""), @Model.Order.City</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Plotas:</td>
+                                        <td>@Model.Order.SquareMeters <b>m2</b></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Data:</td>
+                                        <td>@Model.Order.Date, @Model.Order.Hour:00</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card shadow border-0 mt-4">
+                        <div class="card-header bg-secondary bg-gradient ml-0 py-3">
+                            <div class="row">
+                                <div class="col-12 text-center">
+                                    <h1 class="text-white">Kainodara</h1>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-body p-4">
+                            <div class="row pb-3">
+                            </div>
+                            <table class="table">
+                                <tbody>
+                                    <tr>
+                                        <td>@Model.Bundle.BundleName kaina už @Model.Order.SquareMeters m2:</td>
+                                        <td>
+                                            @Model.Order.Price€
+                                        </td>
+                                    </tr>
+                                    @{
+                                        if (Model.Product != null)
+                                        {
+                                            <tr>
+                                                <td colspan="2" style="text-align:center"><b>Papildoma paslauga:</b></td>
+                                            </tr>
+                                            <tr>
+                                                <td>@Model.Product.Name</td>
+                                                <td>
+                                                    @Model.Product.Price€
+                                                </td>
+                                            </tr>
+                                        }
+                                    }
+                                    <tr>
+                                        <td colspan="2" style="text-align:center"><b>Pilna kaina: <span id="fullPrice">@Model.FullPrice</span>€</b></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="container mt-4">
+            <div class="row">
+                <div class="col-md-12 text-center">
+                    <input type="submit" value="Sukurti fizinį užsakymą" class="btn btn-success btn-lg mb-2" style="width: 50%;" />
+                    <a asp-action="OrderCreate" class="btn btn-primary" style="width: 50%;">Grįžti atgal</a>
+                </div>
+            </div>
+        </div>
+    }
 </form>
 
 
