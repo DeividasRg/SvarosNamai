@@ -95,7 +95,7 @@
                                 @foreach (var timeslot in ViewBag.AvailableDates)
                                 {
                                     <div class="form-check">
-                                        <input asp-for="DateStrings" type="checkbox" class="form-check-input" value="@timeslot.Item2">
+                                        <input name="DateStrings" type="checkbox" class="form-check-input" value="@timeslot.Item2">
                                         <label class="form-check-label" for="checkbox-@timeslot">@timeslot</label>
                                     </div>
                                 }
@@ -204,7 +204,7 @@
                                 @foreach (var timeslot in ViewBag.AvailableDates)
                                 {
                                     <div class="form-check">
-                                        <input asp-for="DateStrings" type="checkbox" class="form-check-input" value="@timeslot.Item2">
+                                        <input name="DateStrings" type="checkbox" class="form-check-input" value="@timeslot.Item2">
                                         <label class="form-check-label" for="checkbox-@timeslot">@timeslot</label>
                                     </div>
                                 }
