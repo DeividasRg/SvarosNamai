@@ -11,7 +11,6 @@
     <input asp-for="Order.CompanyName" hidden />
     <input asp-for="Order.PhoneNumber" hidden />
     <input asp-for="Order.Email" hidden />
-    <input asp-for="Order.Hour" hidden />
     <input asp-for="Order.Date" hidden />
     <input asp-for="Order.IsCompany" hidden />
     <input asp-for="Order.Price" hidden />
@@ -65,7 +64,7 @@
                                 </tr>
                                 <tr>
                                     <td>Data:</td>
-                                    <td>@Model.Order.Date, @Model.Order.Hour:00</td>
+                                    <td>@Model.Order.Date</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -167,10 +166,6 @@
                                     <tr>
                                         <td>Plotas:</td>
                                         <td>@Model.Order.SquareMeters <b>m2</b></td>
-                                    </tr>
-                                    <tr>
-                                        <td>Data:</td>
-                                        <td>@Model.Order.Date, @Model.Order.Hour:00</td>
                                     </tr>
                                 </tbody>
                             </table>

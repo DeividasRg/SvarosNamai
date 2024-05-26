@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace SvarosNamai.Serivce.OrderAPI.Models.Dtos
@@ -20,7 +22,6 @@ namespace SvarosNamai.Serivce.OrderAPI.Models.Dtos
         [Required]
         public string PhoneNumber { get; set; }
         public string Email { get; set; }
-        public int Hour { get; set; }
         public DateOnly Date { get; set; }
         public int Status { get; set; }
         public DateTime CreationDate { get; set; } = DateTime.Now.RoundToNearestSecond();
@@ -29,7 +30,7 @@ namespace SvarosNamai.Serivce.OrderAPI.Models.Dtos
         public double Price { get; set; }
         public int BundleId { get; set; }
         public string? ProductId { get; set; }
-        public string? DateHour { get; set; }
+        public IEnumerable<string> DateStrings {  get; set; }
 
     }
 

@@ -73,13 +73,12 @@ namespace SvarosNamai.Web.Service
             });
         }
 
-        public async Task<ResponseDto> GetReservations(ReservationsIntervalDto dates)
+        public async Task<ResponseDto> GetTimeslots()
         {
             return await _baseService.SendAsync(new RequestDto()
             {
                 ApiType = SD.ApiType.GET,
-                Data = dates,
-                Url = SD.OrderAPIBase + "/api/order/GetReservations"
+                Url = SD.OrderAPIBase + "/api/order/GetTimeslots"
             });
         }
 

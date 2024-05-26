@@ -338,17 +338,7 @@ namespace SvarosNamai.Web.Controllers
 
                     ReservationsDto reservation = new ReservationsDto();
 
-                    DateOnly date = DateOnly.Parse(order.DateHour.Split(',')[0].Trim());
-                    if (TimeSpan.TryParse(order.DateHour.Split(',')[1].Trim(), out TimeSpan time))
-                    {
-                        reservation.Date = date;
-                        reservation.Hour = time.Hours;
 
-                    }
-                    else
-                    {
-                        return NotFound();
-                    }
 
 
                     OrderPreviewDto preview = new OrderPreviewDto()
@@ -358,8 +348,7 @@ namespace SvarosNamai.Web.Controllers
                         Product = product,
                         FullPrice = order.Price + product.Price
                     };
-                    preview.Order.Date = reservation.Date;
-                    preview.Order.Hour = reservation.Hour;
+                    preview.Order.Date = order.Date;
 
                     return View(preview);
                 }
@@ -381,16 +370,6 @@ namespace SvarosNamai.Web.Controllers
                     order.Price = Math.Round(((order.SquareMeters * 2.4) / 60) * bundle.HourPrice, 2);
 
 
-                    DateOnly date = DateOnly.Parse(order.DateHour.Split(',')[0].Trim());
-                    if (TimeSpan.TryParse(order.DateHour.Split(',')[1].Trim(), out TimeSpan time))
-                    {
-                        order.Date = date;
-                        order.Hour = time.Hours;
-                    }
-                    else
-                    {
-                        return NotFound();
-                    }
 
 
                     OrderPreviewDto preview = new OrderPreviewDto()
@@ -399,6 +378,7 @@ namespace SvarosNamai.Web.Controllers
                         Bundle = bundle,
                         FullPrice = order.Price
                     };
+                    preview.Order.Date = order.Date;
 
                     return View(preview);
                 }
@@ -444,25 +424,22 @@ namespace SvarosNamai.Web.Controllers
 
             };
 
-            ResponseDto reservationResponse = await _orderService.GetReservations(dates);
+            ResponseDto availableTimeslotsResponse = await _orderService.GetTimeslots();
             ResponseDto bundlesResponse = await _productService.GetAllActiveBundles();
             ResponseDto productsResponse = await _productService.GetAllProductsAsync();
 
 
-            if (reservationResponse.IsSuccess && bundlesResponse.IsSuccess && productsResponse.IsSuccess)
+            if (availableTimeslotsResponse.IsSuccess && bundlesResponse.IsSuccess && productsResponse.IsSuccess)
             {
-                IEnumerable<ReservationsDto> reservations = JsonConvert.DeserializeObject<IEnumerable<ReservationsDto>>(reservationResponse.Result.ToString());
+                IEnumerable<AvailableTimeSlotsDto> availableTimeSlots = JsonConvert.DeserializeObject<IEnumerable<AvailableTimeSlotsDto>>(availableTimeslotsResponse.Result.ToString());
 
-                var availableDates = new List<(DateOnly Date, int Hour)>();
+                List<(string weekDay, DateOnly date)> availableDates = new List<(string weekDay, DateOnly date)>();
 
-                for (var date = dates.StartDate; date <= dates.EndDate; date = date.AddDays(1))
+                foreach(var day in availableTimeSlots)
                 {
-                    for (int hour = 10; hour < 18; hour++)
+                    if(day.AvailableSlots > 0)
                     {
-                        if (!reservations.Any(r => r.Date == date && r.Hour == hour))
-                        {
-                            availableDates.Add((date, hour));
-                        }
+                        availableDates.Add((day.DayName, day.DayDate));
                     }
                 }
 
@@ -474,9 +451,9 @@ namespace SvarosNamai.Web.Controllers
 
                 ViewBag.Bundles = bundles;
 
-                ViewBag.AvailableDates = availableDates
-                .Select(dh => $"{dh.Date.ToString("yyyy-MM-dd")}, {dh.Hour}")
-                .ToList();
+                ViewBag.AvailableDates = availableDates;
+                //.Select(dh => $"{dh.Date.ToString("yyyy-MM-dd")}, {dh.Hour}")
+                //.ToList();
 
             }
             else

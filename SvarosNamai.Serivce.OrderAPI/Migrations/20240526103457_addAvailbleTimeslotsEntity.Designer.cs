@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SvarosNamai.Service.OrderAPI.Data;
 
@@ -11,9 +12,11 @@ using SvarosNamai.Service.OrderAPI.Data;
 namespace SvarosNamai.Serivce.OrderAPI.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240526103457_addAvailbleTimeslotsEntity")]
+    partial class addAvailbleTimeslotsEntity
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -27,13 +30,13 @@ namespace SvarosNamai.Serivce.OrderAPI.Migrations
 
             modelBuilder.Entity("SvarosNamai.Serivce.OrderAPI.Models.AvailableTimeSlots", b =>
                 {
-                    b.Property<DateOnly>("DayDate")
+                    b.Property<DateOnly>("Date")
                         .HasColumnType("date");
 
                     b.Property<int>("AvailableSlots")
                         .HasColumnType("int");
 
-                    b.Property<string>("DayName")
+                    b.Property<string>("DayDate")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -43,7 +46,7 @@ namespace SvarosNamai.Serivce.OrderAPI.Migrations
                     b.Property<int>("OrderCount")
                         .HasColumnType("int");
 
-                    b.HasKey("DayDate");
+                    b.HasKey("Date");
 
                     b.ToTable("AvailableTimeSlots");
                 });

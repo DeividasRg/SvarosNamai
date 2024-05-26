@@ -6,7 +6,6 @@ namespace SvarosNamai.Web.Models
     public class ReservationsDto
     {
         public DateOnly Date {  get; set; }
-        public int Hour { get; set; }
         public bool IsActive { get; set; } = true;
     }
 }

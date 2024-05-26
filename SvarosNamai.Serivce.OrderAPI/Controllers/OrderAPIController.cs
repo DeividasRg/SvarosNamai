@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using SvarosNamai.Serivce.OrderAPI.Models;
 using SvarosNamai.Serivce.OrderAPI.Models.Dtos;
@@ -456,7 +457,6 @@ namespace SvarosNamai.Serivce.OrderAPI.Controllers
             foreach (var order in orders)
             {
                 var orderDto = _mapper.Map<OrderDto>(order);
-                orderDto.Hour = order.Reservation.Hour;
                 orderDto.Date = order.Reservation.Date;
                 orderDtos.Add(orderDto);
             }
@@ -490,9 +490,8 @@ namespace SvarosNamai.Serivce.OrderAPI.Controllers
             try
             {
                 IEnumerable<Reservations> reservations = _db.Reservations
-                             .Where(r => r.Date >= dates.StartDate && r.Date < dates.EndDate && r.IsActive && r.Hour >= 10 && r.Hour <= 17)
+                             .Where(r => r.Date >= dates.StartDate && r.Date < dates.EndDate && r.IsActive)
                              .OrderBy(r => r.Date)
-                             .ThenBy(r => r.Hour)
                              .ToList();
 
                 _response.Result = _mapper.Map<IEnumerable<ReservationsDto>>(reservations);
@@ -508,6 +507,25 @@ namespace SvarosNamai.Serivce.OrderAPI.Controllers
             return _response;
         }
 
-
+        [HttpGet("GetTimeslots")]
+        public async Task<ResponseDto> GetTimeslots()
+        {
+            try
+            {
+                var slots = _db.AvailableTimeSlots.FromSqlInterpolated($"spGetSlotsV1");
+                if (slots != null)
+                {
+                    _response.Result = slots;
+                    _response.Message = "Successful";
+                }
+            }
+            catch(Exception ex)
+            {
+                _response.IsSuccess = false;
+                _response.Message = ex.Message;
+                _error.LogError(ex.Message);
+            }
+                return _response;
+        }
     }
 }

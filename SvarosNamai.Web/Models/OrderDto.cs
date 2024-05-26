@@ -20,7 +20,6 @@ namespace SvarosNamai.Web.Models
         [Required]
         public string PhoneNumber { get; set; }
         public string Email { get; set; }
-        public int Hour { get; set; }
         public DateOnly Date { get; set; }
         public int Status { get; set; }
         public DateTime CreationDate { get; set; } = DateTime.Now.RoundToNearestSecond();
@@ -29,8 +28,7 @@ namespace SvarosNamai.Web.Models
         public double Price { get; set; }
         public int BundleId { get; set; }
         public string? ProductId { get; set; }
-        public string? DateHour { get; set; }
-
+        public IEnumerable<string> DateStrings { get; set; }
     }
 
     public static class DateTimeExtensions
