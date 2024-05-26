@@ -452,8 +452,6 @@ namespace SvarosNamai.Web.Controllers
                 ViewBag.Bundles = bundles;
 
                 ViewBag.AvailableDates = availableDates;
-                //.Select(dh => $"{dh.Date.ToString("yyyy-MM-dd")}, {dh.Hour}")
-                //.ToList();
 
             }
             else
