@@ -319,8 +319,7 @@ namespace SvarosNamai.Web.Controllers
         public async Task<IActionResult> OrderPreview(OrderDto order)
         {
 
-
-            if (order.ProductId != null)
+            if (order.ProductId != null) 
             {
                 ResponseDto productResponse = await _productService.GetProduct(Int32.Parse(order.ProductId));
                 ResponseDto bundleResponse = await _productService.GetBundle(order.BundleId);
@@ -334,19 +333,23 @@ namespace SvarosNamai.Web.Controllers
 
                     order.Price = Math.Round(((order.SquareMeters * 2.4) / 60) * bundle.HourPrice, 2);
 
-                    ReservationsDto reservation = new ReservationsDto();
-
-
-
 
                     OrderPreviewDto preview = new OrderPreviewDto()
                     {
-                        Order = order,
                         Bundle = bundle,
                         Product = product,
                         FullPrice = order.Price + product.Price
                     };
-                    preview.Order.Date = order.Date;
+
+                    List<OrderDto> ordersList = new List<OrderDto>();
+
+                    foreach (var date in order.DateStrings)
+                    {
+                        order.Date = DateOnly.Parse(date);
+                        ordersList.Add(order);
+                    }
+
+                    preview.Orders = ordersList;
 
                     return View(preview);
                 }
@@ -365,18 +368,22 @@ namespace SvarosNamai.Web.Controllers
 
                     BundleDto bundle = JsonConvert.DeserializeObject<BundleDto>(bundleResponse.Result.ToString());
 
-                    order.Price = Math.Round(((order.SquareMeters * 2.4) / 60) * bundle.HourPrice, 2);
-
-
-
 
                     OrderPreviewDto preview = new OrderPreviewDto()
                     {
-                        Order = order,
                         Bundle = bundle,
-                        FullPrice = order.Price
+                        FullPrice = Math.Round(((order.SquareMeters * 2.4) / 60) * bundle.HourPrice, 2)
                     };
-                    preview.Order.Date = order.Date;
+
+                    List<OrderDto> ordersList = new List<OrderDto>();
+
+                    foreach (var date in order.DateStrings)
+                    {
+                        order.Date = DateOnly.Parse(date);
+                        ordersList.Add(order);
+                    }
+
+                    preview.Orders = ordersList;
 
                     return View(preview);
                 }
@@ -389,38 +396,38 @@ namespace SvarosNamai.Web.Controllers
 
         public async Task<IActionResult> CreateOrder(OrderPreviewDto preview)
         {
+
+            //perdaryt, kad endpointas priimtu kelis orderius ir sukurtų vietoj kelių callų.
+
+
+            
             CreateOrderDto createOrderDto = new CreateOrderDto()
             {
                 Bundle = preview.Bundle,
-                Order = preview.Order,
                 Product = preview.Product
             };
 
-            ResponseDto response = await _orderService.CreateOrder(createOrderDto);
-
-            if (response.IsSuccess)
+            foreach(var order in preview.Orders)
             {
-                TempData["success"] = $"Užsakymas sukurtas ID - {response.Result.ToString()}";
-                return RedirectToAction("OrderIndex");
+                createOrderDto.Order = order;
+                ResponseDto response = await _orderService.CreateOrder(createOrderDto);
+
+                if(!response.IsSuccess)
+                {
+                    TempData["error"] = $"{response.Message}";
+                    return RedirectToAction("OrderIndex");
+                }
             }
-            else
-            {
-                TempData["success"] = $"{response.Message}";
+
+                TempData["success"] = "Užsakymas(-ai) sukurtas(-i)";
                 return RedirectToAction("OrderIndex");
 
-            }
 
         }
 
         public async Task<IActionResult> OrderCreate(bool isCompany)
         {
 
-            ReservationsIntervalDto dates = new()
-            {
-                StartDate = DateOnly.FromDateTime(DateTime.Today),
-                EndDate = DateOnly.FromDateTime(DateTime.Today).AddDays(7)
-
-            };
 
             ResponseDto availableTimeslotsResponse = await _orderService.GetTimeslots();
             ResponseDto bundlesResponse = await _productService.GetAllActiveBundles();

@@ -32,8 +32,6 @@ namespace SvarosNamai.Serivce.OrderAPI.Models.Dtos
         public int BundleId { get; set; }
         public string? ProductId { get; set; }
         public IEnumerable<string> DateStrings {  get; set; }
-        public string s {  get; set; }
-
     }
 
     public static class DateTimeExtensions
