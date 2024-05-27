@@ -322,9 +322,7 @@ namespace SvarosNamai.Web.Controllers
 
             if (order.ProductId != null)
             {
-                int productId = Int32.Parse(order.ProductId);
-
-                ResponseDto productResponse = await _productService.GetProduct(productId);
+                ResponseDto productResponse = await _productService.GetProduct(Int32.Parse(order.ProductId));
                 ResponseDto bundleResponse = await _productService.GetBundle(order.BundleId);
 
 
