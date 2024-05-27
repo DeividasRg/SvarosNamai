@@ -1,12 +1,10 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 
-namespace SvarosNamai.Serivce.OrderAPI.Models
+namespace SvarosNamai.Web.Models
 {
-    public class Reservations
+    public class ReservationsDto
     {
-        [Key]
-        public int ReservationId { get; set; }
         public DateOnly Date {  get; set; }
         public bool IsActive { get; set; } = true;
     }

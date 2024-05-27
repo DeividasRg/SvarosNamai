@@ -46,20 +46,12 @@ function loadDataTable() {
             },
             {
                 data: function (row) {
-                    return row.street + ' ' + row.houseNo + (row.houseLetter != null ? row.houseLetter : "") + (row.apartmentNo != null ? " - " + row.apartmentNo : "") + ', ' + row.city;
+                    return row.street + ' ' + row.houseNo + (row.apartmentNo != null ? " - " + row.apartmentNo : "") + ', ' + row.city;
                 },
                 width: "30%",
                 title: "Adresas"
             },
             { data: 'date', width: "10%", title: "Data" },
-            {
-                data: 'hour',
-                width: "10%",
-                title: "Laikas",
-                render: function (data) {
-                    return data + ' valanda';
-                }
-            },
             {
                 data: 'status',
                 width: "15%",
@@ -79,7 +71,15 @@ function loadDataTable() {
                     }
                 }
             },
-            { data: 'creationDate', width: "3%", title: "Pateikimo laikas" },
+            {
+                data: 'creationDate',
+                width: "3%",
+                title: "Pateikimo laikas",
+                render: function (data) {
+                    // Replace "T" with a space and return the modified date string
+                    return data.replace('T', ' ');
+                }
+            },
             {
                 data: 'isCompany',
                 width: "3%",
@@ -113,12 +113,12 @@ function addFilter() {
 
     // Create select element for filtering
     var select = $('<select><option value="">Visi</option><option value="Taip">Taip</option><option value="Ne">Ne</option></select>')
-        .appendTo($('#tblData').find('thead tr:eq(0) th:eq(8)'))
+        .appendTo($('#tblData').find('thead tr:eq(0) th:eq(7)'))
         .on('change', function () {
             var val = $.fn.dataTable.util.escapeRegex(
                 $(this).val()
             );
 
-            table.columns(8).search(val ? '^' + val + '$' : '', true, false).draw();
+            table.columns(7).search(val ? '^' + val + '$' : '', true, false).draw();
         });
 }

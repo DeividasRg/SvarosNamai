@@ -55,7 +55,7 @@ namespace SvarosNamai.Service.InvoiceAPI.Controllers
                     Directory.CreateDirectory(directoryPath);
                 }
 
-                var filepath = Path.Combine(directoryPath, $"{order.OrderId}_{order.Street} {order.HouseNo}{order.HouseLetter} {order.ApartmentNo}" + ".pdf");
+                var filepath = Path.Combine(directoryPath, $"{order.OrderId}_{order.Street} {order.HouseNo} {order.ApartmentNo}" + ".pdf");
 
 
 
@@ -84,7 +84,7 @@ namespace SvarosNamai.Service.InvoiceAPI.Controllers
                     .Add("Data: ").Add(DateTime.Now.ToShortDateString()).Add("\n")
                     .Add("Užsakymo nr. : ").Add($"{order.OrderId}").Add("\n")
                     .Add("Klientas: ").Add($"{order.Name} {order.LastName}").Add("\n")
-                    .Add("Adresas: ").Add($"{order.Street} {order.HouseNo}{order.ApartmentNo}{order.HouseLetter}, {order.City}").Add("\n")
+                    .Add("Adresas: ").Add($"{order.Street} {order.HouseNo}{order.ApartmentNo}, {order.City}").Add("\n")
                     .Add("El.pašto adresas: ").Add($"{order.Email}").Add("\n")
                     .Add("Telefono nr.: ").Add($"{order.PhoneNumber}");
 
@@ -149,7 +149,7 @@ namespace SvarosNamai.Service.InvoiceAPI.Controllers
                 Invoice invoice = new Invoice()
                 {
                     OrderId = order.OrderId,
-                    InvoiceName = $"{order.OrderId}_{order.Street} {order.HouseNo}{order.HouseLetter} {order.ApartmentNo}",
+                    InvoiceName = $"{order.OrderId}_{order.Street} {order.HouseNo} {order.ApartmentNo}",
                     Path = filepath
                 };
                 

@@ -11,10 +11,8 @@ namespace SvarosNamai.Web.Models
         [Required]
         public string Street { get; set; }
         [Required]
-        [Range(1, 1000)]
-        public int HouseNo { get; set; }
+        public string HouseNo { get; set; }
         public int? ApartmentNo { get; set; }
-        public string? HouseLetter { get; set; }
         public string? Name { get; set; }
         public string? LastName { get; set; }
         public string? CompanyNumber { get; set; }
@@ -22,13 +20,22 @@ namespace SvarosNamai.Web.Models
         [Required]
         public string PhoneNumber { get; set; }
         public string Email { get; set; }
-        public int Hour { get; set; }
         public DateOnly Date { get; set; }
         public int Status { get; set; }
-        public DateTime CreationDate { get; set; }
-        public double SquareFoot { get; set; }
+        public DateTime CreationDate { get; set; } = DateTime.Now.RoundToNearestSecond();
+        public double SquareMeters { get; set; }
         public bool IsCompany { get; set; } = false;
         public double Price { get; set; }
+        public int BundleId { get; set; }
+        public string? ProductId { get; set; }
+        public IEnumerable<string> DateStrings { get; set; }
+    }
 
+    public static class DateTimeExtensions
+    {
+        public static DateTime RoundToNearestSecond(this DateTime dateTime)
+        {
+            return new DateTime(dateTime.Ticks - (dateTime.Ticks % TimeSpan.TicksPerSecond), dateTime.Kind);
+        }
     }
 }

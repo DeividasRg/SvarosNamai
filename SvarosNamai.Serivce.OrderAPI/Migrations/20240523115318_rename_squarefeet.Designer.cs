@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SvarosNamai.Service.OrderAPI.Data;
 
@@ -11,9 +12,11 @@ using SvarosNamai.Service.OrderAPI.Data;
 namespace SvarosNamai.Serivce.OrderAPI.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240523115318_rename_squarefeet")]
+    partial class rename_squarefeet
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -25,29 +28,6 @@ namespace SvarosNamai.Serivce.OrderAPI.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("SvarosNamai.Serivce.OrderAPI.Models.AvailableTimeSlots", b =>
-                {
-                    b.Property<DateOnly>("DayDate")
-                        .HasColumnType("date");
-
-                    b.Property<int>("AvailableSlots")
-                        .HasColumnType("int");
-
-                    b.Property<string>("DayName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("OpenSlots")
-                        .HasColumnType("int");
-
-                    b.Property<int>("OrderCount")
-                        .HasColumnType("int");
-
-                    b.HasKey("DayDate");
-
-                    b.ToTable("AvailableTimeSlots");
-                });
-
             modelBuilder.Entity("SvarosNamai.Serivce.OrderAPI.Models.Order", b =>
                 {
                     b.Property<int>("OrderId")
@@ -58,9 +38,6 @@ namespace SvarosNamai.Serivce.OrderAPI.Migrations
 
                     b.Property<int?>("ApartmentNo")
                         .HasColumnType("int");
-
-                    b.Property<string>("BundleName")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("City")
                         .IsRequired()
@@ -184,62 +161,15 @@ namespace SvarosNamai.Serivce.OrderAPI.Migrations
                     b.Property<DateOnly>("Date")
                         .HasColumnType("date");
 
+                    b.Property<int>("Hour")
+                        .HasColumnType("int");
+
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
 
                     b.HasKey("ReservationId");
 
                     b.ToTable("Reservations");
-                });
-
-            modelBuilder.Entity("SvarosNamai.Serivce.OrderAPI.Models.Slots", b =>
-                {
-                    b.Property<string>("Weekday")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<int>("OpenSlots")
-                        .HasColumnType("int");
-
-                    b.HasKey("Weekday");
-
-                    b.ToTable("Slots");
-
-                    b.HasData(
-                        new
-                        {
-                            Weekday = "Monday",
-                            OpenSlots = 0
-                        },
-                        new
-                        {
-                            Weekday = "Tuesday",
-                            OpenSlots = 0
-                        },
-                        new
-                        {
-                            Weekday = "Wednesday",
-                            OpenSlots = 0
-                        },
-                        new
-                        {
-                            Weekday = "Thursday",
-                            OpenSlots = 0
-                        },
-                        new
-                        {
-                            Weekday = "Friday",
-                            OpenSlots = 0
-                        },
-                        new
-                        {
-                            Weekday = "Saturday",
-                            OpenSlots = 0
-                        },
-                        new
-                        {
-                            Weekday = "Sunday",
-                            OpenSlots = 0
-                        });
                 });
 
             modelBuilder.Entity("SvarosNamai.Serivce.OrderAPI.Models.Order", b =>

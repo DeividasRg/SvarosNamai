@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using SvarosNamai.Serivce.OrderAPI.Models;
 using SvarosNamai.Serivce.OrderAPI.Models.Dtos;
@@ -43,26 +44,101 @@ namespace SvarosNamai.Serivce.OrderAPI.Controllers
         }
 
 
+
+
         [HttpPost("CreateOrder")]
-        public async Task<ResponseDto> CreateOrder(OrderToAddDto order)
+        public async Task<ResponseDto> CreateOrder(CreateOrderDto createOrderDto)
         {
             try
             {
-                BundleDto bundleFromDb = await _productService.GetBundle(order.BundleId);
-                if (bundleFromDb != null)
+                if (createOrderDto.Bundle == null)
                 {
-                    Order orderToDb = _mapper.Map<Order>(order);
-                    orderToDb.Price = ((order.Order.SquareFoot * 2.4) / 60) * bundleFromDb.HourPrice;
+                    BundleDto bundleFromDb = await _productService.GetBundle(createOrderDto.Order.BundleId);
+                    if (bundleFromDb != null)
+                    {
+                        Order orderToDb = _mapper.Map<Order>(createOrderDto.Order);
+                        orderToDb.Price = ((createOrderDto.Order.SquareMeters * 2.4) / 60) * bundleFromDb.HourPrice;
+                        orderToDb.BundleName = bundleFromDb.BundleName;
+                        await _db.Orders.AddAsync(orderToDb);
+                        await _db.SaveChangesAsync();
+
+                        if (createOrderDto.Product != null)
+                        {
+
+                            ProductOrderDto productOrderDto = new ProductOrderDto()
+                            {
+                                orderId = orderToDb.OrderId,
+                                productId = createOrderDto.Product.ProductId,
+                                productName = createOrderDto.Product.Name,
+                                Price = createOrderDto.Product.Price
+                            };
+
+                            ResponseDto addProduct = await AddProductToOrder(productOrderDto);
+
+                            if (!addProduct.IsSuccess)
+                            {
+                                _error.LogError(addProduct.Message);
+                            }
+
+                        }
+
+                        //Send An Email
+                        var emailSend = await _email.SendConfirmationEmail(_mapper.Map<ConfirmationEmailDto>(orderToDb));
+
+
+                        if (emailSend.IsSuccess)
+                        {
+                            _response.Message = "Order Created";
+                            _response.Result = orderToDb.OrderId;
+                        }
+                        else
+                        {
+                            _response.Message = $"Order Created, Email not sent. Reason: {emailSend.Message}";
+                            _error.LogError(emailSend.Message);
+                            return _response;
+                        }
+                    }
+                    else
+                    {
+                        throw new Exception("Bundle doesn't exist or doesn't have products");
+                    }
+                }
+                else
+                {
+                    Order orderToDb = _mapper.Map<Order>(createOrderDto.Order);
+                    orderToDb.Price = createOrderDto.Order.Price;
+                    orderToDb.BundleName = createOrderDto.Bundle.BundleName;
                     await _db.Orders.AddAsync(orderToDb);
                     await _db.SaveChangesAsync();
 
-                    //Send An Email
+                    if (createOrderDto.Product != null)
+                    {
+
+                        ProductOrderDto productOrderDto = new ProductOrderDto()
+                        {
+                            orderId = orderToDb.OrderId,
+                            productId = createOrderDto.Product.ProductId,
+                            productName = createOrderDto.Product.Name,
+                            Price = createOrderDto.Product.Price
+                        };
+
+                        ResponseDto addProduct = await AddProductToOrder(productOrderDto);
+
+                        if (!addProduct.IsSuccess)
+                        {
+                            _error.LogError(addProduct.Message);
+                        }
+
+                    }
+
+                    //Send Email
                     var emailSend = await _email.SendConfirmationEmail(_mapper.Map<ConfirmationEmailDto>(orderToDb));
 
 
                     if (emailSend.IsSuccess)
                     {
                         _response.Message = "Order Created";
+                        _response.Result = orderToDb.OrderId;
                     }
                     else
                     {
@@ -70,10 +146,7 @@ namespace SvarosNamai.Serivce.OrderAPI.Controllers
                         _error.LogError(emailSend.Message);
                         return _response;
                     }
-                }
-                else
-                {
-                    throw new Exception("Bundle doesn't exist or doesn't have products");
+
                 }
             }
             catch (Exception ex)
@@ -295,37 +368,72 @@ namespace SvarosNamai.Serivce.OrderAPI.Controllers
         {
             try
             {
-                var orderCheck = await _db.Orders.FindAsync(info.orderId);
-                var productCheck = await _productService.GetProduct(info.productId);
 
-
-
-                if (orderCheck != null && productCheck.IsSuccess)
+                if (info.Price == null)
                 {
-                    ProductDto product = JsonConvert.DeserializeObject<ProductDto>(productCheck.Result.ToString());
+                    var orderCheck = await _db.Orders.FindAsync(info.orderId);
+                    var productCheck = await _productService.GetProduct(info.productId);
 
-                    bool orderLineCheck = _db.OrderLines.Any(u => u.Order.OrderId == info.orderId && u.ProductName == product.Name);
-                    if (orderLineCheck)
+
+
+                    if (orderCheck != null && productCheck.IsSuccess)
                     {
-                        throw new Exception("OrderLine already exists");
+                        ProductDto product = JsonConvert.DeserializeObject<ProductDto>(productCheck.Result.ToString());
+
+                        bool orderLineCheck = _db.OrderLines.Any(u => u.Order.OrderId == info.orderId && u.ProductName == product.Name);
+                        if (orderLineCheck)
+                        {
+                            throw new Exception("OrderLine already exists");
+                        }
+
+                        OrderLine line = new OrderLine()
+                        {
+                            Order = orderCheck,
+                            ProductName = product.Name,
+                            Price = product.Price
+                        };
+
+                        await _db.OrderLines.AddAsync(line);
+                        await _db.SaveChangesAsync();
+
+                        _response.Message = "Successfully added";
+                        return _response;
                     }
-
-                    OrderLine line = new OrderLine()
+                    else
                     {
-                        Order = orderCheck,
-                        ProductName = product.Name,
-                        Price = 0
-                    };
-
-                    await _db.OrderLines.AddAsync(line);
-                    await _db.SaveChangesAsync();
-
-                    _response.Message = "Successfully added";
-                    return _response;
+                        throw new Exception("Order or Product doesn't exist");
+                    }
                 }
                 else
                 {
-                    throw new Exception("Order or Product doesn't exist");
+                    var orderCheck = await _db.Orders.FindAsync(info.orderId);
+
+                    if(orderCheck != null)
+                    {
+                        if(_db.OrderLines.Any(u => u.Order.OrderId == info.orderId && u.ProductName == info.productName))
+                        {
+                            throw new Exception("OrderLine already exists");
+                        }
+
+                        OrderLine line = new OrderLine()
+                        {
+                            Order = orderCheck,
+                            ProductName = info.productName,
+                            Price = info.Price
+                        };
+
+                        await _db.OrderLines.AddAsync(line);
+                        await _db.SaveChangesAsync();
+
+                        _response.Message = "Successfully added";
+                        return _response;
+
+
+                    }
+                    else
+                    {
+                        throw new Exception("Order does not exist");
+                    }
                 }
             }
             catch (Exception ex)
@@ -349,7 +457,6 @@ namespace SvarosNamai.Serivce.OrderAPI.Controllers
             foreach (var order in orders)
             {
                 var orderDto = _mapper.Map<OrderDto>(order);
-                orderDto.Hour = order.Reservation.Hour;
                 orderDto.Date = order.Reservation.Date;
                 orderDtos.Add(orderDto);
             }
@@ -377,6 +484,48 @@ namespace SvarosNamai.Serivce.OrderAPI.Controllers
             return _response;
         }
 
+        [HttpGet("GetReservations")]
+        public async Task<ResponseDto> GetReservations(ReservationsIntervalDto dates)
+        {
+            try
+            {
+                IEnumerable<Reservations> reservations = _db.Reservations
+                             .Where(r => r.Date >= dates.StartDate && r.Date < dates.EndDate && r.IsActive)
+                             .OrderBy(r => r.Date)
+                             .ToList();
 
+                _response.Result = _mapper.Map<IEnumerable<ReservationsDto>>(reservations);
+
+
+            }
+            catch(Exception ex)
+            {
+                _response.IsSuccess = false;
+                _response.Message = ex.Message;
+                _error.LogError(ex.Message);
+            }
+            return _response;
+        }
+
+        [HttpGet("GetTimeslots")]
+        public async Task<ResponseDto> GetTimeslots()
+        {
+            try
+            {
+                var slots = _db.AvailableTimeSlots.FromSqlInterpolated($"spGetSlotsV1");
+                if (slots != null)
+                {
+                    _response.Result = slots;
+                    _response.Message = "Successful";
+                }
+            }
+            catch(Exception ex)
+            {
+                _response.IsSuccess = false;
+                _response.Message = ex.Message;
+                _error.LogError(ex.Message);
+            }
+                return _response;
+        }
     }
 }

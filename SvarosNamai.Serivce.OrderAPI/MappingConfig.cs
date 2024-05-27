@@ -32,7 +32,6 @@ namespace SvarosNamai.Service.OrderAPI
                 .ForMember(dest => dest.Reservation, opt => opt.MapFrom(src => new Reservations()
                 {
                     Date = src.Date,
-                    Hour = src.Hour
                 }));
 
                 config.CreateMap<OrderLine, OrderLineDto>()
@@ -46,21 +45,20 @@ namespace SvarosNamai.Service.OrderAPI
 
 
                 config.CreateMap<Order, OrderDto>()
-                .ForMember(dest => dest.Date, opt => opt.MapFrom(src => src.Reservation.Date))
-                .ForMember(dest => dest.Hour, opt => opt.MapFrom(src => src.Reservation.Hour));
+                .ForMember(dest => dest.Date, opt => opt.MapFrom(src => src.Reservation.Date));
 
 
 
                 config.CreateMap<Order, ConfirmationEmailDto>()
                 .ForMember(dest => dest.Date, opt => opt.MapFrom(src => src.Reservation.Date))
-                .ForMember(dest => dest.Hour, opt => opt.MapFrom(src => src.Reservation.Hour))
                 .ForMember(dest => dest.OrderStatus, opt => opt.MapFrom(src => src.Status))
-                .ForMember(dest => dest.Address, opt => opt.MapFrom(src => $"{src.Street} {src.HouseNo}{src.ApartmentNo}{src.HouseLetter}, {src.City}"));
+                .ForMember(dest => dest.Address, opt => opt.MapFrom(src => $"{src.Street} {src.HouseNo}{src.ApartmentNo}, {src.City}"));
 
                 config.CreateMap<Order, OrderForInvoiceDto>();
                 config.CreateMap<OrderLine, OrderLinesForInvoiceDto>()
                 .ForMember(dest => dest.OrderId, opt => opt.MapFrom(src => src.Order.OrderId));
 
+                config.CreateMap<Reservations, ReservationsDto>();
 
 
 

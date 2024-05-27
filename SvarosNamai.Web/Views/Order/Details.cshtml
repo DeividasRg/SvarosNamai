@@ -46,11 +46,11 @@
                                     </tr>
                                     <tr>
                                         <td>Adresas:</td>
-                                        <td>@Model.Order.Street @Model.Order.HouseNo@(Model.Order.HouseLetter != null ? Model.Order.HouseLetter : "") @(Model.Order.ApartmentNo != null ? (" - " + Model.Order.ApartmentNo) : ""), @Model.Order.City</td>
+                                        <td>@Model.Order.Street @Model.Order.HouseNo@(Model.Order.ApartmentNo != null ? (" - " + Model.Order.ApartmentNo) : ""), @Model.Order.City</td>
                                     </tr>
                                     <tr>
                                         <td>Plotas:</td>
-                                        <td>@Model.Order.SquareFoot <b>m2</b></td>
+                                        <td>@Model.Order.SquareMeters <b>m2</b></td>
                                     </tr>
                                     <tr>
                                         <td>Data:</td>
@@ -77,11 +77,6 @@
                                             <td>@(Model.Order.Price.ToString("0.00")) €</td>
                                         </tr>
                                     }
-
-                                    <tr>
-                                        <td>Valanda:</td>
-                                        <td>@Model.Order.Hour</td>
-                                    </tr>
                                     <tr>
                                         <td>Statusas:</td>
                                         <td>@(SvarosNamai.Web.Utility.SD.GetStatusDescription(Model.Order.Status))</td>
@@ -107,7 +102,7 @@
                                     </tr>
                                     <tr>
                                         <td>Adresas:</td>
-                                        <td>@Model.Order.Street @Model.Order.HouseNo@(Model.Order.HouseLetter != null ? Model.Order.HouseLetter : "") @(Model.Order.ApartmentNo != null ? (" - " + Model.Order.ApartmentNo) : ""), @Model.Order.City</td>
+                                        <td>@Model.Order.Street @Model.Order.HouseNo @(Model.Order.ApartmentNo != null ? (" - " + Model.Order.ApartmentNo) : ""), @Model.Order.City</td>
                                     </tr>
                                     @if (Model.Lines.Count() > 0)
                                     {
@@ -132,15 +127,11 @@
                                     }
                                     <tr>
                                         <td>Plotas:</td>
-                                        <td>@Model.Order.SquareFoot <b>m2</b></td>
+                                        <td>@Model.Order.SquareMeters <b>m2</b></td>
                                     </tr>
                                     <tr>
                                         <td>Data:</td>
                                         <td>@Model.Order.Date</td>
-                                    </tr>
-                                    <tr>
-                                        <td>Valanda:</td>
-                                        <td>@Model.Order.Hour</td>
                                     </tr>
                                     <tr>
                                         <td>Statusas:</td>

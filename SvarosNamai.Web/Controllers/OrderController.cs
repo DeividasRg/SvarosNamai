@@ -316,14 +316,151 @@ namespace SvarosNamai.Web.Controllers
             }
         }
 
-        public async Task<IActionResult> OrderCreate()
+        public async Task<IActionResult> OrderPreview(OrderDto order)
         {
-            OrderToAddDto dto = new OrderToAddDto();
-            return View(dto);
+
+
+            if (order.ProductId != null)
+            {
+                ResponseDto productResponse = await _productService.GetProduct(Int32.Parse(order.ProductId));
+                ResponseDto bundleResponse = await _productService.GetBundle(order.BundleId);
+
+
+                if (bundleResponse.IsSuccess && productResponse.IsSuccess)
+                {
+
+                    BundleDto bundle = JsonConvert.DeserializeObject<BundleDto>(bundleResponse.Result.ToString());
+                    ProductDto product = JsonConvert.DeserializeObject<ProductDto>(productResponse.Result.ToString());
+
+                    order.Price = Math.Round(((order.SquareMeters * 2.4) / 60) * bundle.HourPrice, 2);
+
+                    ReservationsDto reservation = new ReservationsDto();
+
+
+
+
+                    OrderPreviewDto preview = new OrderPreviewDto()
+                    {
+                        Order = order,
+                        Bundle = bundle,
+                        Product = product,
+                        FullPrice = order.Price + product.Price
+                    };
+                    preview.Order.Date = order.Date;
+
+                    return View(preview);
+                }
+                else
+                {
+                    return NotFound();
+                }
+            }
+            else
+            {
+                ResponseDto bundleResponse = await _productService.GetBundle(order.BundleId);
+
+
+                if (bundleResponse.IsSuccess)
+                {
+
+                    BundleDto bundle = JsonConvert.DeserializeObject<BundleDto>(bundleResponse.Result.ToString());
+
+                    order.Price = Math.Round(((order.SquareMeters * 2.4) / 60) * bundle.HourPrice, 2);
+
+
+
+
+                    OrderPreviewDto preview = new OrderPreviewDto()
+                    {
+                        Order = order,
+                        Bundle = bundle,
+                        FullPrice = order.Price
+                    };
+                    preview.Order.Date = order.Date;
+
+                    return View(preview);
+                }
+                else
+                {
+                    return NotFound();
+                }
+            }
         }
-        public async Task<IActionResult> OrderCreateLegal()
+
+        public async Task<IActionResult> CreateOrder(OrderPreviewDto preview)
         {
-            return View();
+            CreateOrderDto createOrderDto = new CreateOrderDto()
+            {
+                Bundle = preview.Bundle,
+                Order = preview.Order,
+                Product = preview.Product
+            };
+
+            ResponseDto response = await _orderService.CreateOrder(createOrderDto);
+
+            if (response.IsSuccess)
+            {
+                TempData["success"] = $"Užsakymas sukurtas ID - {response.Result.ToString()}";
+                return RedirectToAction("OrderIndex");
+            }
+            else
+            {
+                TempData["success"] = $"{response.Message}";
+                return RedirectToAction("OrderIndex");
+
+            }
+
+        }
+
+        public async Task<IActionResult> OrderCreate(bool isCompany)
+        {
+
+            ReservationsIntervalDto dates = new()
+            {
+                StartDate = DateOnly.FromDateTime(DateTime.Today),
+                EndDate = DateOnly.FromDateTime(DateTime.Today).AddDays(7)
+
+            };
+
+            ResponseDto availableTimeslotsResponse = await _orderService.GetTimeslots();
+            ResponseDto bundlesResponse = await _productService.GetAllActiveBundles();
+            ResponseDto productsResponse = await _productService.GetAllProductsAsync();
+
+
+            if (availableTimeslotsResponse.IsSuccess && bundlesResponse.IsSuccess && productsResponse.IsSuccess)
+            {
+                IEnumerable<AvailableTimeSlotsDto> availableTimeSlots = JsonConvert.DeserializeObject<IEnumerable<AvailableTimeSlotsDto>>(availableTimeslotsResponse.Result.ToString());
+
+                List<(string weekDay, DateOnly date)> availableDates = new List<(string weekDay, DateOnly date)>();
+
+                foreach(var day in availableTimeSlots)
+                {
+                    if(day.AvailableSlots > 0)
+                    {
+                        availableDates.Add((day.DayName, day.DayDate));
+                    }
+                }
+
+                IEnumerable<BundleDto> bundles = JsonConvert.DeserializeObject<IEnumerable<BundleDto>>(bundlesResponse.Result.ToString());
+
+                IEnumerable<ProductDto> products = JsonConvert.DeserializeObject<IEnumerable<ProductDto>>(productsResponse.Result.ToString());
+
+                ViewBag.Products = products;
+
+                ViewBag.Bundles = bundles;
+
+                ViewBag.AvailableDates = availableDates;
+
+            }
+            else
+            {
+                return NotFound();
+            }
+
+            OrderDto order = new OrderDto();
+            order.IsCompany = isCompany;
+
+            return View(order);
         }
 
 

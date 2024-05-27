@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SvarosNamai.Service.OrderAPI.Data;
 
@@ -11,9 +12,11 @@ using SvarosNamai.Service.OrderAPI.Data;
 namespace SvarosNamai.Serivce.OrderAPI.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240526101130_addSlots")]
+    partial class addSlots
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -24,29 +27,6 @@ namespace SvarosNamai.Serivce.OrderAPI.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
-
-            modelBuilder.Entity("SvarosNamai.Serivce.OrderAPI.Models.AvailableTimeSlots", b =>
-                {
-                    b.Property<DateOnly>("DayDate")
-                        .HasColumnType("date");
-
-                    b.Property<int>("AvailableSlots")
-                        .HasColumnType("int");
-
-                    b.Property<string>("DayName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("OpenSlots")
-                        .HasColumnType("int");
-
-                    b.Property<int>("OrderCount")
-                        .HasColumnType("int");
-
-                    b.HasKey("DayDate");
-
-                    b.ToTable("AvailableTimeSlots");
-                });
 
             modelBuilder.Entity("SvarosNamai.Serivce.OrderAPI.Models.Order", b =>
                 {
