@@ -53,14 +53,6 @@ function loadDataTable() {
             },
             { data: 'date', width: "10%", title: "Data" },
             {
-                data: 'hour',
-                width: "10%",
-                title: "Laikas",
-                render: function (data) {
-                    return data + ' valanda';
-                }
-            },
-            {
                 data: 'status',
                 width: "15%",
                 title: "Statusas",
@@ -121,12 +113,12 @@ function addFilter() {
 
     // Create select element for filtering
     var select = $('<select><option value="">Visi</option><option value="Taip">Taip</option><option value="Ne">Ne</option></select>')
-        .appendTo($('#tblData').find('thead tr:eq(0) th:eq(8)'))
+        .appendTo($('#tblData').find('thead tr:eq(0) th:eq(7)'))
         .on('change', function () {
             var val = $.fn.dataTable.util.escapeRegex(
                 $(this).val()
             );
 
-            table.columns(8).search(val ? '^' + val + '$' : '', true, false).draw();
+            table.columns(7).search(val ? '^' + val + '$' : '', true, false).draw();
         });
 }
