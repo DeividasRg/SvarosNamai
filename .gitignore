@@ -365,3 +365,7 @@ FodyWeavers.xsd
 # Ignore all appsettings.json files recursively
 **/appsettings.json
 /SvarosNamai.Web/appsettings.Development.json
+/SvarosNamai.Service.AuthAPI/appsettings.json
+/SvarosNamai.Service.EmailAPI/appsettings.json
+/SvarosNamai.Service.InvoiceAPI/appsettings.json
+/SvarosNamai/appsettings.json
