@@ -364,3 +364,4 @@ FodyWeavers.xsd
 
 # Ignore all appsettings.json files recursively
 **/appsettings.json
+/SvarosNamai.Web/appsettings.Development.json
