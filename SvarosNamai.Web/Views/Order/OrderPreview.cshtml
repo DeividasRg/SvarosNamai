@@ -1,30 +1,38 @@
 ﻿@model OrderPreviewDto
 
 <form asp-controller="Order" asp-action="CreateOrder">
-    <input asp-for="Order.City" hidden />
-    <input asp-for="Order.Street" hidden />
-    <input asp-for="Order.HouseNo" hidden />
-    <input asp-for="Order.ApartmentNo" hidden />
-    <input asp-for="Order.Name" hidden />
-    <input asp-for="Order.LastName" hidden />
-    <input asp-for="Order.CompanyNumber" hidden />
-    <input asp-for="Order.CompanyName" hidden />
-    <input asp-for="Order.PhoneNumber" hidden />
-    <input asp-for="Order.Email" hidden />
-    <input asp-for="Order.Date" hidden />
-    <input asp-for="Order.IsCompany" hidden />
-    <input asp-for="Order.Price" hidden />
-    <input asp-for="Order.SquareMeters" hidden />
-    <input asp-for="Product.Name" hidden />
     <input asp-for="Product.Description" hidden />
     <input asp-for="Product.Price" hidden />
+    <input asp-for="Product.Name" hidden />
     <input asp-for="Product.ProductId" hidden />
     <input asp-for="Bundle.BundleName" hidden />
     <input asp-for="Bundle.BundleId" hidden />
     <input asp-for="Bundle.HourPrice" hidden />
 
+    @for(int i = 0; i < Model.Orders.Count; i++)
+    {
+        var variable = Model.Orders[i];
 
-    @if(!Model.Order.IsCompany)
+        <input asp-for="Orders[i].City" type="hidden" />
+        <input asp-for="Orders[i].Street" type="hidden" />
+        <input asp-for="Orders[i].HouseNo" type="hidden" />
+        <input asp-for="Orders[i].ApartmentNo" type="hidden" />
+        <input asp-for="Orders[i].Name" type="hidden" />
+        <input asp-for="Orders[i].LastName" type="hidden" />
+        <input asp-for="Orders[i].CompanyNumber" type="hidden" />
+        <input asp-for="Orders[i].CompanyName" type="hidden" />
+        <input asp-for="Orders[i].PhoneNumber" type="hidden" />
+        <input asp-for="Orders[i].Email" type="hidden" />
+        <input asp-for="Orders[i].Date" type="hidden" />
+        <input asp-for="Orders[i].IsCompany" type="hidden" />
+        <input asp-for="Orders[i].Price" type="hidden" />
+        <input asp-for="Orders[i].SquareMeters" type="hidden" />
+
+
+
+
+
+    if(variable.IsCompany)
     {
     <div class="container">
         <div class="row">
@@ -44,27 +52,27 @@
                             <tbody>
                                 <tr>
                                     <td>Vardas Pavardė:</td>
-                                    <td>@Model.Order.Name @Model.Order.LastName</td>
+                                    <td>@variable.Name @variable.LastName</td>
                                 </tr>
                                 <tr>
                                     <td>Telefonas:</td>
-                                    <td>@Model.Order.PhoneNumber</td>
+                                    <td>@variable.PhoneNumber</td>
                                 </tr>
                                 <tr>
                                     <td>El.paštas:</td>
-                                    <td>@Model.Order.Email</td>
+                                    <td>@variable.Email</td>
                                 </tr>
                                 <tr>
                                     <td>Adresas:</td>
-                                    <td>@Model.Order.Street @Model.Order.HouseNo@(Model.Order.ApartmentNo != null ? (" - " + Model.Order.ApartmentNo) : ""), @Model.Order.City</td>
+                                    <td>@variable.Street @variable.HouseNo@(variable.ApartmentNo != null ? (" - " + variable.ApartmentNo) : ""), @variable.City</td>
                                 </tr>
                                 <tr>
                                     <td>Plotas:</td>
-                                    <td>@Model.Order.SquareMeters <b>m2</b></td>
+                                    <td>@variable.SquareMeters <b>m2</b></td>
                                 </tr>
                                 <tr>
                                     <td>Data:</td>
-                                    <td>@Model.Order.Date</td>
+                                    <td>@variable.Date</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -86,9 +94,9 @@
                         <table class="table">
                             <tbody>
                                 <tr>
-                                    <td>@Model.Bundle.BundleName kaina už @Model.Order.SquareMeters m2:</td>
+                                    <td>@Model.Bundle.BundleName kaina už @variable.SquareMeters m2:</td>
                                     <td>
-                                        @Model.Order.Price€
+                                        @variable.Price€
                                     </td>
                                 </tr>
                                 @{
@@ -145,27 +153,27 @@
                                 <tbody>
                                     <tr>
                                         <td>Įmonės pavadinimas</td>
-                                        <td>@Model.Order.CompanyName</td>
+                                        <td>@variable.CompanyName</td>
                                     </tr>
                                     <tr>
                                         <td>Įmonės kodas</td>
-                                        <td>@Model.Order.CompanyNumber</td>
+                                        <td>@variable.CompanyNumber</td>
                                     </tr>
                                     <tr>
                                         <td>Telefonas:</td>
-                                        <td>@Model.Order.PhoneNumber</td>
+                                        <td>@variable.PhoneNumber</td>
                                     </tr>
                                     <tr>
                                         <td>El.paštas:</td>
-                                        <td>@Model.Order.Email</td>
+                                        <td>@variable.Email</td>
                                     </tr>
                                     <tr>
                                         <td>Adresas:</td>
-                                        <td>@Model.Order.Street @Model.Order.HouseNo@(Model.Order.ApartmentNo != null ? (" - " + Model.Order.ApartmentNo) : ""), @Model.Order.City</td>
+                                        <td>@variable.Street @variable.HouseNo@(variable.ApartmentNo != null ? (" - " + variable.ApartmentNo) : ""), @variable.City</td>
                                     </tr>
                                     <tr>
                                         <td>Plotas:</td>
-                                        <td>@Model.Order.SquareMeters <b>m2</b></td>
+                                        <td>@variable.SquareMeters <b>m2</b></td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -187,9 +195,9 @@
                             <table class="table">
                                 <tbody>
                                     <tr>
-                                        <td>@Model.Bundle.BundleName kaina už @Model.Order.SquareMeters m2:</td>
+                                        <td>@Model.Bundle.BundleName kaina už @variable.SquareMeters m2:</td>
                                         <td>
-                                            @Model.Order.Price€
+                                            @variable.Price€
                                         </td>
                                     </tr>
                                     @{
@@ -216,6 +224,8 @@
                 </div>
             </div>
         </div>
+        }
+    }
 
         <div class="container mt-4">
             <div class="row">
@@ -225,7 +235,6 @@
                 </div>
             </div>
         </div>
-    }
 </form>
 
 

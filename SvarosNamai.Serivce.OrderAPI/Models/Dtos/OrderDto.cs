@@ -1,6 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore.Storage.ValueConversion.Internal;
-using System;
-using System.Collections;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
@@ -31,7 +29,7 @@ namespace SvarosNamai.Serivce.OrderAPI.Models.Dtos
         public double Price { get; set; }
         public int BundleId { get; set; }
         public string? ProductId { get; set; }
-        public IEnumerable<string> DateStrings {  get; set; }
+        public IEnumerable<string>? DateStrings { get; set; }
     }
 
     public static class DateTimeExtensions
