@@ -36,7 +36,7 @@ namespace SvarosNamai.Web.Service
 
         }
 
-        public async Task<ResponseDto> CreateOrder(CreateOrderDto order)
+        public async Task<ResponseDto> CreateOrder(IEnumerable<CreateOrderDto> order)
         {
             return await _baseService.SendAsync(new RequestDto()
             {

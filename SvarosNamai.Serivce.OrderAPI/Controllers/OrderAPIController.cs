@@ -47,30 +47,71 @@ namespace SvarosNamai.Serivce.OrderAPI.Controllers
 
 
         [HttpPost("CreateOrder")]
-        public async Task<ResponseDto> CreateOrder(CreateOrderDto createOrderDto)
+        public async Task<ResponseDto> CreateOrder(IEnumerable<CreateOrderDto> createOrderDto)
         {
             try
             {
-                if (createOrderDto.Bundle == null)
+
+                List<int> orderIds = new List<int>();
+
+                foreach (var order in createOrderDto)
                 {
-                    BundleDto bundleFromDb = await _productService.GetBundle(createOrderDto.Order.BundleId);
-                    if (bundleFromDb != null)
+
+                    if (order.Bundle == null)
                     {
-                        Order orderToDb = _mapper.Map<Order>(createOrderDto.Order);
-                        orderToDb.Price = ((createOrderDto.Order.SquareMeters * 2.4) / 60) * bundleFromDb.HourPrice;
-                        orderToDb.BundleName = bundleFromDb.BundleName;
+                        BundleDto bundleFromDb = await _productService.GetBundle(order.Order.BundleId);
+                        if (bundleFromDb != null)
+                        {
+                            Order orderToDb = _mapper.Map<Order>(order.Order);
+                            orderToDb.Price = ((order.Order.SquareMeters * 2.4) / 60) * bundleFromDb.HourPrice;
+                            orderToDb.BundleName = bundleFromDb.BundleName;
+                            await _db.Orders.AddAsync(orderToDb);
+                            await _db.SaveChangesAsync();
+                            orderIds.Add(orderToDb.OrderId);
+
+                            if (order.Product != null)
+                            {
+
+                                ProductOrderDto productOrderDto = new ProductOrderDto()
+                                {
+                                    orderId = orderToDb.OrderId,
+                                    productId = order.Product.ProductId,
+                                    productName = order.Product.Name,
+                                    Price = order.Product.Price
+                                };
+
+                                ResponseDto addProduct = await AddProductToOrder(productOrderDto);
+
+                                if (!addProduct.IsSuccess)
+                                {
+                                    _error.LogError(addProduct.Message);
+                                }
+
+                            }
+                        }
+                        else
+                        {
+                            throw new Exception("Bundle doesn't exist or doesn't have products");
+                        }
+                    }
+                    else
+                    {
+                        Order orderToDb = _mapper.Map<Order>(order.Order);
+                        orderToDb.Price = order.Order.Price;
+                        orderToDb.BundleName = order.Bundle.BundleName;
                         await _db.Orders.AddAsync(orderToDb);
                         await _db.SaveChangesAsync();
+                        orderIds.Add(orderToDb.OrderId);
 
-                        if (createOrderDto.Product != null)
+                        if (order.Product != null)
                         {
 
                             ProductOrderDto productOrderDto = new ProductOrderDto()
                             {
                                 orderId = orderToDb.OrderId,
-                                productId = createOrderDto.Product.ProductId,
-                                productName = createOrderDto.Product.Name,
-                                Price = createOrderDto.Product.Price
+                                productId = order.Product.ProductId,
+                                productName = order.Product.Name,
+                                Price = order.Product.Price
                             };
 
                             ResponseDto addProduct = await AddProductToOrder(productOrderDto);
@@ -82,63 +123,26 @@ namespace SvarosNamai.Serivce.OrderAPI.Controllers
 
                         }
 
-                        //Send An Email
-                        var emailSend = await _email.SendConfirmationEmail(_mapper.Map<ConfirmationEmailDto>(orderToDb));
-
-
-                        if (emailSend.IsSuccess)
-                        {
-                            _response.Message = "Order Created";
-                            _response.Result = orderToDb.OrderId;
-                        }
-                        else
-                        {
-                            _response.Message = $"Order Created, Email not sent. Reason: {emailSend.Message}";
-                            _error.LogError(emailSend.Message);
-                            return _response;
-                        }
-                    }
-                    else
-                    {
-                        throw new Exception("Bundle doesn't exist or doesn't have products");
                     }
                 }
-                else
+
+                //Send An Email
+
+                if (createOrderDto.ToList().Count == 1)
                 {
-                    Order orderToDb = _mapper.Map<Order>(createOrderDto.Order);
-                    orderToDb.Price = createOrderDto.Order.Price;
-                    orderToDb.BundleName = createOrderDto.Bundle.BundleName;
-                    await _db.Orders.AddAsync(orderToDb);
-                    await _db.SaveChangesAsync();
 
-                    if (createOrderDto.Product != null)
-                    {
+                    var firstOrder = createOrderDto.First();
+                    firstOrder.Order.OrderId = orderIds.First();
 
-                        ProductOrderDto productOrderDto = new ProductOrderDto()
-                        {
-                            orderId = orderToDb.OrderId,
-                            productId = createOrderDto.Product.ProductId,
-                            productName = createOrderDto.Product.Name,
-                            Price = createOrderDto.Product.Price
-                        };
+                    Order orderForEmailSend = _mapper.Map<Order>(firstOrder.Order);
 
-                        ResponseDto addProduct = await AddProductToOrder(productOrderDto);
 
-                        if (!addProduct.IsSuccess)
-                        {
-                            _error.LogError(addProduct.Message);
-                        }
-
-                    }
-
-                    //Send Email
-                    var emailSend = await _email.SendConfirmationEmail(_mapper.Map<ConfirmationEmailDto>(orderToDb));
+                    var emailSend = await _email.SendConfirmationEmail(_mapper.Map<ConfirmationEmailDto>(orderForEmailSend));
 
 
                     if (emailSend.IsSuccess)
                     {
                         _response.Message = "Order Created";
-                        _response.Result = orderToDb.OrderId;
                     }
                     else
                     {
@@ -146,9 +150,35 @@ namespace SvarosNamai.Serivce.OrderAPI.Controllers
                         _error.LogError(emailSend.Message);
                         return _response;
                     }
+                }
+                else if(createOrderDto.ToList().Count != 0 && createOrderDto.ToList().Count > 1)
+                {
+                    List<CreateOrderDto> orderListFromPayload = createOrderDto.ToList();
+                    List<Order> orders = new List<Order>();
 
+                    for (int i = 0; i < orderListFromPayload.Count(); i++)
+                    {
+                        var instance = orderListFromPayload[i];
+                        instance.Order.OrderId = orderIds[i];
+                        orders.Add(_mapper.Map<Order>(instance.Order));
+                    }
+
+                    ResponseDto emailSend = await _email.SendConfirmationEmailForMultipleOrders(_mapper.Map<IEnumerable<ConfirmationEmailDto>>(orders));
+
+                    if (emailSend.IsSuccess)
+                    {
+                        _response.Message = "Order Created";
+                    }
+                    else
+                    {
+                        _response.Message = $"Order Created, Email not sent. Reason: {emailSend.Message}";
+                        _error.LogError(emailSend.Message);
+                        return _response;
+                    }
                 }
             }
+
+
             catch (Exception ex)
             {
                 _response.IsSuccess = false;
@@ -408,9 +438,9 @@ namespace SvarosNamai.Serivce.OrderAPI.Controllers
                 {
                     var orderCheck = await _db.Orders.FindAsync(info.orderId);
 
-                    if(orderCheck != null)
+                    if (orderCheck != null)
                     {
-                        if(_db.OrderLines.Any(u => u.Order.OrderId == info.orderId && u.ProductName == info.productName))
+                        if (_db.OrderLines.Any(u => u.Order.OrderId == info.orderId && u.ProductName == info.productName))
                         {
                             throw new Exception("OrderLine already exists");
                         }
@@ -498,7 +528,7 @@ namespace SvarosNamai.Serivce.OrderAPI.Controllers
 
 
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 _response.IsSuccess = false;
                 _response.Message = ex.Message;
@@ -519,13 +549,13 @@ namespace SvarosNamai.Serivce.OrderAPI.Controllers
                     _response.Message = "Successful";
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 _response.IsSuccess = false;
                 _response.Message = ex.Message;
                 _error.LogError(ex.Message);
             }
-                return _response;
+            return _response;
         }
     }
 }

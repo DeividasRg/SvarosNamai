@@ -10,7 +10,7 @@ namespace SvarosNamai.Web.Service.IService
         Task<ResponseDto> ChangeOrderStatus(OrderStatusChangeDto orderInfo);
         Task<ResponseDto> AddProductToOrder(ProductOrderDto info);
         Task<ResponseDto> RemoveProductFromOrder(ProductOrderDto info);
-        Task<ResponseDto> CreateOrder(CreateOrderDto order);
+        Task<ResponseDto> CreateOrder(IEnumerable<CreateOrderDto> order);
         Task<ResponseDto> GetTimeslots();
     }
 }

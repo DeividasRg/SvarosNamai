@@ -21,7 +21,7 @@ namespace SvarosNamai.Service.EmailAPI.Controllers
         private readonly AppDbContext _db;
         private readonly IErrorLogger _error;
 
-        public EmailAPIController(ISendGridClient sendgrid,AppDbContext db, IErrorLogger error)
+        public EmailAPIController(ISendGridClient sendgrid, AppDbContext db, IErrorLogger error)
         {
             _sendgrid = sendgrid;
             _response = new ResponseDto();
@@ -40,7 +40,7 @@ namespace SvarosNamai.Service.EmailAPI.Controllers
                 }
 
                 string directoryPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Invoices");
-                if(!Directory.Exists(directoryPath))
+                if (!Directory.Exists(directoryPath))
                 {
                     Directory.CreateDirectory(directoryPath);
                 }
@@ -49,13 +49,13 @@ namespace SvarosNamai.Service.EmailAPI.Controllers
                 var filepath = Path.Combine(directoryPath, $"{info.OrderId}" + ".pdf");
                 using (var stream = new MemoryStream(info.pdfFile))
                 {
-                    using (var fileStream = new FileStream(filepath,FileMode.Create))
+                    using (var fileStream = new FileStream(filepath, FileMode.Create))
                     {
                         await stream.CopyToAsync(fileStream);
                     }
                 }
 
-                    string message = "Užsakymas įvkdytas, prisegame sąskaitą faktūrą.";
+                string message = "Užsakymas įvkdytas, prisegame sąskaitą faktūrą.";
 
                 var msg = new SendGridMessage()
                 {
@@ -72,7 +72,7 @@ namespace SvarosNamai.Service.EmailAPI.Controllers
 
                 _response.IsSuccess = response.IsSuccessStatusCode;
 
-                if(!response.IsSuccessStatusCode)
+                if (!response.IsSuccessStatusCode)
                 {
                     _error.LogError(response.Body.ToString());
                     _response.IsSuccess = false;
@@ -102,13 +102,13 @@ namespace SvarosNamai.Service.EmailAPI.Controllers
                 _db.EmailLogs.Add(log);
                 await _db.SaveChangesAsync();
 
-                if(System.IO.File.Exists(filepath))
+                if (System.IO.File.Exists(filepath))
                 {
                     System.IO.File.Delete(filepath);
                 }
 
             }
-            catch (Exception ex) 
+            catch (Exception ex)
             {
                 _response.IsSuccess = false;
                 _response.Message = ex.Message;
@@ -117,7 +117,91 @@ namespace SvarosNamai.Service.EmailAPI.Controllers
             return _response;
         }
 
+        [HttpPost("SendConfirmationEmailForMultipleOrders")]
+        public async Task<ResponseDto> SendMultipleConfirmationEmails(IEnumerable<ConfirmationEmailDto> emails)
+        {
+            try
+            {
+                string message;
+                string subject;
+                List<int> orderIds = new List<int>();
+                List<DateOnly> dates = new List<DateOnly>();
 
+                var orderCheck = emails.First();
+                foreach (var item in emails)
+                {
+                    if (item.OrderStatus != 0 || item.IsCompany != orderCheck.IsCompany)
+                    {
+                        throw new Exception("Orders must be at status 0 and/or must all match isCompany field");
+                    }
+
+                    orderIds.Add(item.OrderId);
+                    dates.Add(item.Date);
+                }
+
+                if (!orderCheck.IsCompany)
+                {
+                    message = $"Jūsų užsakymai Nr. {string.Join(",",orderIds)} pateikti, laukite patvirtinimo \n \n Užsakymų informacija: \n \n Paštas: {orderCheck.Email} \n Vardas Pavardė: {orderCheck.Name} {orderCheck.LastName} \n Datos: {string.Join(",",dates)} \n Adresas: {orderCheck.Address}";
+                    subject = $"Užsakymai  {string.Join(",", orderIds)} pateikti";
+                }
+                else
+                {
+                    message = $"Jūsų užsakymai Nr. {string.Join(",", orderIds)} pateikti, laukite patvirtinimo \n \n Užsakymų informacija: \n \n Paštas: {orderCheck.Email} \n Įmonės pavadinimas: {orderCheck.CompanyName} \n Įmonės kodas: {orderCheck.CompanyCode} \n Datos: {string.Join(", ", dates)} \n Adresas: {orderCheck.Address}";
+                    subject = $"Užsakymai  {string.Join(",", orderIds)} pateikti";
+                }
+
+                var msg = new SendGridMessage()
+                {
+                    From = new EmailAddress("deividasrg@gmail.com", "Deividas Ragauskas"),
+                    Subject = subject,
+                    PlainTextContent = message
+                };
+
+
+                msg.AddTo(new EmailAddress($"{orderCheck.Email}", $"{orderCheck.Name} {orderCheck.LastName}"));
+                var response = await _sendgrid.SendEmailAsync(msg);
+
+                _response.IsSuccess = response.IsSuccessStatusCode;
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    _error.LogError(response.Body.ToString());
+                }
+
+                bool hasAttachments;
+                if (msg.Attachments == null)
+                {
+                    hasAttachments = false;
+                }
+                else
+                {
+                    hasAttachments = true;
+                }
+
+
+
+                EmailLog log = new EmailLog()
+                {
+                    Email = orderCheck.Email,
+                    Content = message,
+                    WasSent = _response.IsSuccess,
+                    HadAttachment = hasAttachments,
+                    Time = DateTime.Now
+                };
+                _db.EmailLogs.Add(log);
+                await _db.SaveChangesAsync();
+
+
+
+            }
+            catch (Exception ex)
+            {
+                _response.IsSuccess = false;
+                _response.Message = ex.Message;
+                _error.LogError(_response.Message);
+            }
+            return _response;
+        }
 
         [HttpPost("SendConfirmationEmail")]
         public async Task<ResponseDto> SendConfirmationEmail(ConfirmationEmailDto info)
@@ -130,10 +214,10 @@ namespace SvarosNamai.Service.EmailAPI.Controllers
 
                 switch (info.OrderStatus)
                 {
-                        case 0:
+                    case 0:
                         if (!info.IsCompany)
                         {
-                            message = $"Jūsų užsakymas Nr.{info.OrderId} pateiktas, laukite patvirtinimo \n \n Užsakymo informacija: \n \n Paštas: {info.Email} \n Vardas Pavardė: {info.Name} {info.LastName} \n Data: {info.Date} \n Valanda: {info.Hour} \n Adresas: {info.Address}" ;
+                            message = $"Jūsų užsakymas Nr.{info.OrderId} pateiktas, laukite patvirtinimo \n \n Užsakymo informacija: \n \n Paštas: {info.Email} \n Vardas Pavardė: {info.Name} {info.LastName} \n Data: {info.Date} \n Valanda: {info.Hour} \n Adresas: {info.Address}";
                             subject = $"Užsakymas {info.OrderId} pateiktas";
                             break;
                         }
@@ -143,12 +227,12 @@ namespace SvarosNamai.Service.EmailAPI.Controllers
                             subject = $"Užsakymas {info.OrderId} pateiktas";
                             break;
                         }
-                        case 1:
+                    case 1:
                         message = $"Jūsų užsakymas Nr.{info.OrderId} patvirtintas adresu {info.Address}, {info.Date} dieną {info.Hour} valandą.";
                         subject = $"Užsakymas {info.OrderId} patvirtinimas";
                         break;
                     case -1:
-                        if(info.message != null)
+                        if (info.message != null)
                         {
                             message = $"Jūsų užsakymas Nr.{info.OrderId} atšauktas \n \n Priežastis: {info.message}";
                         }
@@ -173,7 +257,7 @@ namespace SvarosNamai.Service.EmailAPI.Controllers
                     Subject = subject,
                     PlainTextContent = message
                 };
-                
+
 
                 msg.AddTo(new EmailAddress($"{info.Email}", $"{info.Name} {info.LastName}"));
                 var response = await _sendgrid.SendEmailAsync(msg);
@@ -186,7 +270,7 @@ namespace SvarosNamai.Service.EmailAPI.Controllers
                 }
 
                 bool hasAttachments;
-                if(msg.Attachments == null)
+                if (msg.Attachments == null)
                 {
                     hasAttachments = false;
                 }
@@ -208,13 +292,13 @@ namespace SvarosNamai.Service.EmailAPI.Controllers
                 _db.EmailLogs.Add(log);
                 await _db.SaveChangesAsync();
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
-                _response.IsSuccess = false;    
+                _response.IsSuccess = false;
                 _response.Message = ex.Message;
                 _error.LogError(_response.Message);
             }
-            
+
 
             return _response;
         }

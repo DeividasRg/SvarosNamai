@@ -400,24 +400,26 @@ namespace SvarosNamai.Web.Controllers
             //perdaryt, kad endpointas priimtu kelis orderius ir sukurtų vietoj kelių callų.
 
 
-            
-            CreateOrderDto createOrderDto = new CreateOrderDto()
-            {
-                Bundle = preview.Bundle,
-                Product = preview.Product
-            };
+
+            List<CreateOrderDto> createOrderDto = new List<CreateOrderDto>();
 
             foreach(var order in preview.Orders)
             {
-                createOrderDto.Order = order;
-                ResponseDto response = await _orderService.CreateOrder(createOrderDto);
+                createOrderDto.Add(new CreateOrderDto()
+                {
+                    Order = order,
+                    Bundle = preview.Bundle,
+                    Product = preview.Product
+                });
+            }
+            IEnumerable<CreateOrderDto> createOrderDtos = createOrderDto;
+            ResponseDto response = await _orderService.CreateOrder(createOrderDtos);
 
                 if(!response.IsSuccess)
                 {
                     TempData["error"] = $"{response.Message}";
                     return RedirectToAction("OrderIndex");
                 }
-            }
 
                 TempData["success"] = "Užsakymas(-ai) sukurtas(-i)";
                 return RedirectToAction("OrderIndex");
@@ -427,7 +429,6 @@ namespace SvarosNamai.Web.Controllers
 
         public async Task<IActionResult> OrderCreate(bool isCompany)
         {
-
 
             ResponseDto availableTimeslotsResponse = await _orderService.GetTimeslots();
             ResponseDto bundlesResponse = await _productService.GetAllActiveBundles();

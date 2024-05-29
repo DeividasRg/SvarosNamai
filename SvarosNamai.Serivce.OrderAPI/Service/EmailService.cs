@@ -5,6 +5,7 @@ using Newtonsoft.Json;
 using SvarosNamai.Serivce.OrderAPI.Service.IService;
 using SvarosNamai.Service.OrderAPI.Models.Dtos;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -112,6 +113,32 @@ namespace SvarosNamai.Serivce.OrderAPI.Service
                 }
             }
             catch(Exception ex)
+            {
+                _response.IsSuccess = false;
+                _response.Message = ex.Message;
+                _error.LogError(_response.Message);
+            }
+            return _response;
+        }
+
+        public async Task<ResponseDto> SendConfirmationEmailForMultipleOrders(IEnumerable<ConfirmationEmailDto> info)
+        {
+            try
+            {
+                var client = _httpClientFactory.CreateClient("Email");
+                var json = JsonConvert.SerializeObject(info);
+                var content = new StringContent(json, Encoding.UTF8, "application/json");
+                var response = await client.PostAsync($"/api/email/SendConfirmationEmailForMultipleOrders", content);
+                var apiContent = await response.Content.ReadAsStringAsync();
+                var result = JsonConvert.DeserializeObject<ResponseDto>(apiContent);
+
+                if (!result.IsSuccess)
+                {
+                    throw new Exception($"{result.Message}");
+                }
+
+            }
+            catch (Exception ex)
             {
                 _response.IsSuccess = false;
                 _response.Message = ex.Message;
