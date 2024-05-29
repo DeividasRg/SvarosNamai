@@ -343,10 +343,18 @@ namespace SvarosNamai.Web.Controllers
 
                     List<OrderDto> ordersList = new List<OrderDto>();
 
+
+
+                    //kazkodel paima ta pati orderi ir neuzmeta datos
                     foreach (var date in order.DateStrings)
                     {
-                        order.Date = DateOnly.Parse(date);
-                        ordersList.Add(order);
+                        OrderDto orderDto = order;
+                        bool isSuccess = DateOnly.TryParse(date, out DateOnly parsedDate);
+                        if(isSuccess)
+                        {
+                            orderDto.Date = parsedDate;
+                        }
+                        ordersList.Add(orderDto);
                     }
 
                     preview.Orders = ordersList;
