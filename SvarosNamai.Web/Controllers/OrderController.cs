@@ -319,86 +319,121 @@ namespace SvarosNamai.Web.Controllers
         public async Task<IActionResult> OrderPreview(OrderDto order)
         {
 
-            if (order.ProductId != null) 
+            try
             {
-                ResponseDto productResponse = await _productService.GetProduct(Int32.Parse(order.ProductId));
-                ResponseDto bundleResponse = await _productService.GetBundle(order.BundleId);
 
-
-                if (bundleResponse.IsSuccess && productResponse.IsSuccess)
+                if (order.ProductId != null)
                 {
-
-                    BundleDto bundle = JsonConvert.DeserializeObject<BundleDto>(bundleResponse.Result.ToString());
-                    ProductDto product = JsonConvert.DeserializeObject<ProductDto>(productResponse.Result.ToString());
-
-                    order.Price = Math.Round(((order.SquareMeters * 2.4) / 60) * bundle.HourPrice, 2);
+                    ResponseDto productResponse = await _productService.GetProduct(Int32.Parse(order.ProductId));
+                    ResponseDto bundleResponse = await _productService.GetBundle(order.BundleId);
 
 
-                    OrderPreviewDto preview = new OrderPreviewDto()
+                    if (bundleResponse.IsSuccess && productResponse.IsSuccess)
                     {
-                        Bundle = bundle,
-                        Product = product,
-                        FullPrice = order.Price + product.Price
-                    };
 
-                    List<OrderDto> ordersList = new List<OrderDto>();
+                        BundleDto bundle = JsonConvert.DeserializeObject<BundleDto>(bundleResponse.Result.ToString());
+                        ProductDto product = JsonConvert.DeserializeObject<ProductDto>(productResponse.Result.ToString());
 
+                        order.Price = Math.Round(((order.SquareMeters * 2.4) / 60) * bundle.HourPrice, 2);
 
 
-                    //kazkodel paima ta pati orderi ir neuzmeta datos
-                    foreach (var date in order.DateStrings)
-                    {
-                        OrderDto orderDto = order;
-                        bool isSuccess = DateOnly.TryParse(date, out DateOnly parsedDate);
-                        if(isSuccess)
+                        OrderPreviewDto preview = new OrderPreviewDto()
                         {
-                            orderDto.Date = parsedDate;
+                            Bundle = bundle,
+                            Product = product,
+                            FullPrice = order.Price + product.Price
+                        };
+
+                        List<OrderDto> ordersList = new List<OrderDto>();
+
+
+
+                        //kazkodel paima ta pati orderi ir neuzmeta datos
+                        foreach (var date in order.DateStrings)
+                        {
+                            OrderDto orderDto = new OrderDto
+                            {
+                                OrderId = order.OrderId,
+                                City = order.City,
+                                Street = order.Street,
+                                HouseNo = order.HouseNo,
+                                ApartmentNo = order.ApartmentNo,
+                                Name = order.Name,
+                                LastName = order.LastName,
+                                CompanyNumber = order.CompanyNumber,
+                                CompanyName = order.CompanyName,
+                                PhoneNumber = order.PhoneNumber,
+                                Email = order.Email,
+                                Status = order.Status,
+                                CreationDate = order.CreationDate,
+                                SquareMeters = order.SquareMeters,
+                                IsCompany = order.IsCompany,
+                                Price = order.Price,
+                                BundleId = order.BundleId,
+                                ProductId = order.ProductId,
+                                DateStrings = order.DateStrings
+                            };
+
+
+                            bool isSuccess = DateOnly.TryParse(date, out DateOnly parsedDate);
+                            if (isSuccess)
+                            {
+                                orderDto.Date = parsedDate;
+                            }
+                            else
+                            {
+                                throw new Exception("Couldn't parse date");
+                            }
+                            ordersList.Add(orderDto);
                         }
-                        ordersList.Add(orderDto);
+
+                        preview.Orders = ordersList;
+
+                        return View(preview);
                     }
-
-                    preview.Orders = ordersList;
-
-                    return View(preview);
+                    else
+                    {
+                        return NotFound();
+                    }
                 }
                 else
                 {
-                    return NotFound();
+                    ResponseDto bundleResponse = await _productService.GetBundle(order.BundleId);
+
+
+                    if (bundleResponse.IsSuccess)
+                    {
+
+                        BundleDto bundle = JsonConvert.DeserializeObject<BundleDto>(bundleResponse.Result.ToString());
+
+
+                        OrderPreviewDto preview = new OrderPreviewDto()
+                        {
+                            Bundle = bundle,
+                            FullPrice = Math.Round(((order.SquareMeters * 2.4) / 60) * bundle.HourPrice, 2)
+                        };
+
+                        List<OrderDto> ordersList = new List<OrderDto>();
+
+                        foreach (var date in order.DateStrings)
+                        {
+                            order.Date = DateOnly.Parse(date);
+                            ordersList.Add(order);
+                        }
+
+                        preview.Orders = ordersList;
+
+                        return View(preview);
+                    }
+                    else
+                    {
+                        return NotFound();
+                    }
                 }
             }
-            else
+            catch(Exception ex)
             {
-                ResponseDto bundleResponse = await _productService.GetBundle(order.BundleId);
-
-
-                if (bundleResponse.IsSuccess)
-                {
-
-                    BundleDto bundle = JsonConvert.DeserializeObject<BundleDto>(bundleResponse.Result.ToString());
-
-
-                    OrderPreviewDto preview = new OrderPreviewDto()
-                    {
-                        Bundle = bundle,
-                        FullPrice = Math.Round(((order.SquareMeters * 2.4) / 60) * bundle.HourPrice, 2)
-                    };
-
-                    List<OrderDto> ordersList = new List<OrderDto>();
-
-                    foreach (var date in order.DateStrings)
-                    {
-                        order.Date = DateOnly.Parse(date);
-                        ordersList.Add(order);
-                    }
-
-                    preview.Orders = ordersList;
-
-                    return View(preview);
-                }
-                else
-                {
-                    return NotFound();
-                }
+                return NotFound(ex.Message);
             }
         }
 

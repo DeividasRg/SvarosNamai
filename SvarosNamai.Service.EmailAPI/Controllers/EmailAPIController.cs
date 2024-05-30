@@ -141,7 +141,7 @@ namespace SvarosNamai.Service.EmailAPI.Controllers
 
                 if (!orderCheck.IsCompany)
                 {
-                    message = $"Jūsų užsakymai Nr. {string.Join(",",orderIds)} pateikti, laukite patvirtinimo \n \n Užsakymų informacija: \n \n Paštas: {orderCheck.Email} \n Vardas Pavardė: {orderCheck.Name} {orderCheck.LastName} \n Datos: {string.Join(",",dates)} \n Adresas: {orderCheck.Address}";
+                    message = $"Jūsų užsakymai Nr. {string.Join(",",orderIds)} pateikti, laukite patvirtinimo \n \n Užsakymų informacija: \n \n Paštas: {orderCheck.Email} \n Vardas Pavardė: {orderCheck.Name} {orderCheck.LastName} \n Datos: {string.Join(", ",dates)} \n Adresas: {orderCheck.Address}";
                     subject = $"Užsakymai  {string.Join(",", orderIds)} pateikti";
                 }
                 else
