@@ -341,7 +341,8 @@ namespace SvarosNamai.Web.Controllers
                         {
                             Bundle = bundle,
                             Product = product,
-                            FullPrice = order.Price + product.Price
+                            FullPrice = order.Price + product.Price,
+                            isCompany = order.IsCompany
                         };
 
                         List<OrderDto> ordersList = new List<OrderDto>();
@@ -410,7 +411,8 @@ namespace SvarosNamai.Web.Controllers
                         OrderPreviewDto preview = new OrderPreviewDto()
                         {
                             Bundle = bundle,
-                            FullPrice = Math.Round(((order.SquareMeters * 2.4) / 60) * bundle.HourPrice, 2)
+                            FullPrice = Math.Round(((order.SquareMeters * 2.4) / 60) * bundle.HourPrice, 2),
+                            isCompany = order.IsCompany
                         };
 
                         List<OrderDto> ordersList = new List<OrderDto>();
@@ -439,9 +441,6 @@ namespace SvarosNamai.Web.Controllers
 
         public async Task<IActionResult> CreateOrder(OrderPreviewDto preview)
         {
-
-            //perdaryt, kad endpointas priimtu kelis orderius ir sukurtų vietoj kelių callų.
-
 
             List<CreateOrderDto> createOrderDto = new List<CreateOrderDto>();
 

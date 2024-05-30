@@ -9,6 +9,9 @@
     <input asp-for="Bundle.BundleId" hidden />
     <input asp-for="Bundle.HourPrice" hidden />
 
+
+    @if(!Model.isCompany)
+    {
     <div class="container">
         <div class="row">
             <div class="col-md-12">
@@ -26,7 +29,6 @@
                         <table class="table">
                             <thead>
                                 <tr>
-                                    <th>Įmonės pavadinimas</th>
                                     <th>Vardas</th>
                                     <th>Pavardė</th>
                                     <th>Telefonas</th>
@@ -58,15 +60,20 @@
                                     <input asp-for="Orders[i].SquareMeters" type="hidden" />
 
                                     <tr>
-                                        <td>@(variable.IsCompany ? variable.CompanyName : "")</td>
-                                        <td>@(variable.IsCompany ? "" : variable.Name)</td>
-                                        <td>@(variable.IsCompany ? "" : variable.LastName)</td>
+                                        <td>@variable.Name</td>
+                                        <td>@variable.LastName</td>
                                         <td>@variable.PhoneNumber</td>
                                         <td>@variable.Email</td>
                                         <td>@variable.Street @variable.HouseNo@(variable.ApartmentNo != null ? (" - " + variable.ApartmentNo) : ""), @variable.City</td>
                                         <td>@variable.SquareMeters</td>
                                         <td>@variable.Date</td>
-                                        <td>@variable.Price</td>
+                                        <td>
+                                            @variable.Price
+                                            @if(Model.Product != null)
+                                            {
+                                                @($" + {Model.Product.Price}")
+                                            }
+                                        </td>
                                     </tr>
                                 }
                             </tbody>
@@ -76,7 +83,83 @@
             </div>
           
         </div>
-    </div>
+        </div>
+    }
+    else
+    {
+        <div class="container">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="card shadow border-0 mt-4">
+                        <div class="card-header bg-secondary bg-gradient ml-0 py-3">
+                            <div class="row">
+                                <div class="col-12 text-center">
+                                    <h1 class="text-white">Užsakymo informacija</h1>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-body p-4">
+                            <div class="row pb-3">
+                            </div>
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Įmonės pavadinimas</th>
+                                        <th>Įmonės kodas</th>
+                                        <th>Telefonas</th>
+                                        <th>El.paštas</th>
+                                        <th>Adresas</th>
+                                        <th>Plotas (m²)</th>
+                                        <th>Data</th>
+                                        <th>Kaina (€)</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @for (int i = 0; i < Model.Orders.Count; i++)
+                                    {
+                                        var variable = Model.Orders[i];
+
+                                        <input asp-for="Orders[i].City" type="hidden" />
+                                        <input asp-for="Orders[i].Street" type="hidden" />
+                                        <input asp-for="Orders[i].HouseNo" type="hidden" />
+                                        <input asp-for="Orders[i].ApartmentNo" type="hidden" />
+                                        <input asp-for="Orders[i].Name" type="hidden" />
+                                        <input asp-for="Orders[i].LastName" type="hidden" />
+                                        <input asp-for="Orders[i].CompanyNumber" type="hidden" />
+                                        <input asp-for="Orders[i].CompanyName" type="hidden" />
+                                        <input asp-for="Orders[i].PhoneNumber" type="hidden" />
+                                        <input asp-for="Orders[i].Email" type="hidden" />
+                                        <input asp-for="Orders[i].Date" type="hidden" />
+                                        <input asp-for="Orders[i].IsCompany" type="hidden" />
+                                        <input asp-for="Orders[i].Price" type="hidden" />
+                                        <input asp-for="Orders[i].SquareMeters" type="hidden" />
+
+                                        <tr>
+                                            <td>@variable.CompanyName</td>
+                                            <td>@variable.CompanyNumber</td>
+                                            <td>@variable.PhoneNumber</td>
+                                            <td>@variable.Email</td>
+                                            <td>@variable.Street @variable.HouseNo@(variable.ApartmentNo != null ? (" - " + variable.ApartmentNo) : ""), @variable.City</td>
+                                            <td>@variable.SquareMeters</td>
+                                            <td>@variable.Date</td>
+                                            <td>
+                                                @variable.Price
+                                                @if (Model.Product != null)
+                                                {
+                                                    @($" + {Model.Product.Price}")
+                                                }
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    }
 
     <div class="container mt-4">
         <div class="row">

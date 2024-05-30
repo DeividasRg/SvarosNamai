@@ -52,7 +52,8 @@ namespace SvarosNamai.Service.OrderAPI
                 config.CreateMap<Order, ConfirmationEmailDto>()
                 .ForMember(dest => dest.Date, opt => opt.MapFrom(src => src.Reservation.Date))
                 .ForMember(dest => dest.OrderStatus, opt => opt.MapFrom(src => src.Status))
-                .ForMember(dest => dest.Address, opt => opt.MapFrom(src => $"{src.Street} {src.HouseNo}-{src.ApartmentNo}, {src.City}"));
+                .ForMember(dest => dest.Address, opt => opt.MapFrom(src => $"{src.Street} {src.HouseNo}-{src.ApartmentNo}, {src.City}"))
+                .ForMember(dest => dest.CompanyCode, opt => opt.MapFrom(src => src.CompanyNumber));
 
                 config.CreateMap<Order, OrderForInvoiceDto>();
                 config.CreateMap<OrderLine, OrderLinesForInvoiceDto>()

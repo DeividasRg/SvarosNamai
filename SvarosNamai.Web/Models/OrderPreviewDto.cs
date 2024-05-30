@@ -6,6 +6,7 @@
         public BundleDto Bundle { get; set; }
         public ProductDto? Product { get; set; }
         public double FullPrice {  get; set; }
+        public bool isCompany { get; set; }
 
     }
 }
