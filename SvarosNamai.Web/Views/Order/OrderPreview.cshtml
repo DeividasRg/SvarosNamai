@@ -74,45 +74,7 @@
                     </div>
                 </div>
             </div>
-            <div class="col-md-12 mt-4">
-                <div class="card shadow border-0">
-                    <div class="card-header bg-secondary bg-gradient ml-0 py-3">
-                        <div class="row">
-                            <div class="col-12 text-center">
-                                <h1 class="text-white">Kainodara</h1>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="card-body p-4">
-                        <div class="row pb-3">
-                        </div>
-                        <table class="table">
-                            <thead>
-                                <tr>
-                                    <th>Paslaugos pavadinimas</th>
-                                    <th>Kaina (€)</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td>@Model.Bundle.BundleName kaina už kv. m:</td>
-                                    <td>@Model.Bundle.HourPrice</td>
-                                </tr>
-                                @if (Model.Product != null)
-                                {
-                                    <tr>
-                                        <td>@Model.Product.Name</td>
-                                        <td>@Model.Product.Price</td>
-                                    </tr>
-                                }
-                                <tr>
-                                    <td colspan="2" class="text-center"><b>Pilna kaina: <span id="fullPrice">@Model.FullPrice</span> €</b></td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
+          
         </div>
     </div>
 

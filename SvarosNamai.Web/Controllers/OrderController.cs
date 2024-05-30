@@ -443,7 +443,6 @@ namespace SvarosNamai.Web.Controllers
             //perdaryt, kad endpointas priimtu kelis orderius ir sukurtų vietoj kelių callų.
 
 
-
             List<CreateOrderDto> createOrderDto = new List<CreateOrderDto>();
 
             foreach(var order in preview.Orders)
