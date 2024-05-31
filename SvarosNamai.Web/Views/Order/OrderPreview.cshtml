@@ -1,6 +1,6 @@
 ﻿@model OrderPreviewDto
 
-<form asp-controller="Order" asp-action="CreateOrder">
+<form asp-controller="Order">
     <input asp-for="Product.Description" hidden />
     <input asp-for="Product.Price" hidden />
     <input asp-for="Product.Name" hidden />
@@ -150,6 +150,7 @@
                                                     @($" + {Model.Product.Price}")
                                                 }
                                             </td>
+                                            <td><i class="bi bi-pencil-square"><input asp-action="CreateOrder" class="btn btn-success btn-lg mb-2" /></i></td>
                                         </tr>
                                     }
                                 </tbody>
@@ -165,7 +166,7 @@
     <div class="container mt-4">
         <div class="row">
             <div class="col-md-12 text-center">
-                <input type="submit" value="Sukurti fizinį užsakymą" class="btn btn-success btn-lg mb-2" style="width: 50%;" />
+                <input asp-action="CreateOrder" type="submit" value="Sukurti fizinį užsakymą" class="btn btn-success btn-lg mb-2" style="width: 50%;" />
                 <a asp-action="OrderCreate" class="btn btn-primary" style="width: 50%;">Grįžti atgal</a>
             </div>
         </div>
